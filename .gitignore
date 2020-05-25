@@ -59,3 +59,10 @@ docs/eox_tagging.*.rst
 # Private requirements
 requirements/private.in
 requirements/private.txt
+
+# Virtual Enviroments
+venv
+virtualenv
+venv2.7
+venv3.5
+venv3.8
