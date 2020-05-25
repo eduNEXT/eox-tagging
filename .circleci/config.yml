@@ -24,6 +24,9 @@ jobs:
     steps:
       - checkout
 
+      - restore_cache:
+          key: tox-cache-test-35-{{ checksum "requirements/base.txt" }}
+
       - run:
           name: activate virtualenv and install dependencies.
           command: |
@@ -37,6 +40,11 @@ jobs:
             . venv/bin/activate
             tox
 
+      - save_cache:
+          paths:
+            - ./tox
+          key: tox-cache-test-35-{{ checksum "requirements/base.txt" }}
+
   # Based on answer https://discuss.circleci.com/t/run-tests-on-multiple-versions-of-python/15462
   test-2.7:
     docker:
@@ -48,6 +56,9 @@ jobs:
     steps:
       - checkout
 
+      - restore_cache:
+          key: tox-cache-test27-{{ checksum "requirements/base.txt" }}
+
       - run:
           name: activate virtualenv and install dependencies.
           command: |
@@ -61,6 +72,11 @@ jobs:
           command: |
             . venv/bin/activate
             tox
+
+      - save_cache:
+          paths:
+            - ./tox
+          key: tox-cache-test27-{{ checksum "requirements/base.txt" }}
 
   test-quality:
     docker:
@@ -72,6 +88,9 @@ jobs:
     steps:
       - checkout
 
+      - restore_cache:
+          key: tox-cache-quality-{{ checksum "requirements/base.txt" }}
+
       - run:
           name: activate virtualenv and install dependencies.
           command: |
@@ -85,3 +104,8 @@ jobs:
           command: |
             . venv/bin/activate
             tox
+
+      - save_cache:
+          paths:
+            - ./tox
+          key: tox-cache-quality-{{ checksum "requirements/base.txt" }}
