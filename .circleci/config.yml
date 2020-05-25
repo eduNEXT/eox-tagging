@@ -1,0 +1,87 @@
+# Python CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+
+version: 2
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test-3.5
+      - test-2.7
+      - test-quality
+jobs:
+  test-3.5:
+    docker:
+      # specify the version you desire here
+      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
+      - image: circleci/python:3.5
+        environment:
+          TOXENV: py35-django111
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - run:
+          name: activate virtualenv and install dependencies.
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install tox
+
+      - run:
+          name: Run tests
+          command: |
+            . venv/bin/activate
+            tox
+
+  # Based on answer https://discuss.circleci.com/t/run-tests-on-multiple-versions-of-python/15462
+  test-2.7:
+    docker:
+      - image: circleci/python:2.7
+        environment:
+          TOXENV: py27-django111
+    working_directory: ~/repo27
+
+    steps:
+      - checkout
+
+      - run:
+          name: activate virtualenv and install dependencies.
+          command: |
+            mkdir -p ./venv
+            virtualenv ./venv
+            . venv/bin/activate
+            pip install tox
+
+      - run:
+          name: Run tests
+          command: |
+            . venv/bin/activate
+            tox
+
+  test-quality:
+    docker:
+      - image: circleci/python:2.7
+        environment:
+          TOXENV: quality
+    working_directory: ~/repo27
+
+    steps:
+      - checkout
+
+      - run:
+          name: activate virtualenv and install dependencies.
+          command: |
+            mkdir -p ./venv
+            virtualenv ./venv
+            . venv/bin/activate
+            pip install tox
+
+      - run:
+          name: Run tests
+          command: |
+            . venv/bin/activate
+            tox

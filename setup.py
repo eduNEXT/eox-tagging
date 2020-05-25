@@ -52,7 +52,7 @@ VERSION = get_version('eox_tagging', '__init__.py')
 
 if sys.argv[-1] == 'tag':
     print("Tagging the version on github:")
-    os.system("git tag -a %s -m 'version %s'" % (VERSION, VERSION))
+    os.system(u"git tag -a %s -m 'version %s'" % (VERSION, VERSION))
     os.system("git push --tags")
     sys.exit()
 
@@ -72,7 +72,7 @@ setup(
     ],
     include_package_data=True,
     install_requires=load_requirements('requirements/base.in'),
-    python_requires=">=3.5",
+    python_requires=">=2.7",
     license="AGPL 3.0",
     zip_safe=False,
     keywords='Django edx',

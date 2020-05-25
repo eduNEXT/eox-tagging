@@ -23,4 +23,4 @@ class Tag(TimeStampedModel):
         Get a string representation of this model instance.
         """
         # TODO: return a string appropriate for the data fields
-        return '<Tag, ID: {}>'.format(self.id)
+        return 'Model TBD'

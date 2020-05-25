@@ -2,9 +2,10 @@
 """
 Tests for the `eox-tagging` models module.
 """
+from django.test import TestCase
 
 
-class TestTag:
+class TestTag(TestCase):
     """
     Tests of the Tag model.
     """
