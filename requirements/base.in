@@ -2,4 +2,4 @@
 -c constraints.txt
 
 Django>=1.11              # Web application framework
-django-model-utils        # Provides TimeStampedModel abstract base class
+django-model-utils < 4.0.0        # Provides TimeStampedModel abstract base class
