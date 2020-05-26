@@ -1,13 +1,44 @@
 """
-eox_tagging Django application initialization.
+App configuration for eox_tagging.
 """
+
+from __future__ import unicode_literals
 
 from django.apps import AppConfig
 
 
 class EoxTaggingConfig(AppConfig):
     """
-    Configuration for the eox_tagging Django application.
+    eox-tagging configuration.
     """
-
     name = 'eox_tagging'
+    verbose_name = 'eox-tagging'
+
+    plugin_app = {
+        'url_config': {
+            'lms.djangoapp': {
+                'namespace': 'eox_tagging',
+                'regex': r'^eox_tagging/',
+                'relative_path': 'urls',
+            },
+            'cms.djangoapp': {
+                'namespace': 'eox_tagging',
+                'regex': r'^eox_tagging/',
+                'relative_path': 'urls',
+            }
+        },
+        'settings_config': {
+            'lms.djangoapp': {
+                'common': {'relative_path': 'settings.common'},
+                'test': {'relative_path': 'settings.test'},
+                'aws': {'relative_path': 'settings.aws'},
+                'production': {'relative_path': 'settings.production'},
+            },
+            'cms.djangoapp': {
+                'common': {'relative_path': 'settings.common'},
+                'test': {'relative_path': 'settings.test'},
+                'aws': {'relative_path': 'settings.aws'},
+                'production': {'relative_path': 'settings.production'},
+            },
+        }
+    }

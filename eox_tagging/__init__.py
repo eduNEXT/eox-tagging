@@ -1,7 +1,8 @@
 """
-Tagging library.
+Init module for eox_tagging.
 """
 
-__version__ = '0.1.0'
+from __future__ import unicode_literals
 
-default_app_config = 'eox_tagging.apps.EoxTaggingConfig'  # pylint: disable=invalid-name
+
+__version__ = '0.0.0'
