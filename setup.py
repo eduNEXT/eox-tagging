@@ -1,12 +1,46 @@
-#!/usr/bin/env python
 """
-Package metadata for eox_tagging.
+Setup file for eox_tagging Django plugin.
 """
+
+from __future__ import print_function
+
 import os
 import re
-import sys
 
 from setuptools import setup
+
+
+def load_requirements(*requirements_paths):
+    """
+    Load all requirements from the specified requirements files.
+    Returns a list of requirement strings.
+    """
+    requirements = set()
+    for path in requirements_paths:
+        requirements.update(
+            line.split('#')[0].strip() for line in open(path).readlines()
+            if is_requirement(line)
+        )
+    return list(requirements)
+
+
+def is_requirement(line):
+    """
+    Return True if the requirement line is a package requirement;
+    that is, it is not blank, a comment, or editable.
+    """
+    # Remove whitespace at the start/end of the line
+    line = line.strip()
+
+    # Skip blank lines, comments, and editable installs
+    return not (
+        line == '' or
+        line.startswith('-r') or
+        line.startswith('#') or
+        line.startswith('-e') or
+        line.startswith('git+') or
+        line.startswith('-c')
+    )
 
 
 def get_version(*file_paths):
@@ -22,74 +56,24 @@ def get_version(*file_paths):
     raise RuntimeError('Unable to find version string.')
 
 
-def load_requirements(*requirements_paths):
-    """
-    Load all requirements from the specified requirements files.
-
-    Returns:
-        list: Requirements file relative path strings
-    """
-    requirements = set()
-    for path in requirements_paths:
-        requirements.update(
-            line.split('#')[0].strip() for line in open(path).readlines()
-            if is_requirement(line.strip())
-        )
-    return list(requirements)
-
-
-def is_requirement(line):
-    """
-    Return True if the requirement line is a package requirement.
-
-    Returns:
-        bool: True if the line is not blank, a comment, a URL, or an included file
-    """
-    return line and not line.startswith(('-r', '#', '-e', 'git+', '-c'))
-
-
 VERSION = get_version('eox_tagging', '__init__.py')
 
-if sys.argv[-1] == 'tag':
-    print("Tagging the version on github:")
-    os.system(u"git tag -a %s -m 'version %s'" % (VERSION, VERSION))
-    os.system("git push --tags")
-    sys.exit()
-
-README = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
-CHANGELOG = open(os.path.join(os.path.dirname(__file__), 'CHANGELOG.rst')).read()
 
 setup(
-    name='eox-tagging',
+    name='eox_tagging',
     version=VERSION,
-    description="""Tagging library""",
-    long_description=README + '\n\n' + CHANGELOG,
-    author='edX',
-    author_email='oscm@edx.org',
-    url='https://github.com/edx/eox-tagging',
+    description='eox-tagging',
+    author='eduNEXT',
+    author_email='contact@edunext.co',
     packages=[
         'eox_tagging',
     ],
     include_package_data=True,
     install_requires=load_requirements('requirements/base.in'),
-    python_requires=">=2.7",
-    license="AGPL 3.0",
     zip_safe=False,
-    keywords='Django edx',
-    classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Framework :: Django',
-        'Framework :: Django :: 1.11',
-        'Framework :: Django :: 2.0',
-        'Framework :: Django :: 2.1',
-        'Framework :: Django :: 2.2',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
-        'Natural Language :: English',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-    ],
+    entry_points={
+        "lms.djangoapp": [
+            'eox_tagging = eox_tagging.apps:EoxTaggingConfig',
+        ],
+    },
 )

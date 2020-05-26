@@ -10,102 +10,79 @@ workflows:
     jobs:
       - test-3.5
       - test-2.7
-      - test-quality
 jobs:
   test-3.5:
     docker:
       # specify the version you desire here
-      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
       - image: circleci/python:3.5
-        environment:
-          TOXENV: py35-django111
     working_directory: ~/repo
 
     steps:
       - checkout
 
+      # Download and cache dependencies
       - restore_cache:
-          key: tox-cache-test-35-{{ checksum "requirements/base.txt" }}
+          keys:
+          - test-35-{{ checksum "requirements/test.txt" }}
+          # fallback to using the latest cache if no exact match is found
+          - test-35-
 
       - run:
           name: activate virtualenv and install dependencies.
           command: |
-            python3 -m venv venv
+            test -d venv || virtualenv -p python3 ./venv
             . venv/bin/activate
-            pip install tox
+            make test_requirements
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: test-35-{{ checksum "requirements/test.txt" }}
 
       - run:
           name: Run tests
           command: |
             . venv/bin/activate
-            tox
-
-      - save_cache:
-          paths:
-            - ./tox
-          key: tox-cache-test-35-{{ checksum "requirements/base.txt" }}
+            coverage run --source="." manage.py test
+            coverage report --fail-under=71 -m
+            pycodestyle ./eox_tagging
+            pylint ./eox_tagging --rcfile=./setup.cfg
+            isort --check-only --recursive --diff ./eox_tagging
 
   # Based on answer https://discuss.circleci.com/t/run-tests-on-multiple-versions-of-python/15462
   test-2.7:
     docker:
       - image: circleci/python:2.7
-        environment:
-          TOXENV: py27-django111
     working_directory: ~/repo27
 
     steps:
       - checkout
 
+      # Download and cache dependencies
       - restore_cache:
-          key: tox-cache-test27-{{ checksum "requirements/base.txt" }}
+          keys:
+          - test-27-{{ checksum "requirements/test.txt" }}
+          # fallback to using the latest cache if no exact match is found
+          - test-27-
 
       - run:
           name: activate virtualenv and install dependencies.
           command: |
-            mkdir -p ./venv
-            virtualenv ./venv
+            test -d venv || virtualenv ./venv
             . venv/bin/activate
-            pip install tox
+            make test_requirements
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: test-27-{{ checksum "requirements/test.txt" }}
 
       - run:
           name: Run tests
           command: |
             . venv/bin/activate
-            tox
-
-      - save_cache:
-          paths:
-            - ./tox
-          key: tox-cache-test27-{{ checksum "requirements/base.txt" }}
-
-  test-quality:
-    docker:
-      - image: circleci/python:2.7
-        environment:
-          TOXENV: quality
-    working_directory: ~/repo27
-
-    steps:
-      - checkout
-
-      - restore_cache:
-          key: tox-cache-quality-{{ checksum "requirements/base.txt" }}
-
-      - run:
-          name: activate virtualenv and install dependencies.
-          command: |
-            mkdir -p ./venv
-            virtualenv ./venv
-            . venv/bin/activate
-            pip install tox
-
-      - run:
-          name: Run tests
-          command: |
-            . venv/bin/activate
-            tox
-
-      - save_cache:
-          paths:
-            - ./tox
-          key: tox-cache-quality-{{ checksum "requirements/base.txt" }}
+            coverage run --source="." --rcfile=.coveragerc manage.py test
+            coverage report --fail-under=71 --rcfile=.coveragerc -m
+            pycodestyle ./eox_tagging
+            pylint ./eox_tagging --rcfile=./setup.cfg
+            isort --check-only --recursive --diff ./eox_tagging
