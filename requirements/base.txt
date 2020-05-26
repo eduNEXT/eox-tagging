@@ -4,6 +4,5 @@
 #
 #    make upgrade
 #
-django-model-utils==3.2.0  # via -r requirements/base.in
-django==1.11.29           # via -c requirements/constraints.txt, -r requirements/base.in, django-model-utils
+django==1.11.29           # via -c requirements/constraints.txt, -r requirements/base.in
 pytz==2020.1              # via django
