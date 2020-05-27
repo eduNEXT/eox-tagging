@@ -13,7 +13,6 @@ class EoxTaggingConfig(AppConfig):
     """
     name = 'eox_tagging'
     verbose_name = 'eduNEXT OpenedX Tagging'
-
     plugin_app = {
         'url_config': {
             'lms.djangoapp': {
