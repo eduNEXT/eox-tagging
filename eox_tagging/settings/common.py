@@ -19,7 +19,10 @@ SECRET_KEY = 'secret-key'
 
 # Application definition
 
-INSTALLED_APPS = []
+INSTALLED_APPS = [
+    'django.contrib.contenttypes',
+    'eox_tagging'
+    ]
 
 ROOT_URLCONF = 'eox_tagging.urls'
 
@@ -32,6 +35,13 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 
 USE_TZ = True
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'db.sqlite3',
+    }
+}
 
 
 def plugin_settings(settings):  # pylint: disable=unused-argument
