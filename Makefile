@@ -40,3 +40,4 @@ run-test: clean ## Run test suite.
 run-quality-test: clean ## Run quality test.
 	pycodestyle ./eox_tagging
 	pylint ./eox_tagging --rcfile=./setup.cfg
+	isort --check-only --recursive --diff ./eox_tagging

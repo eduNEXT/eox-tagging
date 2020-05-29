@@ -1,6 +1,7 @@
 *.py[cod]
 __pycache__
 .pytest_cache
+db.sqlite3
 
 # C extensions
 *.so

@@ -20,13 +20,20 @@ SECRET_KEY = 'secret-key'
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.auth',
     'django.contrib.contenttypes',
     'eox_tagging'
-    ]
+]
 
 ROOT_URLCONF = 'eox_tagging.urls'
 
-
+# For testing
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'db.sqlite3',
+    }
+}
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
