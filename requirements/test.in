@@ -4,3 +4,4 @@
 pylint
 pycodestyle
 coverage
+django-fake-model

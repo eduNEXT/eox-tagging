@@ -5,20 +5,27 @@ Test classes for Tags model
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from eox_tagging.models import Tag
+from eox_tagging.test_utils import CourseFakeModel, EnrollmentsFakeModel
 
-
+@override_settings(EOX_TAGGING_CAN_TAGGED = ["CourseFakeModel", "User"],
+                   EOX_TAGGING_DEFINITIONS = [{"tag_value": "testValue", "tag_type": "testType"}])
+@CourseFakeModel.fake_me
+@EnrollmentsFakeModel.fake_me
 class TestTag(TestCase):
     """Class for testing the Tag model
     """
+
 
     def setUp(self):
         """ Model setup used to create objects used in tests
         """
         self.tagged_object = User.objects.create(username="Tag")
         self.belongs_to_object = User.objects.create(username="User")
+        self.fake_object_tagged = CourseFakeModel.objects.create()
+        self.fake_object_tagged_fail = EnrollmentsFakeModel.objects.create()
 
         Tag.objects.create(
             tag_value="testValue",
@@ -75,15 +82,16 @@ class TestTag(TestCase):
                 belongs_to=self.belongs_to_object,
             )
 
-    def test_tag_different_generic_objects(self):
-        """ Used to confirm the tags can be use with any object defined in settings
-        """
-        pass
-
     def test_tag_different_generic_objects_fail(self):
         """ Used to confirm the tags can't be use with objects not defined in settings
         """
-        pass
+        with self.assertRaises(ValidationError):
+            Tag.objects.create(
+                tag_value="testValue",
+                tag_type="testType",
+                tagged_object=self.fake_object_tagged_fail,
+                belongs_to=self.belongs_to_object,
+            )
 
     def test_tag_inmutable(self):
         """ Used to confirm that the tags can't be updated
@@ -102,3 +110,13 @@ class TestTag(TestCase):
         tag_status = getattr(test_tag, "status")
 
         self.assertEqual(tag_status, 0)
+
+    def test_tag_different_generic_objects(self):
+        """ Used to confirm the tags can be use with any object defined in settings
+        """
+        Tag.objects.create(
+            tag_value="testValue",
+            tag_type="testType",
+            tagged_object=self.fake_object_tagged,
+            belongs_to=self.belongs_to_object,
+        )
