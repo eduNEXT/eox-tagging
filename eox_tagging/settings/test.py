@@ -26,10 +26,6 @@ for app in TEST_INSTALLED_APPS:
         INSTALLED_APPS.append(app)
 
 
-EOX_TAGGING_CAN_TAGGED = ["User"]
-EOX_TAGGING_DEFINITIONS = [{"tag_value": "testValue", "tag_type": "testType"}]
-
-
 def plugin_settings(settings):  # pylint: disable=function-redefined, unused-argument
     """
     Set of plugin settings used by the Open Edx platform.

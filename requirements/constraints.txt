@@ -14,5 +14,6 @@ Django<2.0
 # TODO: Add contraint explanation
 pylint==1.9.3
 pycodestyle==2.5.0
+django-fake-model==0.1.4
 # Already in python3 standard library
 futures; python_version == "2.7"
