@@ -1,8 +1,6 @@
 """
 Utils to run tests
 """
-from django.db import models
-
 
 try:
     from django_fake_model import models as fake
