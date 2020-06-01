@@ -10,22 +10,22 @@ from django.test import TestCase, override_settings
 from eox_tagging.models import Tag
 from eox_tagging.test_utils import CourseFakeModel, EnrollmentsFakeModel
 
-@override_settings(EOX_TAGGING_CAN_TAGGED = ["CourseFakeModel", "User"],
-                   EOX_TAGGING_DEFINITIONS = [{"tag_value": "testValue", "tag_type": "testType"}])
+
+@override_settings(EOX_TAGGING_CAN_TAGGED=["CourseFakeModel", "User"],
+                   EOX_TAGGING_DEFINITIONS=[{"tag_value": "testValue", "tag_type": "testType"}])
 @CourseFakeModel.fake_me
 @EnrollmentsFakeModel.fake_me
 class TestTag(TestCase):
     """Class for testing the Tag model
     """
 
-
     def setUp(self):
         """ Model setup used to create objects used in tests
         """
         self.tagged_object = User.objects.create(username="Tag")
         self.belongs_to_object = User.objects.create(username="User")
-        self.fake_object_tagged = CourseFakeModel.objects.create()
-        self.fake_object_tagged_fail = EnrollmentsFakeModel.objects.create()
+        self.fake_object_tagged = CourseFakeModel.objects.create()  # pylint: disable=no-member
+        self.fake_object_tagged_fail = EnrollmentsFakeModel.objects.create()  # pylint: disable=no-member
 
         Tag.objects.create(
             tag_value="testValue",

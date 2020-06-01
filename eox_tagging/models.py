@@ -13,6 +13,8 @@ from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 
+from eox_tagging.constants import AccessLevel, GenericType, Status
+
 log = logging.getLogger(__name__)
 
 
@@ -84,13 +86,8 @@ class SoftDeletionModel(models.Model):
         invalidated_at: date when the tag is soft deleted
     """
 
-    VALID = 1
-    INVALID = 0
-
-    STATUS_CHOICES = [(VALID, "Valid"), (INVALID, "Invalid")]
-
     status = models.PositiveIntegerField(
-        choices=STATUS_CHOICES, default=VALID, editable=False,
+        choices=Status.choices(), default=Status.VALID, editable=False,
     )
 
     invalidated_at = models.DateTimeField(blank=True, null=True)
@@ -106,7 +103,7 @@ class SoftDeletionModel(models.Model):
 
     def delete(self):  # pylint: disable=arguments-differ
         self.invalidated_at = timezone.now()
-        self.status = self.INVALID
+        self.status = Status.INVALID
         super(SoftDeletionModel, self).save()
 
     def hard_delete(self):
@@ -139,16 +136,6 @@ class Tag(SoftDeletionModel):
 
     DEFAULT = 1
 
-    PUBLIC_ACCESS = 1
-    PROTECTED_ACCESS = 2
-    PRIVATE_ACCESS = 3
-
-    ACCESS_TAG_CHOICES = [
-        (PUBLIC_ACCESS, "Public"),
-        (PROTECTED_ACCESS, "Protected"),
-        (PRIVATE_ACCESS, "Private"),
-    ]
-
     id = models.AutoField(primary_key=True,)
     uid = models.UUIDField(
         unique=True,
@@ -160,7 +147,7 @@ class Tag(SoftDeletionModel):
     tag_value = models.CharField(max_length=150)
     tag_type = models.CharField(max_length=150)
     access = models.PositiveIntegerField(
-        choices=ACCESS_TAG_CHOICES, default=PUBLIC_ACCESS,
+        choices=AccessLevel.choices(), default=AccessLevel.PUBLIC,
     )
     activation_date = models.DateField(null=True, blank=True)
     expiration_date = models.DateField(null=True, blank=True)
@@ -172,9 +159,9 @@ class Tag(SoftDeletionModel):
         ContentType,
         on_delete=models.CASCADE,
         related_name="%(class)s_type",
-        default=DEFAULT,
+        default=GenericType.DEFAULT,
     )
-    tagged_object_id = models.PositiveIntegerField(default=DEFAULT)
+    tagged_object_id = models.PositiveIntegerField(default=GenericType.DEFAULT)
     tagged_object = GenericForeignKey("tagged_type", "tagged_object_id")
 
     # Generic foreign key for `tag belonging to` USER or SITE
@@ -182,9 +169,9 @@ class Tag(SoftDeletionModel):
         ContentType,
         on_delete=models.CASCADE,
         related_name="belongs_to_%(class)s_type",
-        default=DEFAULT,
+        default=GenericType.DEFAULT,
     )
-    belongs_to_object_id = models.PositiveIntegerField(default=DEFAULT)
+    belongs_to_object_id = models.PositiveIntegerField(default=GenericType.DEFAULT)
     belongs_to = GenericForeignKey("belongs_to_type", "belongs_to_object_id")
 
     objects = TagManager()
