@@ -57,6 +57,8 @@ class TagQuerySet(QuerySet):
 @python_2_unicode_compatible
 class Tag(models.Model):
     """Model class for tags
+       Overrides save method to validate data entries before saving
+       Also, overrides delete so softDeletion is available
 
     Attributes:
         tag_value: unicode value of the tag tag
