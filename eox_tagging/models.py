@@ -4,33 +4,22 @@ Model to store tags in the database
 import logging
 import uuid
 
-from django.conf import settings as base_settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 
 from eox_tagging.constants import AccessLevel, GenericType, Status
+from eox_tagging.validators import Validators
 
 log = logging.getLogger(__name__)
 
 
-class SoftDeletionQuerySet(QuerySet):
-    """SoftDeletion queryset used as helper
-
+class TagQuerySet(QuerySet):
+    """ Tag queryset used as manager
     """
-
-    def delete(self):
-        return super(SoftDeletionQuerySet, self).update(invalidated_at=timezone.now())
-
-    def hard_delete(self):
-        """
-        Hard delete using queryset
-        """
-        return super(SoftDeletionQuerySet, self).delete()
 
     def valid(self):
         """
@@ -44,84 +33,29 @@ class SoftDeletionQuerySet(QuerySet):
         """
         return self.exclude(invalidated_at=None)
 
-
-class SoftDeletionManager(models.Manager):
-    """SoftDelition model manager
-
-    """
-
-    def __init__(self, *args, **kwargs):
+    def find_by_owner(self, owner):
         """
-        Softdeletion init
+        Returns all valid tags owned by owner_id
         """
-        self.valid_only = kwargs.pop("valid_only", True)
-        super(SoftDeletionManager, self).__init__(*args, **kwargs)
+        model = owner.__class__
+        ctype = ContentType.objects.get_for_model(model)
 
-    def get_queryset(self):
+        return self.valid().filter(belongs_to_type=ctype,
+                                   belongs_to_object_id=owner.id)
+
+    def find_all_tags_for(self, tagged_object):
         """
-        Get queryset depending on using all objects or just valid objects
+        Returns all valid on an object
         """
-        if self.valid_only:
-            return SoftDeletionQuerySet(self.model).filter(invalidated_at=None)
-        return SoftDeletionQuerySet(self.model)
+        model = tagged_object.__class__
+        ctype = ContentType.objects.get_for_model(model)
 
-    def hard_delete(self):
-        """
-        Hard delete depending on using all objects or just valid objects
-        """
-        return self.get_queryset().hard_delete()
-
-    def delete(self):
-        """
-        Soft delete depending on using all objects or just valid objects
-        """
-        return self.get_queryset().delete()
-
-
-class SoftDeletionModel(models.Model):
-    """Abstract Model used for soft deletion
-
-    Attributes:
-        status: status of the tag, valid or invalid
-        invalidated_at: date when the tag is soft deleted
-    """
-
-    status = models.PositiveIntegerField(
-        choices=Status.choices(), default=Status.VALID, editable=False,
-    )
-
-    invalidated_at = models.DateTimeField(blank=True, null=True)
-
-    objects = SoftDeletionManager()
-    all_objects = SoftDeletionManager(valid_only=False)
-
-    class Meta:  # pylint: disable=old-style-class
-        """
-        Abstract class
-        """
-        abstract = True
-
-    def delete(self):  # pylint: disable=arguments-differ
-        self.invalidated_at = timezone.now()
-        self.status = Status.INVALID
-        super(SoftDeletionModel, self).save()
-
-    def hard_delete(self):
-        """
-        Deletes object from database
-        """
-        super(SoftDeletionModel, self).delete()
-
-
-class TagManager(SoftDeletionManager):
-    """Tag manager
-    """
-
-    pass
+        return self.valid().filter(tagged_type=ctype,
+                                   tagged_object_id=tagged_object.id)
 
 
 @python_2_unicode_compatible
-class Tag(SoftDeletionModel):
+class Tag(models.Model):
     """Model class for tags
 
     Attributes:
@@ -131,13 +65,13 @@ class Tag(SoftDeletionModel):
         activation_date: date to activate the tag
         expiration-date: date to deactivate de tag
         tagged_object: object tagged
-        belongs_to: object to which the tag belongd
+        belongs_to: object to which the tag belongs
+        status: status of the tag, valid or invalid
+        invalidated_at: date when the tag is soft deleted
     """
 
-    DEFAULT = 1
-
     id = models.AutoField(primary_key=True,)
-    uid = models.UUIDField(
+    key = models.UUIDField(
         unique=True,
         editable=False,
         default=uuid.uuid4,
@@ -152,7 +86,12 @@ class Tag(SoftDeletionModel):
     activation_date = models.DateField(null=True, blank=True)
     expiration_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
-    invalidated_at = models.DateTimeField(null=True, blank=True)
+
+    status = models.PositiveIntegerField(
+        choices=Status.choices(), default=Status.VALID, editable=False,
+    )
+
+    invalidated_at = models.DateTimeField(blank=True, null=True)
 
     # Generic foreign key for tagged objects
     tagged_type = models.ForeignKey(
@@ -174,7 +113,7 @@ class Tag(SoftDeletionModel):
     belongs_to_object_id = models.PositiveIntegerField(default=GenericType.DEFAULT)
     belongs_to = GenericForeignKey("belongs_to_type", "belongs_to_object_id")
 
-    objects = TagManager()
+    objects = TagQuerySet().as_manager()
 
     class Meta:  # pylint: disable=old-style-class
         """
@@ -203,34 +142,16 @@ class Tag(SoftDeletionModel):
 
     def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
 
-        if self.id:
-            #  Exception raised when trying to update
-            raise ValidationError(
-                "EOX_TAGGING  |   Can't update tag. Tags are inmutable by definition"
-            )
-
-        # Tags validations
-
-        if not any(
-            s["tag_value"] == self.tag_value
-            for s in base_settings.EOX_TAGGING_DEFINITIONS
-        ):
-            raise ValidationError(
-                "EOX_TAGGING  |   The tag value is not in tag definitions"
-            )
-
-        if not any(
-            s["tag_type"] == self.tag_type
-            for s in base_settings.EOX_TAGGING_DEFINITIONS
-        ):
-            raise ValidationError(
-                "EOX_TAGGING  |   The tag type is not in tag definitions"
-            )
-
-        if not any(
-            taggeable_object == self.tagged_object_name
-            for taggeable_object in base_settings.EOX_TAGGING_CAN_TAGGED
-        ):
-            raise ValidationError("EOX_TAGGING  |   Object is not available to tag")
-
+        Validators(self).run_validators()
         super(Tag, self).save(*args, **kwargs)
+
+    def delete(self):  # pylint: disable=arguments-differ
+        self.invalidated_at = timezone.now()
+        self.status = Status.INVALID
+        super(Tag, self).save()
+
+    def hard_delete(self):
+        """
+        Deletes object from database
+        """
+        super(Tag, self).delete()
