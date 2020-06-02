@@ -4,15 +4,22 @@ Test classes for Tags model
 
 
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.test import TestCase, override_settings
 
 from eox_tagging.models import Tag
 from eox_tagging.test_utils import CourseFakeModel, EnrollmentsFakeModel
 
 
-@override_settings(EOX_TAGGING_CAN_TAGGED=["CourseFakeModel", "User"],
-                   EOX_TAGGING_DEFINITIONS=[{"tag_value": "testValue", "tag_type": "testType"}])
+@override_settings(EOX_TAGGING_DEFINITIONS=[{"field_name": "tag_value",
+                                             "validations": ["definition"],
+                                             "allowed": ["testValue"]},
+                                            {"field_name": "tag_type",
+                                             "validations": ["definition"],
+                                             "allowed": ["testType"]},
+                                            {"field_name": "tagged_object_name",
+                                             "validations": ["definition"],
+                                             "allowed": ["User", "CourseFakeModel"]}])
 @CourseFakeModel.fake_me
 @EnrollmentsFakeModel.fake_me
 class TestTag(TestCase):
@@ -101,13 +108,32 @@ class TestTag(TestCase):
         with self.assertRaises(ValidationError):
             test_tag.save()
 
+    def test_find_by_owner(self):
+        """
+        Used to confirm that can retrieve tags by owner
+        """
+        tags_owned = Tag.objects.find_by_owner(self.belongs_to_object)
+        self.assertEqual(tags_owned.first().belongs_to_object_id, self.belongs_to_object.id)
+
+    def test_find_all_tags_for(self):
+        """
+        Used to confirm that can retrieve tags by tagged object
+        """
+        tags = Tag.objects.find_all_tags_for(self.tagged_object)
+        self.assertEqual(tags.first().tagged_object_id, self.tagged_object.id)
+
     def test_tag_soft_delete(self):
         """ Used to confirm that the tags can be invalidated soft deleting them
         """
-
         test_tag = Tag.objects.get(id=1)
         test_tag.delete()
         tag_status = getattr(test_tag, "status")
+
+        with self.assertRaises(ObjectDoesNotExist):
+            Tag.objects.valid().get(id=1)
+
+        # Exists in invalid objects
+        Tag.objects.invalid().get(id=1)
 
         self.assertEqual(tag_status, 0)
 
