@@ -32,7 +32,11 @@ class Validators(object):
         for obj in definitions:
             validations = obj.get("validations")
             for val in validations:
-                self.functions[val](obj)
+                try:
+                    validator_function = self.functions[val]
+                    validator_function(obj)
+                except AttributeError:
+                    raise ValidationError("EOX_TAGGING  |   Validator {} does not exist ".format(obj))
 
     def __validate_not_update(self):
         """Function that validates that the save is not an update."""
