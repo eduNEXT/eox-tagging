@@ -1,7 +1,6 @@
 """
 Test Django settings for eox_tagging project.
 """
-
 from __future__ import unicode_literals
 
 from .common import *  # pylint: disable=wildcard-import
@@ -24,6 +23,14 @@ TEST_INSTALLED_APPS = [
 for app in TEST_INSTALLED_APPS:
     if app not in INSTALLED_APPS:
         INSTALLED_APPS.append(app)
+
+# For testing
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'db.sqlite3',
+    }
+}
 
 
 def plugin_settings(settings):  # pylint: disable=function-redefined, unused-argument
