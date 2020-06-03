@@ -1,4 +1,17 @@
 """ File to define validations for tag model fields.
+
+A validation over a field is done if is defined in the plugin settings as follows:
+
+EOX_TAGGING_DEFINITIONS = [
+    {
+        field_name (str): name of the field to be validated,
+        validations (str[]): list with the names of the validations to be performed,
+        allowed (str[] | str): list of strings with the allowed values for the field or a pattern
+    }
+]
+
+For every field I want to validate, I would have to define an object inside of EOX_TAGGING_DEFINITIONS
+with the fields defined above
 """
 import logging
 import re
