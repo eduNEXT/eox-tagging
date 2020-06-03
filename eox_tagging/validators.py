@@ -1,6 +1,5 @@
-""" File to define validations for tag model fields
+""" File to define validations for tag model fields.
 """
-
 import re
 
 from django.conf import settings as base_settings
@@ -18,13 +17,11 @@ class Validators(object):
         """
         self.instance = instance
         self.functions = {  # Functions defined for validation
-            "definition": self.__validate_field_definition
+            "definition": self.__validate_field_definition,
         }
 
     def run_validators(self):
-        """
-        Runs defined validators
-        """
+        """Runs defined validators."""
         self.__validate_not_update()
 
         definitions = base_settings.EOX_TAGGING_DEFINITIONS
@@ -35,9 +32,7 @@ class Validators(object):
                 self.functions[val](obj)
 
     def __validate_not_update(self):
-        """
-        Function that validates that the save is not an update
-        """
+        """Function that validates that the save is not an update."""
         if self.instance.id:
             #  Exception raised when trying to update
             raise ValidationError("EOX_TAGGING  |   Can't update tag. Tags are inmutable by definition")
@@ -45,10 +40,10 @@ class Validators(object):
     def __validate_field_definition(self, obj):
         """
         Function that validate the existence of the definition of the field. The
-        definition can be a list of values or regex like ` r'definition' `
+        definition can be a list of values or regex like ` r'definition' `.
 
         If the value does not match with any value in allowed values list or regex, an
-        exception is raised
+        exception is raised.
 
         Attributes:
             obj: the object in definitions used for validations

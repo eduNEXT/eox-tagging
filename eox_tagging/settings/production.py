@@ -1,7 +1,6 @@
 """
 Production Django settings for eox_tagging project.
 """
-
 from __future__ import unicode_literals
 
 

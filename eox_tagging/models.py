@@ -18,51 +18,48 @@ log = logging.getLogger(__name__)
 
 
 class TagQuerySet(QuerySet):
-    """ Tag queryset used as manager
-    """
+    """ Tag queryset used as manager."""
 
     def valid(self):
-        """
-        Returns all valid tags
-        """
+        """Returns all valid tags."""
         return self.filter(invalidated_at=None)
 
     def invalid(self):
-        """
-        Returns all invalid tags
-        """
+        """Returns all invalid tags."""
         return self.exclude(invalidated_at=None)
 
     def find_by_owner(self, owner):
-        """
-        Returns all valid tags owned by owner_id
-        """
+        """Returns all valid tags owned by owner_id."""
         model = owner.__class__
         ctype = ContentType.objects.get_for_model(model)
 
-        return self.valid().filter(belongs_to_type=ctype,
-                                   belongs_to_object_id=owner.id)
+        return self.valid().filter(
+            belongs_to_type=ctype,
+            belongs_to_object_id=owner.id
+        )
 
     def find_all_tags_for(self, tagged_object):
-        """
-        Returns all valid on an object
-        """
+        """Returns all valid on an object."""
         model = tagged_object.__class__
         ctype = ContentType.objects.get_for_model(model)
 
-        return self.valid().filter(tagged_type=ctype,
-                                   tagged_object_id=tagged_object.id)
+        return self.valid().filter(
+            tagged_type=ctype,
+            tagged_object_id=tagged_object.id
+        )
 
 
 @python_2_unicode_compatible
 class Tag(models.Model):
-    """Model class for tags
-       Overrides save method to validate data entries before saving
-       Also, overrides delete so softDeletion is available
+    """
+    Model class for tags.
+
+    Overrides save method to validate data entries before saving.
+    Also, overrides delete so softDeletion is available.
 
     Attributes:
-        tag_value: unicode value of the tag tag
-        tag_type: type of the tag
+        tag_value: unicode value of the tag. Example: free or premium
+        tag_type: type of the tag. Example: Subscription tiers
         access: access level of the tag
         activation_date: date to activate the tag
         expiration-date: date to deactivate de tag
@@ -71,7 +68,6 @@ class Tag(models.Model):
         status: status of the tag, valid or invalid
         invalidated_at: date when the tag is soft deleted
     """
-
     id = models.AutoField(primary_key=True,)
     key = models.UUIDField(
         unique=True,
@@ -118,9 +114,7 @@ class Tag(models.Model):
     objects = TagQuerySet().as_manager()
 
     class Meta:  # pylint: disable=old-style-class
-        """
-        Meta class
-        """
+        """Meta class. """
         verbose_name = "tag"
         verbose_name_plural = "tags"
         app_label = "eox_tagging"
@@ -130,21 +124,21 @@ class Tag(models.Model):
 
     @property
     def tagged_object_name(self):
-        """
-        Obtain the name of the object tagged by the `Tag`
-        """
+        """Obtain the name of the object tagged by the `Tag`."""
         return self.tagged_object.__class__.__name__
 
     @property
     def belongs_to_object_name(self):
-        """
-        Obtain the name of the object which the tag belongs to
-        """
+        """Obtain the name of the object which the tag belongs to."""
         return self.belongs_to.__class__.__name__
 
-    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
-
+    def clean(self, *args, **kwargs):  # pylint: disable=arguments-differ
         Validators(self).run_validators()
+        super(Tag, self).clean(*args, **kwargs)
+
+    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
+        exclude_from_validation = ["tagged_object", "belongs_to", "tagged_type", "belongs_to_type"]
+        self.full_clean(exclude=exclude_from_validation)
         super(Tag, self).save(*args, **kwargs)
 
     def delete(self):  # pylint: disable=arguments-differ
@@ -153,7 +147,5 @@ class Tag(models.Model):
         super(Tag, self).save()
 
     def hard_delete(self):
-        """
-        Deletes object from database
-        """
+        """Deletes object from database."""
         super(Tag, self).delete()
