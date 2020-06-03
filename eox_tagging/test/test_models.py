@@ -40,6 +40,16 @@ class TestTag(TestCase):
             belongs_to=self.fake_belongs_to_object,
         )
 
+    @override_settings(EOX_TAGGING_DEFINITIONS=[])
+    def test_empty_setting(self):
+        """ Used to test saving without validations defined"""
+        Tag.objects.create(
+            tag_value="testValue",
+            tag_type="testType",
+            tagged_object=self.fake_object_tagged,
+            belongs_to=self.fake_belongs_to_object,
+        )
+
     def test_valid_tag(self):
         """ Used to confirm that the tags created are valid."""
         tag_status = getattr(self.test_tag, "status")

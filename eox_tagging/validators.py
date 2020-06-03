@@ -1,9 +1,12 @@
 """ File to define validations for tag model fields.
 """
+import logging
 import re
 
 from django.conf import settings as base_settings
 from django.core.exceptions import ValidationError
+
+log = logging.getLogger(__name__)
 
 
 class Validators(object):
@@ -27,7 +30,7 @@ class Validators(object):
         definitions = base_settings.EOX_TAGGING_DEFINITIONS
 
         for obj in definitions:
-            validations = obj["validations"]
+            validations = obj.get("validations")
             for val in validations:
                 self.functions[val](obj)
 
@@ -48,9 +51,14 @@ class Validators(object):
         Attributes:
             obj: the object in definitions used for validations
         """
-        field = obj["field_name"]
-        field_value = getattr(self.instance, field)
-        values_allowed = obj["allowed"]
+        field = obj.get("field_name")
+        values_allowed = obj.get("allowed")
+
+        try:
+            field_value = getattr(self.instance, field)
+        except AttributeError:
+            log.error("EOX_TAGGING  |   The tag with value %s does not have attribute %s", self.instance, field)
+            return
 
         if isinstance(values_allowed, list) and all(value != field_value for value in values_allowed):
             # Values allowed is list of values (at least one)
