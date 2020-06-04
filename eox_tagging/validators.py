@@ -17,7 +17,11 @@ import logging
 import re
 
 from django.conf import settings as base_settings
-from django.core.exceptions import ValidationError
+from django.contrib.sites.models import Site
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from eox_core.edxapp_wrapper.courseware import get_courseware_courses
+from eox_core.edxapp_wrapper.enrollments import get_enrollment
+from eox_core.edxapp_wrapper.users import get_edxapp_user
 
 log = logging.getLogger(__name__)
 
@@ -35,9 +39,85 @@ class Validators(object):
         self.functions = {  # Functions defined for validation
             "definition": self.__validate_field_definition,
         }
+        self.model_validations = {
+            'User': self.__validate_user_integrity,
+            'Course': self.__validate_course_integrity,
+            'CourseEnrollment': self.__validate_enrollment_integrity,
+            'Site': self.__validate_site_integrity,
+        }
 
+    # GFK validations
+    def validate_tagged_object(self):
+        """Function that validates the tagged object calling the integrity validators."""
+
+        model_tagged_name = self.instance.tagged_object_name
+
+        try:
+            self.model_validations[model_tagged_name]("tagged_object")
+        except KeyError:
+            raise ValidationError("EOX_TAGGING  |   Could not find integrity validation for field {}".format(model_tagged_name))
+
+    def validate_owner(self):
+        """Function that validates the owner of the tag calling the integrity validators."""
+
+        belongs_to_model_name = self.instance.belongs_to_object_name
+        try:
+            self.model_validations[belongs_to_model_name]("belongs_to")
+        except KeyError:
+            raise ValidationError("EOX_TAGGING  |   Could not find integrity validation for field {}".format(belongs_to_model_name))
+
+    # Integrity validators
+    def __validate_user_integrity(self, object_name):
+        """ Function that validates existence of user."""
+        data = {
+            "username": getattr(self.instance, object_name).username  # User needs to have username
+        }
+        try:
+            get_edxapp_user(**data)
+            log.info("EOX_TAGGING  |   Validated user integrity %s", data["username"])
+
+        except Exception:
+            raise ValidationError("EOX_TAGGING  |   User {} does not exist".format(data["username"]))
+
+    def __validate_course_integrity(self, object_name):
+        """ Function that validates existence of the course."""
+        course_id = getattr(self.instance, object_name).course_id  # Course needs to have course_id
+        try:
+            get_courseware_courses().get_course_by_id(course_id)
+            log.info("EOX_TAGGING  |   Validated course integrity %s", course_id)
+        except Exception:
+            raise ValidationError("EOX_TAGGING  |   Course {} does not exist".format(course_id))
+
+    def __validate_enrollment_integrity(self, object_name):
+        """ Function that validates existence of the enrollment."""
+        data = {
+            "username": getattr(self.instance, object_name).username,
+            "course_id": getattr(self.instance, object_name).course_id,
+        }
+        try:
+            enrollment, _ = get_enrollment(**data)
+            log.info("EOX_TAGGING!  |   Enrollment for user %s and course ID %s", data["username"], data["course_id"])
+            if not enrollment:
+                log.error("EOX_TAGGING  |   There's no enrollment")
+                raise ValidationError("EOX_TAGGING!  |   Enrollment for user {user} and course ID {course} does not exist"
+                                      .format(user=data["username"], course=data["course_id"]))
+        except Exception:
+            log.error("EOX_TAGGING  |   There's no enrollment")
+            raise ValidationError("EOX_TAGGING  |   Enrollment for user {user} and course ID {course} does not exist"
+                                  .format(user=data["username"], course=data["course_id"]))
+
+    def __validate_site_integrity(self, object_name):
+        """ Function that validates existence of the site."""
+        site_id = getattr(self.instance, object_name).id
+
+        try:
+            Site.objects.get(id=site_id)
+        except ObjectDoesNotExist:
+            raise ValidationError("EOX_TAGGING  |   Site {} does not exist".format(site_id))
+
+    # Other validations
     def run_validators(self):
-        """Runs defined validators."""
+        """Runs defined validators on the EOX_TAGGING_DEFINITIONS object."""
         self.__validate_not_update()
 
         definitions = base_settings.EOX_TAGGING_DEFINITIONS

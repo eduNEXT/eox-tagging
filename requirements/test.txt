@@ -4,6 +4,7 @@
 #
 #    make upgrade
 #
+-e git+https://github.com/edunext/eox-core.git@v2.12.3#egg=eox-core  # via -r requirements/base.txt
 astroid==1.6.6            # via pylint
 backports.functools-lru-cache==1.6.1  # via astroid, isort, pylint
 configparser==4.0.2       # via pylint

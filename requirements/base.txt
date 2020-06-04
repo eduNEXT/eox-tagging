@@ -4,5 +4,6 @@
 #
 #    make upgrade
 #
+-e git+https://github.com/edunext/eox-core.git@v2.12.3#egg=eox-core  # via -r requirements/base.in
 django==1.11.29           # via -c requirements/constraints.txt, -r requirements/base.in
 pytz==2020.1              # via django
