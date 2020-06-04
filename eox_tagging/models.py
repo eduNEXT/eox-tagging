@@ -4,6 +4,7 @@ Model to store tags in the database
 import logging
 import uuid
 
+from django.conf import settings as base_settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -134,11 +135,23 @@ class Tag(models.Model):
 
     def clean(self, *args, **kwargs):  # pylint: disable=arguments-differ
         Validators(self).run_validators()
-        super(Tag, self).clean(*args, **kwargs)
+
+    def clean_fields(self, *args, **kwargs):
+        if getattr(base_settings, "EOX_TAGGING_SKIP_VALIDATIONS", False):  # Skip these validations while testing
+            return
+        Validators(self).validate_owner()
+        Validators(self).validate_tagged_object()
+
+    def full_clean(self, exclude=None, validate_unique=False):
+        """
+        Call clean_fields(), clean(), and validate_unique() on the model.
+        Raise a ValidationError for any errors that occur.
+        """
+        self.clean_fields()
+        self.clean()
 
     def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
-        exclude_from_validation = ["tagged_object", "belongs_to", "tagged_type", "belongs_to_type"]
-        self.full_clean(exclude=exclude_from_validation)
+        self.full_clean()
         super(Tag, self).save(*args, **kwargs)
 
     def delete(self):  # pylint: disable=arguments-differ
