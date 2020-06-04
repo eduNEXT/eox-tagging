@@ -36,7 +36,7 @@ class TagQuerySet(QuerySet):
 
         return self.valid().filter(
             belongs_to_type=ctype,
-            belongs_to_object_id=owner.id
+            belongs_to_object_id=owner.id,
         )
 
     def find_all_tags_for(self, tagged_object):
@@ -46,7 +46,7 @@ class TagQuerySet(QuerySet):
 
         return self.valid().filter(
             tagged_type=ctype,
-            tagged_object_id=tagged_object.id
+            tagged_object_id=tagged_object.id,
         )
 
 
@@ -133,10 +133,10 @@ class Tag(models.Model):
         """Obtain the name of the object which the tag belongs to."""
         return self.belongs_to.__class__.__name__
 
-    def clean(self, *args, **kwargs):  # pylint: disable=arguments-differ
+    def clean(self):
         Validators(self).run_validators()
 
-    def clean_fields(self, *args, **kwargs):
+    def clean_fields(self):  # pylint: disable=arguments-differ
         if getattr(base_settings, "EOX_TAGGING_SKIP_VALIDATIONS", False):  # Skip these validations while testing
             return
         Validators(self).validate_owner()
