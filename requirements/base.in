@@ -3,3 +3,4 @@
 
 Django
 -e git+https://github.com/edunext/eox-core.git@v2.12.3#egg=eox-core
+edx-opaque-keys

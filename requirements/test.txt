@@ -11,14 +11,18 @@ configparser==4.0.2       # via pylint
 coverage==5.1             # via -r requirements/test.in
 django-fake-model==0.1.4  # via -c requirements/constraints.txt, -r requirements/test.in
 django==1.11.29           # via -c requirements/constraints.txt, -r requirements/base.txt
+edx-opaque-keys==2.1.0    # via -r requirements/base.txt
 enum34==1.1.10            # via astroid
 futures==3.3.0 ; python_version == "2.7"  # via -c requirements/constraints.txt, isort
 isort==4.3.21             # via pylint
-lazy-object-proxy==1.4.3  # via astroid
+lazy-object-proxy==1.5.0  # via astroid
 mccabe==0.6.1             # via pylint
+pbr==5.4.5                # via -r requirements/base.txt, stevedore
 pycodestyle==2.5.0        # via -c requirements/constraints.txt, -r requirements/test.in
 pylint==1.9.3             # via -c requirements/constraints.txt, -r requirements/test.in
+pymongo==3.10.1           # via -r requirements/base.txt, edx-opaque-keys
 pytz==2020.1              # via -r requirements/base.txt, django
 singledispatch==3.4.0.3   # via astroid, pylint
-six==1.15.0               # via astroid, pylint, singledispatch
+six==1.15.0               # via -r requirements/base.txt, astroid, edx-opaque-keys, pylint, singledispatch, stevedore
+stevedore==1.32.0         # via -r requirements/base.txt, edx-opaque-keys
 wrapt==1.12.1             # via astroid

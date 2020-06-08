@@ -12,7 +12,8 @@ from eox_tagging.test_utils import CourseFakeModel, EnrollmentsFakeModel
 @override_settings(EOX_TAGGING_DEFINITIONS=[
     {"field_name": "tag_value", "validations": ["definition"], "allowed": ["testValue"]},
     {"field_name": "tag_type", "validations": ["definition"], "allowed": ["testType"]},
-    {"field_name": "tagged_object_name", "validations": ["definition"], "allowed": ["User", "CourseFakeModel"]}])
+    {"field_name": "tagged_object_name", "validations": ["definition"], "allowed": ["User", "CourseFakeModel"]},
+])
 @CourseFakeModel.fake_me
 @EnrollmentsFakeModel.fake_me
 class TestTag(TestCase):
@@ -69,7 +70,7 @@ class TestTag(TestCase):
         self.assertEqual(tag_value, "testType")
 
     def test_tag_value_not_in_settings(self):
-        """ Used to confirm validation error when the value is not defined."""
+        """ Used to confirm validation error when the value is not defined in the settings."""
         with self.assertRaises(ValidationError):
             Tag.objects.create(
                 tag_value="testValues",
@@ -79,7 +80,7 @@ class TestTag(TestCase):
             )
 
     def test_tag_type_not_in_settings(self):
-        """ Used to confirm validation error when the type is not defined."""
+        """ Used to confirm validation error when the type is not defined in the settings."""
         with self.assertRaises(ValidationError):
             Tag.objects.create(
                 tag_value="testValue",
@@ -89,7 +90,7 @@ class TestTag(TestCase):
             )
 
     def test_tag_different_generic_objects_fail(self):
-        """ Used to confirm the tags can't be use with objects not defined in settings."""
+        """ Used to confirm that tags can't be created if its fields don't match the strings defined in settings."""
         with self.assertRaises(ValidationError):
             Tag.objects.create(
                 tag_value="testValue",
@@ -99,7 +100,7 @@ class TestTag(TestCase):
             )
 
     def test_tag_different_generic_objects(self):
-        """ Used to confirm the tags can be use with any object defined in settings."""
+        """ Used to confirm that tags can be created if its fields match the strings defined in settings."""
         Tag.objects.create(
             tag_value="testValue",
             tag_type="testType",
@@ -111,7 +112,7 @@ class TestTag(TestCase):
         {"field_name": "tag_value", "validations": ["definition"], "allowed": r".*"},
         {"field_name": "tagged_object_name", "validations": ["definition"], "allowed": r".*"}])
     def test_tag_validation_regex_accepts_any_value(self):
-        """ Used to confirm that tags can match any string if defined in settings."""
+        """ Used to confirm that tags can be created if its fields match any string if that's defined in settings."""
         Tag.objects.create(
             tag_value="anything can be here",
             tag_type="testType",
@@ -122,7 +123,7 @@ class TestTag(TestCase):
         Tag.objects.create(
             tag_value="anything can be here",
             tag_type="testType",
-            tagged_object=self.fake_object_tagged_fail,  # In previus tests failed, not in this
+            tagged_object=self.fake_object_tagged_fail,  # In previous tests failed, not in this
             belongs_to=self.belongs_to_object,
         )
 
@@ -140,8 +141,7 @@ class TestTag(TestCase):
     @override_settings(EOX_TAGGING_DEFINITIONS=[
         {"field_name": "tag_value", "validations": ["definition"], "allowed": r"^a...s$"}])
     def test_tag_validation_regex_accepts_pattern_fail(self):
-        """ Used to confirm that saving fails if tag does not match pattern defined in settings
-        """
+        """ Used to confirm that saving fails if tag does not match pattern defined in settings."""
         with self.assertRaises(ValidationError):
             Tag.objects.create(
                 tag_value="Alias",
@@ -181,3 +181,67 @@ class TestTag(TestCase):
 
         # Exists in invalid objects
         Tag.objects.invalid().get(id=1)
+
+    @override_settings(EOX_TAGGING_DEFINITIONS=[])
+    def test_only_resource_locator(self):
+        """
+        Used to test that a tag can be created using as the `tagged object` a resource locator.
+        This means that tagged_object can be None. For this, EOX_TAGGING_DEFINITIONS must not contain
+        a definition for tagged_object.
+        """
+        Tag.objects.create(
+            tag_value="testValue",
+            tag_type="testType",
+            belongs_to=self.belongs_to_object,
+            resource_locator="course-v1:demo-courses+DM101+2017",
+        )
+
+    @override_settings(EOX_TAGGING_DEFINITIONS=[
+        {"field_name": "resource_locator", "validations": ["OpaqueKey"], "allowed":"CourseKey"}
+    ])
+    def test_resource_locator_validation(self):
+        """
+        Used to test that if added to settings a resource locator can be validated as a course_key.
+        """
+        Tag.objects.create(
+            tag_value="testValue",
+            tag_type="testType",
+            belongs_to=self.belongs_to_object,
+            resource_locator="course-v1:demo-courses+DM101+2017",
+        )
+
+    @override_settings(EOX_TAGGING_DEFINITIONS=[
+        {"field_name": "resource_locator", "validations": ["OpaqueKey"], "allowed":"CourseKey"}
+    ])
+    def test_resource_locator_validation_fail(self):
+        """
+        Used to test that if added to settings a resource locator can be validated as a course_key.
+        Given that the resource_locator it's not a course_key, it raises a validation error.
+        """
+        with self.assertRaises(ValidationError):
+            Tag.objects.create(
+                tag_value="testValue",
+                tag_type="testType",
+                belongs_to=self.belongs_to_object,
+                resource_locator="resourceLocatorFail",
+            )
+
+    def test_create_tag_without_resource_or_tagged_object(self):
+        """
+        Used to test that a tag can't be created without a resource locator or
+        a model.
+        """
+        with self.assertRaises(ValidationError):
+            Tag.objects.create(
+                tag_value="testValue",
+                tag_type="testType",
+                belongs_to=self.belongs_to_object,
+            )
+
+    def test_create_tag_without_owner(self):
+        """ Used to test that a tag can be created without owner"""
+        Tag.objects.create(
+            tag_value="testValue",
+            tag_type="testType",
+            tagged_object=self.tagged_object,
+        )
