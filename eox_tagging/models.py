@@ -12,7 +12,7 @@ from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 
-from eox_tagging.constants import AccessLevel, GenericType, Status
+from eox_tagging.constants import AccessLevel, Status
 from eox_tagging.validators import Validators
 
 log = logging.getLogger(__name__)
@@ -48,6 +48,10 @@ class TagQuerySet(QuerySet):
             tagged_type=ctype,
             tagged_object_id=tagged_object.id,
         )
+
+    def hard_delete(self):
+        """ Method for deleting Tag objects"""
+        return super(TagQuerySet, self).delete()
 
 
 @python_2_unicode_compatible
@@ -97,12 +101,10 @@ class Tag(models.Model):
         ContentType,
         on_delete=models.CASCADE,
         related_name="%(class)s_type",
-        default=GenericType.DEFAULT,
         null=True,
         blank=True,
     )
     tagged_object_id = models.PositiveIntegerField(
-        default=GenericType.DEFAULT,
         null=True,
         blank=True,
     )
@@ -113,12 +115,10 @@ class Tag(models.Model):
         ContentType,
         on_delete=models.CASCADE,
         related_name="belongs_to_%(class)s_type",
-        default=GenericType.DEFAULT,
         null=True,
         blank=True,
     )
     belongs_to_object_id = models.PositiveIntegerField(
-        default=GenericType.DEFAULT,
         null=True,
         blank=True,
     )
