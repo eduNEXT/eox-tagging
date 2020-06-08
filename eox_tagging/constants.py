@@ -32,8 +32,3 @@ class Status(IntEnum):
     def choices(cls):
         """Returns choices for the class."""
         return [(key.value, key.name) for key in cls]  # pylint: disable=not-an-iterable
-
-
-class GenericType(IntEnum):
-    """Used for defaults when creating generic fields."""
-    DEFAULT = 1
