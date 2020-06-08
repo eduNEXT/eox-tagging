@@ -98,8 +98,14 @@ class Tag(models.Model):
         on_delete=models.CASCADE,
         related_name="%(class)s_type",
         default=GenericType.DEFAULT,
+        null=True,
+        blank=True,
     )
-    tagged_object_id = models.PositiveIntegerField(default=GenericType.DEFAULT)
+    tagged_object_id = models.PositiveIntegerField(
+        default=GenericType.DEFAULT,
+        null=True,
+        blank=True,
+    )
     tagged_object = GenericForeignKey("tagged_type", "tagged_object_id")
 
     # Generic foreign key for `tag belonging to` USER or SITE
@@ -108,9 +114,17 @@ class Tag(models.Model):
         on_delete=models.CASCADE,
         related_name="belongs_to_%(class)s_type",
         default=GenericType.DEFAULT,
+        null=True,
+        blank=True,
     )
-    belongs_to_object_id = models.PositiveIntegerField(default=GenericType.DEFAULT)
+    belongs_to_object_id = models.PositiveIntegerField(
+        default=GenericType.DEFAULT,
+        null=True,
+        blank=True,
+    )
     belongs_to = GenericForeignKey("belongs_to_type", "belongs_to_object_id")
+
+    resource_locator = models.CharField(max_length=150, null=True, blank=True)
 
     objects = TagQuerySet().as_manager()
 
@@ -119,6 +133,7 @@ class Tag(models.Model):
         verbose_name = "tag"
         verbose_name_plural = "tags"
         app_label = "eox_tagging"
+        unique_together = (("resource_locator", "tagged_object_id"),)
 
     def __str__(self):
         return self.tag_value
@@ -126,15 +141,16 @@ class Tag(models.Model):
     @property
     def tagged_object_name(self):
         """Obtain the name of the object tagged by the `Tag`."""
-        return self.tagged_object.__class__.__name__
+        return self.tagged_object.__class__.__name__ if self.tagged_object else None
 
     @property
     def belongs_to_object_name(self):
         """Obtain the name of the object which the tag belongs to."""
-        return self.belongs_to.__class__.__name__
+        return self.belongs_to.__class__.__name__ if self.belongs_to else None
 
     def clean(self):
         Validators(self).run_validators()
+        Validators(self).validate_unique_together()
 
     def clean_fields(self):  # pylint: disable=arguments-differ
         if getattr(base_settings, "EOX_TAGGING_SKIP_VALIDATIONS", False):  # Skip these validations while testing
@@ -144,7 +160,7 @@ class Tag(models.Model):
 
     def full_clean(self, exclude=None, validate_unique=False):
         """
-        Call clean_fields(), clean(), and validate_unique() on the model.
+        Call clean_fields(), clean(), and validate_unique() -not implemented- on the model.
         Raise a ValidationError for any errors that occur.
         """
         self.clean_fields()

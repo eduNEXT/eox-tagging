@@ -12,18 +12,31 @@ EOX_TAGGING_DEFINITIONS = [
 
 For every field I want to validate, I would have to define an object inside of EOX_TAGGING_DEFINITIONS
 with the fields defined above
+
+Type of validations:
+    definition: it means that the value of field_name must be in allowed or match the allowed pattern
+    OpaqueKey: it means that the resource locator can be validated as opaque key. Here, allowed need to be
+    a string with the key type. For example: CourseKey
 """
 import logging
 import re
 
+import opaque_keys.edx.keys as all_opaque_keys
 from django.conf import settings as base_settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from eox_core.edxapp_wrapper.courseware import get_courseware_courses
 from eox_core.edxapp_wrapper.enrollments import get_enrollment
 from eox_core.edxapp_wrapper.users import get_edxapp_user
+from opaque_keys import InvalidKeyError  # pylint: disable=ungrouped-imports
 
 log = logging.getLogger(__name__)
+
+try:
+    # Python 2: "unicode" is built-in
+    unicode
+except NameError:
+    unicode = str  # pylint: disable=redefined-builtin
 
 
 class Validators(object):
@@ -38,6 +51,7 @@ class Validators(object):
         self.instance = instance
         self.functions = {  # Functions defined for validation
             "definition": self.__validate_field_definition,
+            "OpaqueKey": self.__validate_opaque_key,
         }
         self.model_validations = {
             'User': self.__validate_user_integrity,
@@ -53,7 +67,7 @@ class Validators(object):
         model_tagged_name = self.instance.tagged_object_name
 
         try:
-            self.model_validations[model_tagged_name]("tagged_object")
+            self.model_validations[model_tagged_name]("tagged_object") if model_tagged_name else None
         except KeyError:
             raise ValidationError("EOX_TAGGING  |   Could not find integrity validation for field {}"
                                   .format(model_tagged_name))
@@ -63,7 +77,7 @@ class Validators(object):
 
         belongs_to_model_name = self.instance.belongs_to_object_name
         try:
-            self.model_validations[belongs_to_model_name]("belongs_to")
+            self.model_validations[belongs_to_model_name]("belongs_to") if belongs_to_model_name else None
         except KeyError:
             raise ValidationError("EOX_TAGGING  |   Could not find integrity validation for field {}"
                                   .format(belongs_to_model_name))
@@ -83,7 +97,7 @@ class Validators(object):
 
     def __validate_course_integrity(self, object_name):
         """ Function that validates existence of the course."""
-        course_id = getattr(self.instance, object_name).course_id  # Course needs to have course_id
+        course_id = unicode(getattr(self.instance, object_name).course_id)  # Course needs to have course_id
         try:
             get_courseware_courses().get_course_by_id(course_id)
             log.info("EOX_TAGGING  |   Validated course integrity %s", course_id)
@@ -94,7 +108,7 @@ class Validators(object):
         """ Function that validates existence of the enrollment."""
         data = {
             "username": getattr(self.instance, object_name).username,
-            "course_id": getattr(self.instance, object_name).course_id,
+            "course_id": unicode(getattr(self.instance, object_name).course_id),
         }
         try:
             enrollment, _ = get_enrollment(**data)
@@ -102,7 +116,7 @@ class Validators(object):
                 raise ValidationError("EOX_TAGGING  |  Enrollment for user {user} and courseID {course} does not exist"
                                       .format(user=data["username"], course=data["course_id"]))
         except Exception:
-            raise ValidationError("EOX_TAGGING  |   Enrollment for user {user} and courseID {course} does not exist"
+            raise ValidationError("EOX_TAGGING  |   Error getting enrollment for user {user} and courseID {course}"
                                   .format(user=data["username"], course=data["course_id"]))
 
     def __validate_site_integrity(self, object_name):
@@ -165,3 +179,28 @@ class Validators(object):
             # Values allowed is regex pattern
 
             raise ValidationError("EOX_TAGGING  |   The {} is not in tag definitions".format(field))
+
+    def __validate_opaque_key(self, obj):
+        """ Function that if called validates that the resource locator is a CourseKey"""
+        field = obj.get("field_name")
+        values_allowed = obj.get("allowed")
+
+        try:
+            field_value = getattr(self.instance, field)
+        except AttributeError:
+            log.error("EOX_TAGGING  |   The tag with value %s does not have attribute %s", self.instance, field)
+            return
+
+        try:
+            opaque_key_to_validate = getattr(all_opaque_keys, values_allowed)
+            getattr(opaque_key_to_validate, "from_string")(field_value)
+        except InvalidKeyError:
+            # We don't recognize this key
+            raise ValidationError("The key {} is not a course key".format(field_value))
+
+    def validate_unique_together(self):
+        """Function that validates that at least one of the two fields in unique together is not null."""
+        for field_tuple in self.instance._meta.unique_together[:]:  # pylint: disable=protected-access
+            if all(getattr(self.instance, field_name) is None for field_name in field_tuple):
+                raise ValidationError("At least one of {field_one} and {field_two} must be not null"
+                                      .format(field_one=field_tuple[0], field_two=field_tuple[1]))

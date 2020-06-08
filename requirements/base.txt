@@ -6,4 +6,9 @@
 #
 -e git+https://github.com/edunext/eox-core.git@v2.12.3#egg=eox-core  # via -r requirements/base.in
 django==1.11.29           # via -c requirements/constraints.txt, -r requirements/base.in
+edx-opaque-keys==2.1.0    # via -r requirements/base.in
+pbr==5.4.5                # via stevedore
+pymongo==3.10.1           # via edx-opaque-keys
 pytz==2020.1              # via django
+six==1.15.0               # via edx-opaque-keys, stevedore
+stevedore==1.32.0         # via edx-opaque-keys

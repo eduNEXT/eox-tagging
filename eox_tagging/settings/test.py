@@ -40,4 +40,3 @@ def plugin_settings(settings):  # pylint: disable=function-redefined, unused-arg
     Set of plugin settings used by the Open Edx platform.
     More info: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
     """
-    pass
