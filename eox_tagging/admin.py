@@ -11,9 +11,43 @@ class TagAdmin(admin.ModelAdmin):
     list_display = [
         "tag_type",
         "tag_value",
-        "tagged_object_name",
-        "belongs_to_object_name",
+        "tagged_object",
+        "belongs_to",
     ]
+    # search_fields = ('tag_type', 'tag_value', 'tagged_object', 'belongs_to')
+    search_fields = ('tag_type', 'tag_value')
+
+    def get_search_results(self, request, queryset, search_term):
+        """
+        Custom search to support searching on the tagged objects
+        """
+        queryset, use_distinct = super(TagAdmin, self).get_search_results(
+            request,
+            queryset,
+            search_term
+        )
+        # TODO: we need to connect the TagQuery search here.
+        return queryset, use_distinct
+
+    def belongs_to(self, tag):
+        """
+        Displays useful info about the owner of the tag
+        """
+        # pylint: disable=broad-except
+        try:
+            return u"{}: {}".format(tag.belongs_to_object_name, tag.belongs_to)
+        except Exception as error:
+            return str(error)
+
+    def tagged_object(self, tag):
+        """
+        Displays useful info about the tagged object
+        """
+        # pylint: disable=broad-except
+        try:
+            return u"{}: {}".format(tag.tagged_object_name, tag.tagged_object)
+        except Exception as error:
+            return str(error)
 
 
 admin.site.register(Tag, TagAdmin)
