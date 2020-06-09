@@ -4,16 +4,17 @@ Model to store tags in the database
 import logging
 import uuid
 
-from django.conf import settings as base_settings
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 
 from eox_tagging.constants import AccessLevel, Status
-from eox_tagging.validators import Validators
+from eox_tagging.validators import TagValidators
 
 log = logging.getLogger(__name__)
 
@@ -149,20 +150,38 @@ class Tag(models.Model):
         return self.belongs_to.__class__.__name__ if self.belongs_to else None
 
     def clean(self):
-        Validators(self).run_validators()
-        Validators(self).validate_unique_together()
+        """
+        Validates inter-field relations
+        """
+        self.validator.run_validators()
+        self.validator.validate_unique_together()
 
     def clean_fields(self):  # pylint: disable=arguments-differ
-        if getattr(base_settings, "EOX_TAGGING_SKIP_VALIDATIONS", False):  # Skip these validations while testing
+        """
+        Validates fields individually
+        """
+        if getattr(settings, "EOX_TAGGING_SKIP_VALIDATIONS", False):  # Skip these validations while testing
             return
-        Validators(self).validate_owner()
-        Validators(self).validate_tagged_object()
+        self.validator.validate_owner()
+        self.validator.validate_tagged_object()
 
     def full_clean(self, exclude=None, validate_unique=False):
         """
         Call clean_fields(), clean(), and validate_unique() -not implemented- on the model.
         Raise a ValidationError for any errors that occur.
         """
+
+        definitions = None
+        for tag_def in settings.EOX_TAGGING_DEFINITIONS:
+            tag_type = tag_def.get('tag_type')
+            if tag_type is self.tag_type:
+                definitions = tag_def
+                break
+
+        if not definitions:
+            raise ValidationError("Tag_type '{}' not configured".format(self.tag_type))
+
+        self.validator = TagValidators(self, definitions)
         self.clean_fields()
         self.clean()
 

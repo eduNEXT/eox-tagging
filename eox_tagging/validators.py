@@ -23,7 +23,7 @@ import logging
 import re
 
 import opaque_keys.edx.keys as all_opaque_keys
-from django.conf import settings as base_settings
+from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from eox_core.edxapp_wrapper.courseware import get_courseware_courses
@@ -40,11 +40,11 @@ except NameError:
     unicode = str  # pylint: disable=redefined-builtin
 
 
-class Validators(object):
+class TagValidators(object):
     """ Defines all validator methods.
     """
 
-    def __init__(self, instance):
+    def __init__(self, instance, definitions):
         """
         Attributes:
             instance: instance of the model to validate before saving
@@ -60,6 +60,7 @@ class Validators(object):
             'CourseEnrollment': self.__validate_enrollment_integrity,
             'Site': self.__validate_site_integrity,
         }
+        current_tag_definitions = definitions
 
     # GFK validations
     def validate_tagged_object(self):
@@ -137,12 +138,10 @@ class Validators(object):
 
     # Other validations
     def run_validators(self):
-        """Runs defined validators on the EOX_TAGGING_DEFINITIONS object."""
+        """Runs defined validators on the definitions of one tag."""
         self.__validate_not_update()
 
-        definitions = base_settings.EOX_TAGGING_DEFINITIONS
-
-        for obj in definitions:
+        for obj in self.current_tag_definitions:
             validations = obj.get("validations")
             for val in validations:
                 try:
