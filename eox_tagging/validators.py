@@ -18,6 +18,7 @@ Type of validations:
     OpaqueKey: it means that the resource locator can be validated as opaque key. Here, allowed need to be
     a string with the key type. For example: CourseKey
 """
+import crum
 import logging
 import re
 
@@ -85,15 +86,21 @@ class Validators(object):
     # Integrity validators
     def __validate_user_integrity(self, object_name):
         """ Function that validates existence of user."""
+
+        request = crum.get_current_request()
         data = {
             "username": getattr(self.instance, object_name).username,  # User needs to have username
+            "site": request.site
         }
         try:
             get_edxapp_user(**data)
             log.info("EOX_TAGGING  |   Validated user integrity %s", data["username"])
 
         except Exception:
-            raise ValidationError("EOX_TAGGING  |   User {} does not exist".format(data["username"]))
+            raise ValidationError("EOX_TAGGING  |   Could not find ID: {id} for relation {name}".format(
+                id=getattr(self.instance, object_name).id,
+                name=object_name,
+            ))
 
     def __validate_course_integrity(self, object_name):
         """ Function that validates existence of the course."""
