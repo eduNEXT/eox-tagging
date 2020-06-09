@@ -7,3 +7,5 @@ pylint
 pycodestyle
 coverage
 django-fake-model
+django-crum
+django-filter

@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
                 ('target_object_id', models.PositiveIntegerField(blank=True, null=True)),
                 ('owner_object_id', models.PositiveIntegerField(blank=True, null=True)),
                 ('owner_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='owner_tag_type', to='contenttypes.ContentType')),
-                ('target_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='tag_type', to='contenttypes.ContentType')),
+                ('target_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='target_tag_type', to='contenttypes.ContentType')),
             ],
             options={
                 'verbose_name': 'tag',
