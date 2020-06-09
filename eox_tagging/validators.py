@@ -181,9 +181,12 @@ class Validators(object):
             raise ValidationError("EOX_TAGGING  |   The {} is not in tag definitions".format(field))
 
     def __validate_opaque_key(self, obj):
-        """ Function that if called validates that the resource locator is a CourseKey"""
+        """
+        Function that if called validates that the resource locator is any OpaqueKey defined in
+        opaque_keys.edx.keys
+        """
         field = obj.get("field_name")
-        values_allowed = obj.get("allowed")
+        values_allowed = obj.get("allowed")  # OpaqueKey for validation defined in settings
 
         try:
             field_value = getattr(self.instance, field)
@@ -193,10 +196,11 @@ class Validators(object):
 
         try:
             opaque_key_to_validate = getattr(all_opaque_keys, values_allowed)
+            # Validation method for OpaqueKey opaque_key_to_validate
             getattr(opaque_key_to_validate, "from_string")(field_value)
         except InvalidKeyError:
             # We don't recognize this key
-            raise ValidationError("The key {} is not a course key".format(field_value))
+            raise ValidationError("The key {} is not an opaque key".format(field_value))
 
     def validate_unique_together(self):
         """Function that validates that at least one of the two fields in unique together is not null."""
