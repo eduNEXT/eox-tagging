@@ -12,7 +12,7 @@ class TagAdmin(admin.ModelAdmin):
         "tag_type",
         "tag_value",
         "tagged_object",
-        "belongs_to",
+        "owner",
     ]
     # search_fields = ('tag_type', 'tag_value', 'tagged_object', 'belongs_to')
     search_fields = ('tag_type', 'tag_value')
@@ -29,13 +29,13 @@ class TagAdmin(admin.ModelAdmin):
         # TODO: we need to connect the TagQuery search here.
         return queryset, use_distinct
 
-    def belongs_to(self, tag):
+    def owner(self, tag):
         """
         Displays useful info about the owner of the tag
         """
         # pylint: disable=broad-except
         try:
-            return u"{}: {}".format(tag.belongs_to_object_name, tag.belongs_to)
+            return u"{}: {}".format(tag.owner_object_name, tag.owner_object)
         except Exception as error:
             return str(error)
 
@@ -45,7 +45,7 @@ class TagAdmin(admin.ModelAdmin):
         """
         # pylint: disable=broad-except
         try:
-            return u"{}: {}".format(tag.tagged_object_name, tag.tagged_object)
+            return u"{}: {}".format(tag.target_object_name, tag.target_object)
         except Exception as error:
             return str(error)
 

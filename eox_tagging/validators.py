@@ -18,7 +18,7 @@ Type of validations:
     OpaqueKey: it means that the resource locator can be validated as opaque key. Here, allowed need to be
     a string with the key type. For example: CourseKey
 """
-import crum
+import crum  # pylint: disable=import-error
 import logging
 import re
 
@@ -50,39 +50,69 @@ class TagValidators(object):
             instance: instance of the model to validate before saving
         """
         self.instance = instance
-        self.functions = {  # Functions defined for validation
-            "definition": self.__validate_field_definition,
-            "OpaqueKey": self.__validate_opaque_key,
-        }
         self.model_validations = {
             'User': self.__validate_user_integrity,
             'Course': self.__validate_course_integrity,
             'CourseEnrollment': self.__validate_enrollment_integrity,
             'Site': self.__validate_site_integrity,
         }
-        current_tag_definitions = definitions
+        self.current_tag_definitions = definitions
+
+        self.validations_allowed = ["in", "exist", "regex", "object"]
+
+    # Config validations
+    def validate_config(self, settings):
+        """
+        Function that validates EOX_TAGGING_DEFINITIONS. The validations consist in:
+            - Validate available validations
+            - Validate field names
+        If any error occur a ValidationError will be raised.
+        """
+        regex = r"validate_"
+
+        for tag_def in settings:
+            for key, value in tag_def:
+
+                # Validate value correctness if it has validations defined
+                if re.match(regex, key):  # Validations must exist in self.validations_allowed
+                    for key in value:
+                        if key not in self.validations_allowed:
+                            raise ValidationError("EOX_TAGGING  |   The {} is not in the defined validations"
+                                                  .format(key))
+                # Validate key existence
+                clean_key = re.sub(regex,"", key)
+                try:
+                    getattr(self.instance, clean_key)
+                except AttributeError:
+                    raise ValidationError("EOX_TAGGING  |   The tag with value {} does not have attribute {}"
+                                          .format(self.instance, clean_key))
 
     # GFK validations
-    def validate_tagged_object(self):
-        """Function that validates the tagged object calling the integrity validators."""
 
-        model_tagged_name = self.instance.tagged_object_name
+    def validate_fields_integrity(self):
+        self.__validate_target_object()
+        self.__validate_owner()
+
+    def __validate_target_object(self):
+        """Function that validates the target object calling the integrity validators."""
+
+        model_target_name = self.instance.target_object_name
 
         try:
-            self.model_validations[model_tagged_name]("tagged_object") if model_tagged_name else None
+            self.model_validations[model_target_name]("target_object") if model_target_name else None
         except KeyError:
             raise ValidationError("EOX_TAGGING  |   Could not find integrity validation for field {}"
-                                  .format(model_tagged_name))
+                                  .format(model_target_name))
 
-    def validate_owner(self):
+    def __validate_owner(self):
         """Function that validates the owner of the tag calling the integrity validators."""
 
-        belongs_to_model_name = self.instance.belongs_to_object_name
+        owner_model_name = self.instance.owner_object_name
         try:
-            self.model_validations[belongs_to_model_name]("belongs_to") if belongs_to_model_name else None
+            self.model_validations[owner_model_name]("owner") if owner_model_name else None
         except KeyError:
             raise ValidationError("EOX_TAGGING  |   Could not find integrity validation for field {}"
-                                  .format(belongs_to_model_name))
+                                  .format(owner_model_name))
 
     # Integrity validators
     def __validate_user_integrity(self, object_name):
@@ -137,63 +167,33 @@ class TagValidators(object):
             raise ValidationError("EOX_TAGGING  |   Site {} does not exist".format(site_id))
 
     # Other validations
-    def run_validators(self):
-        """Runs defined validators on the definitions of one tag."""
-        self.__validate_not_update()
-
-        for obj in self.current_tag_definitions:
-            validations = obj.get("validations")
-            for val in validations:
-                try:
-                    validator_function = self.functions[val]
-                    validator_function(obj)
-                except AttributeError:
-                    raise ValidationError("EOX_TAGGING  |   Validator {} does not exist ".format(obj))
-
-    def __validate_not_update(self):
+    def validate_not_update(self):
         """Function that validates that the save is not an update."""
         if self.instance.id:
             #  Exception raised when trying to update
             raise ValidationError("EOX_TAGGING  |   Can't update tag. Tags are inmutable by definition")
 
-    def __validate_field_definition(self, obj):
-        """
-        Function that validate the existence of the definition of the field. The
-        definition can be a list of values or regex like ` r'definition' `.
+    def validate_fields(self):
+        """ Function that validates all fields for the current definition."""
+        regex = r"^validate_"
 
-        If the value does not match with any value in allowed values list or regex, an
-        exception is raised.
+        for key, value in self.current_tag_definitions:
 
-        Attributes:
-            obj: the object in definitions used for validations
-        """
-        field = obj.get("field_name")
-        values_allowed = obj.get("allowed")
+            if re.search(regex, key):
+                clean_key = re.sub(regex,"", key)
+                for _key, _value in value:
+                    validator_method = getattr(self, "__validate_{}".format(_key))
+                    validator_method(clean_key, _value)
+            else:
+                validator_method = getattr(self, "__validate_equals") # Required?
+                #TODO: preguntar si esta bien
+                validator_method(key, value)
 
-        try:
-            field_value = getattr(self.instance, field)
-        except AttributeError:
-            log.error("EOX_TAGGING  |   The tag with value %s does not have attribute %s", self.instance, field)
-            return
-
-        if isinstance(values_allowed, list) and all(value != field_value for value in values_allowed):
-            # Values allowed is list of values (at least one)
-
-            raise ValidationError("EOX_TAGGING  |   The {} is not in tag definitions".format(field))
-
-        elif isinstance(values_allowed, str) and not re.search(values_allowed, field_value):
-            # Values allowed is regex pattern
-
-            raise ValidationError("EOX_TAGGING  |   The {} is not in tag definitions".format(field))
-
-    def __validate_opaque_key(self, obj):
+    def __validate_OpaqueKey(self, field, value):
         """
         Function that if called validates that the resource locator is any OpaqueKey defined in
         opaque_keys.edx.keys
         """
-        field = obj.get("field_name")
-        values_allowed = obj.get("allowed")  # OpaqueKey for validation defined in settings
-
         try:
             field_value = getattr(self.instance, field)
         except AttributeError:
@@ -201,12 +201,52 @@ class TagValidators(object):
             return
 
         try:
-            opaque_key_to_validate = getattr(all_opaque_keys, values_allowed)
-            # Validation method for OpaqueKey opaque_key_to_validate
+            opaque_key_to_validate = getattr(all_opaque_keys, value)
+            # Validation method for OpaqueKey: opaque_key_to_validate
             getattr(opaque_key_to_validate, "from_string")(field_value)
         except InvalidKeyError:
             # We don't recognize this key
-            raise ValidationError("The key {} is not an opaque key".format(field_value))
+            raise ValidationError("The key {} for {} is not an opaque key".format(field_value, field))
+
+    def __validate_in(self, field, values):
+
+        field_value = getattr(self.instance, field)
+
+        if field_value not in values:
+            # Values allowed is list of values (at least one)
+
+            raise ValidationError("EOX_TAGGING  |   The {} is not in tag definitions".format(field))
+
+    def __validate_exist(self, field, value):
+
+        field_value = getattr(self.instance, field)
+
+        if not field_value:
+            raise ValidationError("EOX_TAGGING  |   The {} must exist in the instance created.".format(field))
+
+    def __validate_equals(self, field, value):
+
+        field_value = getattr(self.instance, field)
+
+        if field_value is not value:
+            raise ValidationError("EOX_TAGGING  |   The {} must be equal to {}".format(field, value))
+
+
+    def __validate_object(self, field, value):
+
+        field_value = getattr(self.instance, "{}_name".format(field))
+
+        if field_value is not value:
+            raise ValidationError("EOX_TAGGING  |   The {} must be an instance of {}.".format(field, value))
+
+    def __validate_regex(self, field, value):
+
+        field_value = getattr(self.instance, field)
+
+        if not re.search(value, field_value):
+            # Values allowed is regex pattern
+
+            raise ValidationError("EOX_TAGGING  |   The {} is not in tag definitions".format(field))
 
     def validate_unique_together(self):
         """Function that validates that at least one of the two fields in unique together is not null."""

@@ -40,14 +40,14 @@ class TagQuerySet(QuerySet):
             belongs_to_object_id=owner.id,
         )
 
-    def find_all_tags_for(self, tagged_object):
+    def find_all_tags_for(self, target_object):
         """Returns all valid on an object."""
-        model = tagged_object.__class__
+        model = target_object.__class__
         ctype = ContentType.objects.get_for_model(model)
 
         return self.valid().filter(
-            tagged_type=ctype,
-            tagged_object_id=tagged_object.id,
+            target_type=ctype,
+            target_object_id=target_object.id,
         )
 
     def hard_delete(self):
@@ -69,7 +69,7 @@ class Tag(models.Model):
         access: access level of the tag
         activation_date: date to activate the tag
         expiration-date: date to deactivate de tag
-        tagged_object: object tagged
+        target_object: object to tag
         belongs_to: object to which the tag belongs
         status: status of the tag, valid or invalid
         invalidated_at: date when the tag is soft deleted
@@ -98,32 +98,32 @@ class Tag(models.Model):
     invalidated_at = models.DateTimeField(blank=True, null=True)
 
     # Generic foreign key for tagged objects
-    tagged_type = models.ForeignKey(
+    target_type = models.ForeignKey(
         ContentType,
         on_delete=models.CASCADE,
         related_name="%(class)s_type",
         null=True,
         blank=True,
     )
-    tagged_object_id = models.PositiveIntegerField(
+    target_object_id = models.PositiveIntegerField(
         null=True,
         blank=True,
     )
-    tagged_object = GenericForeignKey("tagged_type", "tagged_object_id")
+    target_object = GenericForeignKey("target_type", "target_object_id")
 
     # Generic foreign key for `tag belonging to` USER or SITE
-    belongs_to_type = models.ForeignKey(
+    owner_type = models.ForeignKey(
         ContentType,
         on_delete=models.CASCADE,
-        related_name="belongs_to_%(class)s_type",
+        related_name="owner_%(class)s_type",
         null=True,
         blank=True,
     )
-    belongs_to_object_id = models.PositiveIntegerField(
+    owner_object_id = models.PositiveIntegerField(
         null=True,
         blank=True,
     )
-    belongs_to = GenericForeignKey("belongs_to_type", "belongs_to_object_id")
+    owner_object = GenericForeignKey("owner_type", "owner_object_id")
 
     resource_locator = models.CharField(max_length=150, null=True, blank=True)
 
@@ -140,20 +140,20 @@ class Tag(models.Model):
         return self.tag_value
 
     @property
-    def tagged_object_name(self):
-        """Obtain the name of the object tagged by the `Tag`."""
-        return self.tagged_object.__class__.__name__ if self.tagged_object else None
+    def target_object_name(self):
+        """Obtain the name of the object target by the `Tag`."""
+        return self.target_object.__class__.__name__ if self.target_object else None
 
     @property
-    def belongs_to_object_name(self):
+    def owner_object_name(self):
         """Obtain the name of the object which the tag belongs to."""
-        return self.belongs_to.__class__.__name__ if self.belongs_to else None
+        return self.owner_object.__class__.__name__ if self.owner_object else None
 
     def clean(self):
         """
         Validates inter-field relations
         """
-        self.validator.run_validators()
+        self.validator.validate_fields()
         self.validator.validate_unique_together()
 
     def clean_fields(self):  # pylint: disable=arguments-differ
@@ -162,8 +162,7 @@ class Tag(models.Model):
         """
         if getattr(settings, "EOX_TAGGING_SKIP_VALIDATIONS", False):  # Skip these validations while testing
             return
-        self.validator.validate_owner()
-        self.validator.validate_tagged_object()
+        self.validator.validate_fields_integrity()
 
     def full_clean(self, exclude=None, validate_unique=False):
         """
