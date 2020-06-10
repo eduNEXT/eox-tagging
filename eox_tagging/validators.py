@@ -9,8 +9,6 @@ import logging
 import re
 
 import opaque_keys.edx.keys as all_opaque_keys
-import six
-from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from eox_core.edxapp_wrapper.enrollments import get_enrollment
@@ -327,7 +325,6 @@ class TagValidators(object):
     def validate_regex(self, field, value):
         """
         Function that validates that the field matches value.
-
         Arguments:
             - field: field to validate
             - value: validations defined for the field
