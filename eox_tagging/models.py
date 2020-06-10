@@ -36,8 +36,8 @@ class TagQuerySet(QuerySet):
         ctype = ContentType.objects.get_for_model(model)
 
         return self.valid().filter(
-            belongs_to_type=ctype,
-            belongs_to_object_id=owner.id,
+            owner_type=ctype,
+            owner_object_id=owner.id,
         )
 
     def find_all_tags_for(self, target_object):
@@ -74,7 +74,6 @@ class Tag(models.Model):
         status: status of the tag, valid or invalid
         invalidated_at: date when the tag is soft deleted
     """
-    id = models.AutoField(primary_key=True,)
     key = models.UUIDField(
         unique=True,
         editable=False,
@@ -134,18 +133,18 @@ class Tag(models.Model):
         verbose_name = "tag"
         verbose_name_plural = "tags"
         app_label = "eox_tagging"
-        unique_together = (("resource_locator", "tagged_object_id"),)
+        unique_together = (("resource_locator", "target_object_id"),)
 
     def __str__(self):
         return self.tag_value
 
     @property
-    def target_object_name(self):
+    def target_object_type(self):
         """Obtain the name of the object target by the `Tag`."""
         return self.target_object.__class__.__name__ if self.target_object else None
 
     @property
-    def owner_object_name(self):
+    def owner_object_type(self):
         """Obtain the name of the object which the tag belongs to."""
         return self.owner_object.__class__.__name__ if self.owner_object else None
 
@@ -169,18 +168,19 @@ class Tag(models.Model):
         Call clean_fields(), clean(), and validate_unique() -not implemented- on the model.
         Raise a ValidationError for any errors that occur.
         """
-
         definitions = None
         for tag_def in settings.EOX_TAGGING_DEFINITIONS:
             tag_type = tag_def.get('tag_type')
-            if tag_type is self.tag_type:
+            if tag_type == self.tag_type:
                 definitions = tag_def
                 break
 
         if not definitions:
             raise ValidationError("Tag_type '{}' not configured".format(self.tag_type))
 
-        self.validator = TagValidators(self, definitions)
+        self.validator = TagValidators(self, definitions)  # pylint: disable=attribute-defined-outside-init
+        self.validator.validate_configuration()
+        self.validator.validate_no_updating()
         self.clean_fields()
         self.clean()
 

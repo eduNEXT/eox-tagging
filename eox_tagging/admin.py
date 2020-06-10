@@ -35,7 +35,7 @@ class TagAdmin(admin.ModelAdmin):
         """
         # pylint: disable=broad-except
         try:
-            return u"{}: {}".format(tag.owner_object_name, tag.owner_object)
+            return u"{}: {}".format(tag.owner_object_type, tag.owner_object)
         except Exception as error:
             return str(error)
 
@@ -45,7 +45,7 @@ class TagAdmin(admin.ModelAdmin):
         """
         # pylint: disable=broad-except
         try:
-            return u"{}: {}".format(tag.target_object_name, tag.target_object)
+            return u"{}: {}".format(tag.target_object_type, tag.target_object)
         except Exception as error:
             return str(error)
 
