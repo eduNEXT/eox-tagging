@@ -12,7 +12,7 @@ class EoxTaggingConfig(AppConfig):
     eox-tagging configuration.
     """
     name = 'eox_tagging'
-    verbose_name = 'eox-tagging'
+    verbose_name = 'eduNEXT OpenedX Tagging'
 
     plugin_app = {
         'url_config': {
