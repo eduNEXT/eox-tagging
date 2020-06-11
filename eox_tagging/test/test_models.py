@@ -38,6 +38,7 @@ from eox_tagging.test_utils import CourseEnrollments, CourseOverview
             "tag_type": "example_tag_4",
             "validate_tag_value": {"in": ["example_tag_value", "example_tag_value_1"]},
             "validate_resource_locator": {"OpaqueKey": "CourseKey"},
+            "validate_target_object_type": "CourseOverview",
         },
     ])
 @CourseOverview.fake_me
@@ -183,7 +184,7 @@ class TestTag(TestCase):
             tag_value="example by eduNEXT",
             tag_type="example_tag_3",
             target_object=self.fake_object_target_enroll,
-            owner_object=self.owner_object,
+            owner_object=self.fake_owner_object,
             expiration_date=datetime.date(2020, 10, 19),
         )
 
@@ -243,7 +244,7 @@ class TestTag(TestCase):
         Tag.objects.create(
             tag_value="example_tag_value",
             tag_type="example_tag_4",
-            owner_object=self.owner_object,
+            owner_object=self.fake_owner_object,
             resource_locator="course-v1:demo-courses+DM101+2017",
         )
 
@@ -256,7 +257,7 @@ class TestTag(TestCase):
             Tag.objects.create(
                 tag_value="example_tag_value",
                 tag_type="example_tag_4",
-                owner_object=self.owner_object,
+                owner_object=self.fake_owner_object,
                 resource_locator="resourceLocatorFail",
             )
 
@@ -269,5 +270,18 @@ class TestTag(TestCase):
             Tag.objects.create(
                 tag_value="example_tag_value",
                 tag_type="example_tag_4",
-                owner_object=self.owner_object,
+                owner_object=self.fake_owner_object,
+            )
+
+    def test_create_without_default_owner(self):
+        """
+        Used to test that if the configuration does not have an owner defined, then
+        the tag must belong to a site.
+        """
+        with self.assertRaises(ValidationError):
+            Tag.objects.create(
+                tag_value="example_tag_value",
+                tag_type="example_tag_4",
+                owner_object=self.owner_object,  # Owner type: user
+                resource_locator="course-v1:demo-courses+DM101+2017",
             )

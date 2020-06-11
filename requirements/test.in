@@ -1,6 +1,8 @@
 -c constraints.txt
 -r base.txt
 
+Django
+edx-opaque-keys[django]
 pylint
 pycodestyle
 coverage

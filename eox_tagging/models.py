@@ -7,7 +7,6 @@ import uuid
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
@@ -168,19 +167,7 @@ class Tag(models.Model):
         Call clean_fields(), clean(), and validate_unique() -not implemented- on the model.
         Raise a ValidationError for any errors that occur.
         """
-        definitions = None
-        for tag_def in settings.EOX_TAGGING_DEFINITIONS:
-            tag_type = tag_def.get('tag_type')
-            if tag_type == self.tag_type:
-                definitions = tag_def
-                break
-
-        if not definitions:
-            raise ValidationError("Tag_type '{}' not configured".format(self.tag_type))
-
-        self.validator = TagValidators(self, definitions)  # pylint: disable=attribute-defined-outside-init
-        self.validator.validate_configuration()
-        self.validator.validate_no_updating()
+        self.validator = TagValidators(self)  # pylint: disable=attribute-defined-outside-init
         self.clean_fields()
         self.clean()
 
