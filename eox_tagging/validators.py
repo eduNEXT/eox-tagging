@@ -318,10 +318,3 @@ class TagValidators(object):
         if not re.search(value, field_value):
             # Values allowed is regex pattern
             raise ValidationError("EOX_TAGGING  |   The field {} is not in tag definitions".format(field))
-
-    def validate_unique_together(self):
-        """Function that validates that at least one of the two fields in unique together is not null."""
-        for field_tuple in self.instance._meta.unique_together[:]:  # pylint: disable=protected-access
-            if all(getattr(self.instance, field_name) is None for field_name in field_tuple):
-                raise ValidationError("At least one of {field_one} and {field_two} must be not null"
-                                      .format(field_one=field_tuple[0], field_two=field_tuple[1]))

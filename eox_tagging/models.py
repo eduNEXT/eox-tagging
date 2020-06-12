@@ -132,7 +132,6 @@ class Tag(models.Model):
         verbose_name = "tag"
         verbose_name_plural = "tags"
         app_label = "eox_tagging"
-        unique_together = (("resource_locator", "target_object_id"),)
 
     def __str__(self):
         return self.tag_value
@@ -152,7 +151,6 @@ class Tag(models.Model):
         Validates inter-field relations
         """
         self.validator.validate_fields()
-        self.validator.validate_unique_together()
 
     def clean_fields(self):  # pylint: disable=arguments-differ
         """
