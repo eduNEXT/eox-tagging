@@ -63,11 +63,12 @@ class TagValidators(object):
     def __validate_required(self):
         """Function that validates the configuration for the required fields target and owner."""
 
-        required_target_fields = ["validate_target_object", "validate_target_object_type", ]
+        required_target_fields = ["validate_target_object", "validate_target_object_type",
+                                  "validate_resource_locator", ]
         required_owner_fields = ["validate_owner_object", "validate_owner_object_type", ]
 
         if not self.__find_attribute(required_target_fields):
-            raise ValidationError("Target name or target object for tag_type '{}' is not configured"
+            raise ValidationError("The target type or target object for `tag_type` '{}' is not configured"
                                   .format(self.instance.tag_type))
 
         if not self.__find_attribute(required_owner_fields):

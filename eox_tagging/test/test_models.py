@@ -211,9 +211,7 @@ class TestTag(TestCase):
         tags_owned_fake = Tag.objects.find_by_owner(self.fake_owner_object)
 
         self.assertEqual(tags_owned.first().owner_object_id, self.owner_object.id)
-        self.assertEqual(
-            tags_owned_fake.first().owner_object_id, self.fake_owner_object.id
-        )
+        self.assertEqual(tags_owned_fake.first().owner_object_id, self.fake_owner_object.id)
 
     def test_find_all_tags_for(self):
         """Used to confirm that can retrieve tags by target object."""
@@ -221,9 +219,7 @@ class TestTag(TestCase):
         tags_fake = Tag.objects.find_all_tags_for(self.fake_object_target_course)
 
         self.assertEqual(tags.first().target_object_id, self.target_object.id)
-        self.assertEqual(
-            tags_fake.first().target_object_id, self.fake_object_target_course.id
-        )
+        self.assertEqual(tags_fake.first().target_object_id, self.fake_object_target_course.id)
 
     def test_tag_soft_delete(self):
         """ Used to confirm that the tags can be invalidated soft deleting them."""
