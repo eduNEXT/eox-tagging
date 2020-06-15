@@ -7,31 +7,32 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.test import TestCase, override_settings
+from opaque_keys.edx.keys import CourseKey
 
 from eox_tagging.constants import AccessLevel
 from eox_tagging.models import Tag
-from eox_tagging.test_utils import CourseEnrollments, CourseOverview
+from eox_tagging.test_utils import CourseEnrollment, CourseOverview
 
 
 @override_settings(
     EOX_TAGGING_DEFINITIONS=[
         {
             "tag_type": "example_tag_1",
-            "validate_owner_object": {"object": "User"},  # default = Site
-            "validate_target_object": {"object": "User"},
+            "validate_owner_object": "User",  # default = Site
+            "validate_target_object": "User",
             "validate_access": {"equals": "PRIVATE"},
             "validate_tag_value": {"in": ["example_tag_value", "example_tag_value_1"]},
         },
         {
             "tag_type": "example_tag_2",
             "owner_object": "Site",
-            "validate_target_object": {"object": "CourseOverview"},
+            "validate_target_object": "CourseOverview",
             "validate_tag_value": {"opaque_key": "CourseKey"},
         },
         {
             "tag_type": "example_tag_3",
             "validate_tag_value": {"regex": r".*eduNEXT$"},
-            "validate_target_object": {"object": "CourseEnrollments"},
+            "validate_target_object": "CourseEnrollment",
             "validate_expiration_date": {"exist": True},
         },
         {
@@ -41,7 +42,7 @@ from eox_tagging.test_utils import CourseEnrollments, CourseOverview
         },
     ])
 @CourseOverview.fake_me
-@CourseEnrollments.fake_me
+@CourseEnrollment.fake_me
 class TestTag(TestCase):
     """Class for testing the Tag model."""
 
@@ -50,10 +51,10 @@ class TestTag(TestCase):
         self.target_object = User.objects.create(username="Tag")
         self.owner_object = User.objects.create(username="User")
         self.fake_owner_object = Site.objects.create()
-        self.fake_object_target_course = CourseOverview.objects.create()  # pylint: disable=no-member
-        self.fake_object_target_enroll = CourseEnrollments.objects.create()  # pylint: disable=no-member
+        self.course_key = CourseKey.from_string('course-v1:edX+FUN101x+3T2017')
+        self.fake_object_target_course = CourseOverview.objects.create(course_id=self.course_key)  # pylint: disable=no-member
 
-        self.test_tag = Tag.objects.create(
+        self.test_tag = Tag.objects.create_tag(
             tag_value="example_tag_value",
             tag_type="example_tag_1",
             target_object=self.target_object,
@@ -61,7 +62,7 @@ class TestTag(TestCase):
             access=AccessLevel.PRIVATE,
         )
 
-        Tag.objects.create(
+        Tag.objects.create_tag(
             tag_value="course-v1:demo-courses+DM101+2017",
             tag_type="example_tag_2",
             target_object=self.fake_object_target_course,
@@ -71,37 +72,41 @@ class TestTag(TestCase):
     @override_settings(
         EOX_TAGGING_DEFINITIONS=[
             {
-                "tag_type": "example_tag_4",
+                "tag_type": "example_tag_5",
                 "validate_tag_value": {"belongs": ["example_tag_value", "example_tag_value_1"]},
                 "validate_resource_locator": {"opaque_key": "CourseKey"},
             }
         ])
     def test_bad_validation_config(self):
-        """Used to check that if the config is not correct, then """
+        """
+        Used to check that if the validation is not defined then the creation fails.
+        In this case, `belongs` is not defined.
+        """
         with self.assertRaises(ValidationError):
-            Tag.objects.create(
-                tag_value="course-v1:demo-courses+DM101+2017",
-                tag_type="example_tag_2",
-                target_object=self.fake_object_target_course,
-                owner_object=self.fake_owner_object,
+            Tag.objects.create_tag(
+                tag_value="example_tag_value",
+                tag_type="example_tag_5",
+                resource_locator="course-v1:demo-courses+DM101+2017",
             )
 
     @override_settings(
         EOX_TAGGING_DEFINITIONS=[
             {
-                "tag_type": "example_tag_4",
+                "tag_type": "example_tag_6",
                 "validate_tag_name": {"in": ["example_tag_value", "example_tag_value_1"]},
                 "validate_resource_locator": {"opaque_key": "CourseKey"},
             }
         ])
     def test_bad_field_config(self):
-        """Used to check that if the config is not correct, then """
+        """
+        Used to check that if the validation is not defined then the creation fails.
+        In this case, `tag_name` is not defined.
+        """
         with self.assertRaises(ValidationError):
-            Tag.objects.create(
-                tag_value="course-v1:demo-courses+DM101+2017",
-                tag_type="example_tag_2",
-                target_object=self.fake_object_target_course,
-                owner_object=self.fake_owner_object,
+            Tag.objects.create_tag(
+                tag_value="example_tag_value",
+                tag_type="example_tag_6",
+                resource_locator="course-v1:demo-courses+DM101+2017",
             )
 
     @override_settings(EOX_TAGGING_DEFINITIONS=[])
@@ -111,11 +116,35 @@ class TestTag(TestCase):
         If the definitions array is empty then the tag cannot be created.
         """
         with self.assertRaises(ValidationError):
-            Tag.objects.create(
-                tag_value="example_tag_1",
-                tag_type="example_tag_value",
+            Tag.objects.create_tag(
+                tag_value="example_tag_value",
+                tag_type="example_tag_1",
                 target_object=self.target_object,
                 owner_object=self.owner_object,
+                access=AccessLevel.PRIVATE,
+            )
+
+    @override_settings(
+        EOX_TAGGING_DEFINITIONS=[
+            {
+                "tag_type": "example_tag_7",
+                "validate_owner_object": {"object": "User"},
+                "validate_access": {"equals": "PRIVATE"},
+                "validate_tag_value": {"in": ["example_tag_value", "example_tag_value_1"]},
+            }]
+    )
+    def test_create_config_without_target(self):
+        """
+        Used to test creating a Tag without target.
+        It results in validation error.
+        """
+        with self.assertRaises(ValidationError):
+            Tag.objects.create_tag(
+                tag_value="example_tag_value",
+                tag_type="example_tag_7",
+                target_object=self.target_object,
+                owner_object=self.owner_object,
+                access=AccessLevel.PRIVATE,
             )
 
     def test_valid_tag(self):
@@ -143,7 +172,7 @@ class TestTag(TestCase):
         of the tag, then tag_value must exist or match the validation defined.
         """
         with self.assertRaises(ValidationError):
-            Tag.objects.create(
+            Tag.objects.create_tag(
                 tag_value="testValues",
                 tag_type="example_tag_1",
                 target_object=self.target_object,
@@ -157,8 +186,8 @@ class TestTag(TestCase):
         value defined.
         """
         with self.assertRaises(ValidationError):
-            Tag.objects.create(
-                tag_value="testValue",
+            Tag.objects.create_tag(
+                tag_value="example_tag_value",
                 tag_type="testTypes",
                 target_object=self.target_object,
                 owner_object=self.owner_object,
@@ -169,31 +198,34 @@ class TestTag(TestCase):
         Used to confirm that tags can't be created if the target_object does not match
         the definition.
         """
+        fake_object_target_enroll = CourseEnrollment.objects.create()  # pylint: disable=no-member
         with self.assertRaises(ValidationError):
-            Tag.objects.create(
+            Tag.objects.create_tag(
                 tag_value="course-v1:demo-courses+DM101+2017",
                 tag_type="example_tag_2",
-                target_object=self.fake_object_target_enroll,
+                target_object=fake_object_target_enroll,
                 owner_object=self.fake_owner_object,
             )
 
     def test_tag_validation_regex_accepts_pattern(self):
         """ Used to confirm that tags can accept a pattern if defined in settings."""
-        Tag.objects.create(
+        fake_object_target_enroll = CourseEnrollment.objects.create()  # pylint: disable=no-member
+        Tag.objects.create_tag(
             tag_value="example by eduNEXT",
             tag_type="example_tag_3",
-            target_object=self.fake_object_target_enroll,
+            target_object=fake_object_target_enroll,
             owner_object=self.fake_owner_object,
             expiration_date=datetime.date(2020, 10, 19),
         )
 
     def test_tag_validation_regex_accepts_pattern_fail(self):
         """ Used to confirm that saving fails if tag does not match pattern defined in settings."""
+        fake_object_target_enroll = CourseEnrollment.objects.create()  # pylint: disable=no-member
         with self.assertRaises(ValidationError):
-            Tag.objects.create(
+            Tag.objects.create_tag(
                 tag_value="example by edx",
                 tag_type="example_tag_3",
-                target_object=self.fake_object_target_enroll,
+                target_object=fake_object_target_enroll,
                 owner_object=self.owner_object,
                 expiration_date=datetime.date(2020, 10, 19),
             )
@@ -236,7 +268,7 @@ class TestTag(TestCase):
         This means that target_object can be None. For this, EOX_TAGGING_DEFINITIONS must not contain
         a definition for target_object.
         """
-        Tag.objects.create(
+        Tag.objects.create_tag(
             tag_value="example_tag_value",
             tag_type="example_tag_4",
             owner_object=self.fake_owner_object,
@@ -249,7 +281,7 @@ class TestTag(TestCase):
         Given that the resource_locator it's not a course_key, it raises a validation error.
         """
         with self.assertRaises(ValidationError):
-            Tag.objects.create(
+            Tag.objects.create_tag(
                 tag_value="example_tag_value",
                 tag_type="example_tag_4",
                 owner_object=self.fake_owner_object,
@@ -262,10 +294,35 @@ class TestTag(TestCase):
         a model.
         """
         with self.assertRaises(ValidationError):
-            Tag.objects.create(
+            Tag.objects.create_tag(
                 tag_value="example_tag_value",
                 tag_type="example_tag_4",
                 owner_object=self.fake_owner_object,
+            )
+
+    def test_create_with_default_owner(self):
+        """
+        Used to test that if the configuration does not have an owner defined, then
+        the tag must belong to a site.
+        """
+        Tag.objects.create_tag(
+            tag_value="example_tag_value",
+            tag_type="example_tag_4",
+            owner_object=self.fake_owner_object,  # Owner type: Site
+            resource_locator="course-v1:demo-courses+DM101+2017",
+        )
+
+    def test_create_without_matching_default_owner(self):
+        """
+        Used to test that if the configuration does not have an owner defined, then
+        the tag must belong to a site.
+        """
+        with self.assertRaises(ValidationError):
+            Tag.objects.create_tag(
+                tag_value="example_tag_value",
+                tag_type="example_tag_4",
+                owner_object=self.owner_object,  # Owner type: user
+                resource_locator="course-v1:demo-courses+DM101+2017",
             )
 
     def test_create_without_default_owner(self):
@@ -274,9 +331,30 @@ class TestTag(TestCase):
         the tag must belong to a site.
         """
         with self.assertRaises(ValidationError):
-            Tag.objects.create(
+            Tag.objects.create_tag(
                 tag_value="example_tag_value",
                 tag_type="example_tag_4",
-                owner_object=self.owner_object,  # Owner type: user
                 resource_locator="course-v1:demo-courses+DM101+2017",
             )
+
+    @override_settings(
+        EOX_TAGGING_DEFINITIONS=[
+            {
+                "tag_type": "example_tag_3",
+                "validate_tag_value": {"regex": r".*eduNEXT$"},
+                "validate_target_object": "CourseEnrollment",
+                "validate_expiration_date": {"exist": True, "in": ["Dec 04 2020", "Oct 19 2020"]},
+                "validate_activation_date": "Jun 16 2020"
+            }]
+    )
+    def test_validation_list_with_date(self):
+        """Used to test date validations."""
+        fake_object_target_enroll = CourseEnrollment.objects.create()  # pylint: disable=no-member
+        Tag.objects.create_tag(
+            tag_value="example by eduNEXT",
+            tag_type="example_tag_3",
+            target_object=fake_object_target_enroll,
+            owner_object=self.fake_owner_object,
+            expiration_date=datetime.date(2020, 10, 19),
+            activation_date=datetime.date(2020, 6, 16),
+        )

@@ -11,9 +11,11 @@
 # Django version 2.0.0 dropped support for python 2.7
 Django<2.0
 
-# TODO: Add contraint explanation
-pylint==1.9.3
-pycodestyle==2.5.0
-django-fake-model==0.1.4
+# Working version with Python 2.7 and version used in Edx Platform
+edx-opaque-keys==0.4.4
+
 # Already in python3 standard library
 futures; python_version == "2.7"
+
+# Working version with Python 2.7
+pylint<2.0

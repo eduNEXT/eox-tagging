@@ -1,4 +1,4 @@
 # Main requirements of your plugin application.
 -c constraints.txt
 
--e git+https://github.com/edunext/eox-core.git@v2.12.3#egg=eox-core
+eox-core

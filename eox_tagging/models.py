@@ -1,7 +1,9 @@
 """
-Model to store tags in the database
+Model to store tags in the database.
 """
+import datetime
 import logging
+import re
 import uuid
 
 from django.conf import settings
@@ -11,8 +13,11 @@ from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
+from opaque_keys.edx.keys import CourseKey
 
 from eox_tagging.constants import AccessLevel, Status
+from eox_tagging.helpers import get_model_name
+from eox_tagging.models_utils import ProxyModel
 from eox_tagging.validators import TagValidators
 
 log = logging.getLogger(__name__)
@@ -20,6 +25,16 @@ log = logging.getLogger(__name__)
 
 class TagQuerySet(QuerySet):
     """ Tag queryset used as manager."""
+
+    def create_tag(self, **kwargs):
+        """Method used to create tags."""
+        target = kwargs.pop('target_object', None)
+        if target and target.__class__.__name__ == "CourseOverview":
+            kwargs['target_object'] = ProxyModel.objects.create(opaque_key=target.course_id)
+        else:
+            kwargs['target_object'] = target
+        instance = self.create(**kwargs)
+        return instance
 
     def valid(self):
         """Returns all valid tags."""
@@ -41,12 +56,17 @@ class TagQuerySet(QuerySet):
 
     def find_all_tags_for(self, target_object):
         """Returns all valid on an object."""
-        model = target_object.__class__
+        if get_model_name(target_object) == 'CourseOverview':
+            model = ProxyModel
+            target_id = ProxyModel.objects.get(opaque_key=target_object.course_id).id
+        else:
+            model = target_object.__class__
+            target_id = target_object.id
         ctype = ContentType.objects.get_for_model(model)
 
         return self.valid().filter(
             target_type=ctype,
-            target_object_id=target_object.id,
+            target_object_id=target_id,
         )
 
     def hard_delete(self):
@@ -93,7 +113,7 @@ class Tag(models.Model):
         choices=Status.choices(), default=Status.VALID, editable=False,
     )
 
-    invalidated_at = models.DateTimeField(blank=True, null=True)
+    invalidated_at = models.DateTimeField(blank=True, null=True, editable=False)
 
     # Generic foreign key for tagged objects
     target_type = models.ForeignKey(
@@ -139,12 +159,85 @@ class Tag(models.Model):
     @property
     def target_object_type(self):
         """Obtain the name of the object target by the `Tag`."""
-        return self.target_object.__class__.__name__ if self.target_object else None
+        target_type = self.target_object.__class__.__name__ if self.target_object else None
+
+        if target_type == 'ProxyModel':
+            return self.__opaque_key_target()
+
+        return target_type
+
+    def __opaque_key_target(self):
+        if self.target_object.__class__.__name__ == 'ProxyModel' and \
+           isinstance(self.target_object.opaque_key, CourseKey):
+            return 'CourseOverview'
+        return None
 
     @property
     def owner_object_type(self):
         """Obtain the name of the object which the tag belongs to."""
         return self.owner_object.__class__.__name__ if self.owner_object else None
+
+    def get_attribute(self, attr, name=False):
+        """
+        Function used to format attributes getting them from self object.
+
+        Arguments:
+            - name: used if attr is target or owner and want to get the class name.
+        """
+
+        if attr and re.match(r".+object$|.+object_type$", attr):
+            return self.__get_model(attr, name)
+
+        if attr in ['activation_date', 'expiration_date']:
+            return self.__get_dates(attr)
+
+        if attr == 'access':
+            return self.__get_field_choice(attr)
+
+        return getattr(self, attr)
+
+    def __get_dates(self, attr):
+        """Function that gets formatted dates for the model."""
+        date = getattr(self, attr)
+        date_format = "%b %d %Y"
+        try:
+            date_str = datetime.datetime.strftime(date, date_format)
+        except TypeError:
+            return None
+        return date_str
+
+    def __get_model(self, attr, name):
+        """
+        Function that gets the type stored by the proxy model. This function is called when we want
+        the actual type of the target object.
+
+        Arguments:
+            - attr: name of the attr
+            - name: in case we want the class and not the object
+        """
+
+        field_value = getattr(self, "{}_type".format(attr))
+        if name:
+            return field_value
+        else:
+            return getattr(self, attr)
+
+    def __get_field_choice(self, attr):
+        """
+        Function that gets the choice of the choice field
+
+        Arguments:
+            - attr: name of the attr
+            - name: in case we want the class and not the object
+        """
+        field_value = getattr(self, attr)
+
+        try:
+            choice = getattr(field_value, "name")
+            return choice
+        except AttributeError:
+            choice = AccessLevel.get_choice(field_value)
+            return choice
 
     def clean(self):
         """
@@ -166,8 +259,8 @@ class Tag(models.Model):
         Raise a ValidationError for any errors that occur.
         """
         self.validator = TagValidators(self)  # pylint: disable=attribute-defined-outside-init
-        self.clean_fields()
         self.clean()
+        self.clean_fields()
 
     def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
         self.full_clean()
