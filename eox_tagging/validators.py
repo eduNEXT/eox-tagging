@@ -9,6 +9,7 @@ import logging
 import re
 
 import opaque_keys.edx.keys as all_opaque_keys
+import six
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -16,6 +17,8 @@ from eox_core.edxapp_wrapper.courseware import get_courseware_courses
 from eox_core.edxapp_wrapper.enrollments import get_enrollment
 from eox_core.edxapp_wrapper.users import get_edxapp_user
 from opaque_keys import InvalidKeyError  # pylint: disable=ungrouped-imports
+
+from eox_tagging.constants import AccessLevel
 
 log = logging.getLogger(__name__)
 
@@ -48,6 +51,7 @@ class TagValidators(object):
 
     def set_configuration(self):
         """Function that sets and validates configuracion for model instance."""
+        self.validate_no_updating()  # Don't validate if trying to update
         self.__select_configuration()
         self.__validate_configuration()
 
@@ -63,9 +67,8 @@ class TagValidators(object):
     def __validate_required(self):
         """Function that validates the configuration for the required fields target and owner."""
 
-        required_target_fields = ["validate_target_object", "validate_target_object_type",
-                                  "validate_resource_locator", ]
-        required_owner_fields = ["validate_owner_object", "validate_owner_object_type", ]
+        required_target_fields = ["validate_target_object", "validate_resource_locator", ]
+        required_owner_fields = ["validate_owner_object", ]
 
         if not self.__find_attribute(required_target_fields):
             raise ValidationError("The target type or target object for `tag_type` '{}' is not configured"
@@ -98,14 +101,14 @@ class TagValidators(object):
         for key, value in self.current_tag_definitions.items():
 
             # Validate value correctness if it has validations defined
-            if re.match(regex, key) and not isinstance(value, str):
+            if re.match(regex, key) and not isinstance(value, six.string_types):
                 for _key in value:  # Validations must exist as a class method
                     try:
                         getattr(self, "validate_{}".format(_key))
                     except AttributeError:
                         raise ValidationError(u"EOX_TAGGING  |   The {} defined in configurations is not"
                                               u" in the defined validations."
-                                              .format(key))
+                                              .format(_key))
             # Validate key existence
             clean_key = re.sub(regex, "", key)
             try:
@@ -216,14 +219,12 @@ class TagValidators(object):
     def validate_fields(self):
         """ Function that validates all fields for the current definition."""
 
-        self.validate_no_updating()  # Don't validate if trying to update
-
         regex = r"^validate_"
 
         for key, value in self.current_tag_definitions.items():
 
             clean_key = re.sub(regex, "", key)
-            if isinstance(value, str):
+            if isinstance(value, six.string_types):
                 validator_method = getattr(self, "validate_equals")
                 validator_method(clean_key, value)
             else:
@@ -231,7 +232,7 @@ class TagValidators(object):
                     validator_method = getattr(self, "validate_{}".format(_key))
                     validator_method(clean_key, _value)
 
-    def validate_OpaqueKey(self, field, value):
+    def validate_opaque_key(self, field, value):
         """
         Function that if called validates that that field is value OpaqueKey defined in
         opaque_keys.edx.keys.
@@ -287,9 +288,20 @@ class TagValidators(object):
         """
         field_value = getattr(self.instance, field)
 
-        field_value = getattr(field_value, "name", field_value)  # In case is choicefield
+        # In case is choicefield
+        if field == 'access':
+            try:
+                field_value = getattr(field_value, "name")
+            except AttributeError:
+                field_value = AccessLevel.get_choice(field_value)
 
-        if field_value and field_value.lower() != value.lower():
+        # In case of object field
+        if field_value and not isinstance(field_value, six.string_types):
+            field_value = field_value.__class__.__name__
+
+        if not field_value:
+            raise ValidationError("EOX_TAGGING  |   The field {} cannot be None.".format(field))
+        elif field_value.lower() != value.lower():
             raise ValidationError("EOX_TAGGING  |   The field {} must be equal to {}".format(field, value))
 
     def validate_object(self, field, value):
@@ -302,7 +314,9 @@ class TagValidators(object):
         """
         field_value = getattr(self.instance, "{}_type".format(field))
 
-        if field_value and field_value.lower() != value.lower():
+        if not field_value:
+            raise ValidationError("EOX_TAGGING  |   The field {} cannot be None.".format(field))
+        elif field_value.lower() != value.lower():
             raise ValidationError("EOX_TAGGING  |   The field {} must be an instance of {}.".format(field, value))
 
     def validate_regex(self, field, value):

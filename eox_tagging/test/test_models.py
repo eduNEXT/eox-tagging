@@ -24,9 +24,9 @@ from eox_tagging.test_utils import CourseEnrollments, CourseOverview
         },
         {
             "tag_type": "example_tag_2",
-            "owner_object_type": "Site",
+            "owner_object": "Site",
             "validate_target_object": {"object": "CourseOverview"},
-            "validate_tag_value": {"OpaqueKey": "CourseKey"},
+            "validate_tag_value": {"opaque_key": "CourseKey"},
         },
         {
             "tag_type": "example_tag_3",
@@ -37,8 +37,7 @@ from eox_tagging.test_utils import CourseEnrollments, CourseOverview
         {
             "tag_type": "example_tag_4",
             "validate_tag_value": {"in": ["example_tag_value", "example_tag_value_1"]},
-            "validate_resource_locator": {"OpaqueKey": "CourseKey"},
-            "validate_target_object_type": "CourseOverview",
+            "validate_resource_locator": {"opaque_key": "CourseKey"},
         },
     ])
 @CourseOverview.fake_me
@@ -74,7 +73,7 @@ class TestTag(TestCase):
             {
                 "tag_type": "example_tag_4",
                 "validate_tag_value": {"belongs": ["example_tag_value", "example_tag_value_1"]},
-                "validate_resource_locator": {"OpaqueKey": "CourseKey"},
+                "validate_resource_locator": {"opaque_key": "CourseKey"},
             }
         ])
     def test_bad_validation_config(self):
@@ -92,7 +91,7 @@ class TestTag(TestCase):
             {
                 "tag_type": "example_tag_4",
                 "validate_tag_name": {"in": ["example_tag_value", "example_tag_value_1"]},
-                "validate_resource_locator": {"OpaqueKey": "CourseKey"},
+                "validate_resource_locator": {"opaque_key": "CourseKey"},
             }
         ])
     def test_bad_field_config(self):

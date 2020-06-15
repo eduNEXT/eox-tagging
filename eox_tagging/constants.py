@@ -18,6 +18,14 @@ class AccessLevel(IntEnum):
         """Returns choices for the class"""
         return [(key.value, key.name) for key in cls]  # pylint: disable=not-an-iterable
 
+    @classmethod
+    def get_choice(cls, value):
+        """Function that gets choice value for AccessLevel"""
+        for key in cls:  # pylint: disable=not-an-iterable
+            if key.value == value:
+                return key.name
+        return None
+
 
 class Status(IntEnum):
     """

@@ -45,7 +45,9 @@ class TagAdmin(admin.ModelAdmin):
         """
         # pylint: disable=broad-except
         try:
-            return u"{}: {}".format(tag.target_object_type, tag.target_object)
+            if tag.target_object:
+                return u"{}: {}".format(tag.target_object_type, tag.target_object)
+            return u"Resource locator: {}".format(tag.resource_locator)
         except Exception as error:
             return str(error)
 
