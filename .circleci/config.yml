@@ -3,19 +3,28 @@
 # Check https://circleci.com/docs/2.0/language-python/ for more details
 #
 
-version: 2
+version: 2.1
 workflows:
-  version: 2
+  version: 2.1
   test:
     jobs:
-      - test-3.5
-      - test-2.7
+      - test:
+          matrix:
+            parameters:
+              python_version: ["2.7", "3.5"]
+              debian_version: ["stretch"]
+
 jobs:
-  test-3.5:
+  test:
+    parameters:
+      python_version:
+        type: string
+      debian_version:
+        type: string
     docker:
       # specify the version you desire here
-      - image: circleci/python:3.5
-    working_directory: ~/repo
+      - image: circleci/python:<< parameters.python_version >>-<< parameters.debian_version >>
+    working_directory: ~/repo<< parameters.python_version >>
 
     steps:
       - checkout
@@ -23,47 +32,9 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - test-35-{{ checksum "requirements/test.txt" }}
+          - test-<< parameters.python_version >>-{{ checksum "requirements/test.txt" }}
           # fallback to using the latest cache if no exact match is found
-          - test-35-
-
-      - run:
-          name: activate virtualenv and install dependencies.
-          command: |
-            test -d venv || virtualenv -p python3 ./venv
-            . venv/bin/activate
-            make test_requirements
-
-      - save_cache:
-          paths:
-            - ./venv
-          key: test-35-{{ checksum "requirements/test.txt" }}
-
-      - run:
-          name: Run tests
-          command: |
-            . venv/bin/activate
-            coverage run --source="." manage.py test
-            coverage report --fail-under=71 -m
-            pycodestyle ./eox_tagging
-            pylint ./eox_tagging --rcfile=./setup.cfg
-            isort --check-only --recursive --diff ./eox_tagging
-
-  # Based on answer https://discuss.circleci.com/t/run-tests-on-multiple-versions-of-python/15462
-  test-2.7:
-    docker:
-      - image: circleci/python:2.7
-    working_directory: ~/repo27
-
-    steps:
-      - checkout
-
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - test-27-{{ checksum "requirements/test.txt" }}
-          # fallback to using the latest cache if no exact match is found
-          - test-27-
+          - test-<< parameters.python_version >>-
 
       - run:
           name: activate virtualenv and install dependencies.
@@ -75,14 +46,14 @@ jobs:
       - save_cache:
           paths:
             - ./venv
-          key: test-27-{{ checksum "requirements/test.txt" }}
+          key: test-<< parameters.python_version >>-{{ checksum "requirements/test.txt" }}
 
       - run:
           name: Run tests
           command: |
             . venv/bin/activate
-            coverage run --source="." --rcfile=.coveragerc manage.py test
-            coverage report --fail-under=71 --rcfile=.coveragerc -m
+            coverage run --source="." manage.py test
+            coverage report --fail-under=71 -m
             pycodestyle ./eox_tagging
             pylint ./eox_tagging --rcfile=./setup.cfg
             isort --check-only --recursive --diff ./eox_tagging
