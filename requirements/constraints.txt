@@ -11,8 +11,8 @@
 # Django version 2.0.0 dropped support for python 2.7
 Django<2.0
 
-# Working version with Python 2.7 and version used in Edx Platform
-edx-opaque-keys==0.4.4
+# Version used in Ironwood version of edx-platform
+edx-opaque-keys<1.0.0
 
 # Already in python3 standard library
 futures; python_version == "2.7"
