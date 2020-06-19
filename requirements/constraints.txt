@@ -17,5 +17,6 @@ edx-opaque-keys<1.0.0
 # Already in python3 standard library
 futures; python_version == "2.7"
 
-# Working version with Python 2.7
+# pylint version 2.0.0 dropped support for python 2.7
+# See: https://github.com/PyCQA/pylint/blob/master/doc/whatsnew/2.0.rst
 pylint<2.0
