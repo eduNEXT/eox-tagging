@@ -53,25 +53,20 @@ Important notes:
 
 * The validations available are:
 
-* in: the field must be equal to one of the strings defined inside the array
-
- For example: `validate_tag_value : {"in": ["tag_value_1", "tag_value_2"]}`
-
-* ``exists``: the field must be different to None.
-
- For example: `validate_tag_value : {"exists": true}`
-
-* ``equals``: the field must be equal to the dictionary value. This is equivalent to: tag_value: "tag_value" or validate_tag_value : "tag_value"
-
- For example: `validate_tag_value : {"equals": "tag_value"}`
-
-* ``regex``: the field must match the pattern defined.
-
- For example: `validate_tag_value : {"regex": ".+eduNEXT"}`
-
-* ``opaque_key``: the field must be an opaque key.
-
- For example: `validate_tag_value : {"opaque_key": "CourseKey"}`
++---------------+-------+-----------------------------------------------+----------------------------------------------------------------+
+| Name          | Description                                           | Example                                                        |
++===============+=======================================================+================================================================+
+| ``in``        | the field must be equal to one of the strings defined | ``validate_tag_value : {"in": ["tag_value_1", "tag_value_2"]}``|
+|               | inside the array                                      |                                                                |
++---------------+-------------------------------------------------------+----------------------------------------------------------------+
+| ``exists``    | the field must be different to None                   |  ``validate_tag_value : {"exists": true}``                     |
++---------------+-------------------------------------------------------+----------------------------------------------------------------+
+|  ``equals``   | the field must be equal to the dictionary value       |  ``validate_tag_value : {"equals": "tag_value"}``              |
++---------------+-------------------------------------------------------+----------------------------------------------------------------+
+|  ``regex``    | the field must match the pattern defined              |  ``validate_tag_value : {"regex": ".+eduNEXT"}``               |
++---------------+-------------------------------------------------------+----------------------------------------------------------------+
+|``opaque_key`` | the field must be an opaque key                       |  ``validate_tag_value : {"opaque_key": "CourseKey"}``          |
++---------------+-------------------------------------------------------+----------------------------------------------------------------+
 
 
 * The available objects to tag and validate are: User, Site, CourseOverview and CourseEnrollment
