@@ -42,7 +42,6 @@ class Migration(migrations.Migration):
                 ('invalidated_at', models.DateTimeField(blank=True, editable=False, null=True)),
                 ('target_object_id', models.PositiveIntegerField(blank=True, null=True)),
                 ('owner_object_id', models.PositiveIntegerField(blank=True, null=True)),
-                ('resource_locator', models.CharField(blank=True, max_length=150, null=True)),
                 ('owner_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='owner_tag_type', to='contenttypes.ContentType')),
                 ('target_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='tag_type', to='contenttypes.ContentType')),
             ],

@@ -154,8 +154,6 @@ class Tag(models.Model):
     )
     owner_object = GenericForeignKey("owner_type", "owner_object_id")
 
-    resource_locator = models.CharField(max_length=150, null=True, blank=True)
-
     objects = TagQuerySet().as_manager()
 
     class Meta:  # pylint: disable=old-style-class
