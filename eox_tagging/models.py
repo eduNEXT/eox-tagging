@@ -13,11 +13,11 @@ from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
+from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
 
 from eox_tagging.constants import AccessLevel, Status
 from eox_tagging.helpers import get_model_name
-from eox_tagging.models_utils import ProxyModel
 from eox_tagging.validators import TagValidators
 
 log = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ class TagQuerySet(QuerySet):
         """Method used to create tags."""
         target = kwargs.pop('target_object', None)
         if target and target.__class__.__name__ == "CourseOverview":
-            kwargs['target_object'] = ProxyModel.objects.create(opaque_key=target.course_id)
+            kwargs['target_object'] = OpaqueKeyProxyModel.objects.create(opaque_key=target.course_id)
         else:
             kwargs['target_object'] = target
         instance = self.create(**kwargs)
@@ -57,8 +57,8 @@ class TagQuerySet(QuerySet):
     def find_all_tags_for(self, target_object):
         """Returns all valid on an object."""
         if get_model_name(target_object) == 'CourseOverview':
-            model = ProxyModel
-            target_id = ProxyModel.objects.get(opaque_key=target_object.course_id).id
+            model = OpaqueKeyProxyModel
+            target_id = OpaqueKeyProxyModel.objects.get(opaque_key=target_object.course_id).id
         else:
             model = target_object.__class__
             target_id = target_object.id
@@ -72,6 +72,17 @@ class TagQuerySet(QuerySet):
     def hard_delete(self):
         """ Method for deleting Tag objects"""
         return super(TagQuerySet, self).delete()
+
+
+@python_2_unicode_compatible
+class OpaqueKeyProxyModel(models.Model):
+    """Model used to tag objects with opaque keys."""
+    opaque_key = CourseKeyField(max_length=255)
+    objects = models.Manager()
+
+    def __str__(self):
+        """Method that returns the opaque_key string representation."""
+        return unicode(self.opaque_key)
 
 
 @python_2_unicode_compatible
@@ -161,13 +172,13 @@ class Tag(models.Model):
         """Obtain the name of the object target by the `Tag`."""
         target_type = self.target_object.__class__.__name__ if self.target_object else None
 
-        if target_type == 'ProxyModel':
+        if target_type == 'OpaqueKeyProxyModel':
             return self.__opaque_key_target()
 
         return target_type
 
     def __opaque_key_target(self):
-        if self.target_object.__class__.__name__ == 'ProxyModel' and \
+        if self.target_object.__class__.__name__ == 'OpaqueKeyProxyModel' and \
            isinstance(self.target_object.opaque_key, CourseKey):
             return 'CourseOverview'
         return None

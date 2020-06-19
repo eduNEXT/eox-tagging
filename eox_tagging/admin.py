@@ -8,8 +8,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from eox_tagging.forms import TagForm
-from eox_tagging.models import Tag
-from eox_tagging.models_utils import ProxyModel
+from eox_tagging.models import Tag, OpaqueKeyProxyModel
 
 
 class TagAdmin(admin.ModelAdmin):
@@ -60,7 +59,9 @@ class TagAdmin(admin.ModelAdmin):
             return str(error)
 
     def add_view(self, request, *args, **kwargs):  # pylint: disable=arguments-differ
-
+        """
+        Custom method to handle the specific case of tagging course_keys
+        """
         if request.POST:
             selected_object = request.POST['target_type'] and request.POST['target_object_id']
 
@@ -79,8 +80,8 @@ class TagAdmin(admin.ModelAdmin):
 
                 _mutable = request.POST._mutable  # pylint: disable=protected-access
                 request.POST._mutable = True  # pylint: disable=protected-access
-                model_instance = ProxyModel.objects.create(opaque_key=course_key)
-                request.POST['target_type'] = ContentType.objects.get(model='ProxyModel').id
+                model_instance = OpaqueKeyProxyModel.objects.create(opaque_key=course_key)
+                request.POST['target_type'] = ContentType.objects.get(model='OpaqueKeyProxyModel').id
                 request.POST['target_object_id'] = model_instance.id
                 request.POST._mutable = _mutable  # pylint: disable=protected-access
 

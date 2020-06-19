@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='ProxyModel',
+            name='OpaqueKeyProxyModel',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('opaque_key', opaque_keys.edx.django.models.CourseKeyField(max_length=255)),
