@@ -18,9 +18,13 @@ class TagAdmin(admin.ModelAdmin):
         "tag_value",
         "tagged_object",
         "owner",
+        "status",
     ]
-    # search_fields = ('tag_type', 'tag_value', 'tagged_object', 'belongs_to')
-    search_fields = ('tag_type', 'tag_value')
+    readonly_fields = (
+        'status',
+        'invalidated_at',
+    )
+    search_fields = ('tag_type', 'tag_value', 'status')
 
     form = TagForm
 
