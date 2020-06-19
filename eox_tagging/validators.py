@@ -83,8 +83,7 @@ class TagValidators(object):
                                   .format(self.instance.tag_type))
 
         if not self.__find_attribute(required_owner_fields):
-            key = "validate_owner_object"
-            self.current_tag_definitions[key] = "site"
+            self.current_tag_definitions["validate_owner_object"] = "site"
 
     def __find_attribute(self, attr_pattern):
         """Function that fiends an attribute in the current tag definitions."""
@@ -113,14 +112,14 @@ class TagValidators(object):
                     try:
                         getattr(self, "validate_{}".format(_key))
                     except AttributeError:
-                        raise ValidationError(u"EOX_TAGGING  | The field {} with value `{}` is wrongly configured."
+                        raise ValidationError(u"EOX_TAGGING | The field {} with value `{}` is wrongly configured."
                                               .format(key, _key))
             # Validate key existence
             clean_key = re.sub(regex, "", key)
             try:
                 self.instance.get_attribute(clean_key)
             except AttributeError:
-                raise ValidationError(u"EOX_TAGGING  |  The field `{}` is wrongly configured."
+                raise ValidationError(u"EOX_TAGGING | The field `{}` is wrongly configured."
                                       .format(key))
 
     def __validate_configuration_types(self):
@@ -138,11 +137,11 @@ class TagValidators(object):
                     field_value = value.get(key_)
 
                     if value_type and not isinstance(field_value, value_type):
-                        raise ValidationError(u"EOX_TAGGING  |  The validation '{}' for '{}' is wrongly configured."
+                        raise ValidationError(u"EOX_TAGGING | The validation '{}' for '{}' is wrongly configured."
                                               .format(key_, key))
 
             elif not isinstance(value, six.string_types):
-                raise ValidationError(u"EOX_TAGGING  |  The field '{}' is wrongly configured.".format(key))
+                raise ValidationError(u"EOX_TAGGING | The field '{}' is wrongly configured.".format(key))
 
     # GFK validations
 
@@ -156,13 +155,13 @@ class TagValidators(object):
         try:
             model_name = self.instance.get_attribute(field_name, name=True)
         except AttributeError:
-            raise ValidationError("EOX_TAGGING  |  The field '{}' is wrongly configured."
+            raise ValidationError("EOX_TAGGING | The field '{}' is wrongly configured."
                                   .format(field_name))
         try:
             if model_name:
                 self.model_validations[model_name](field_name)
         except KeyError:
-            raise ValidationError("EOX_TAGGING  |   Could not find integrity validation for field '{}'"
+            raise ValidationError("EOX_TAGGING | Could not find integrity validation for field '{}'"
                                   .format(field_name))
 
     # Integrity validators
@@ -177,7 +176,7 @@ class TagValidators(object):
         try:
             CourseOverview.get_from_id(opaque_key)
         except Exception:
-            raise ValidationError("EOX_TAGGING  |   Could not find opaque key: '{key}' for relation '{name}'".format(
+            raise ValidationError("EOX_TAGGING | Could not find opaque key: '{key}' for relation '{name}'".format(
                 key=opaque_key,
                 name=object_name,
             ))
@@ -198,7 +197,7 @@ class TagValidators(object):
             get_edxapp_user(**data)
 
         except Exception:
-            raise ValidationError("EOX_TAGGING  |   Could not find ID: {id} for relation '{name}'".format(
+            raise ValidationError("EOX_TAGGING | Could not find ID: {id} for relation '{name}'".format(
                 id=self.instance.get_attribute(object_name).id,
                 name=object_name,
             ))
@@ -218,10 +217,10 @@ class TagValidators(object):
         try:
             enrollment, _ = get_enrollment(**data)
             if not enrollment:
-                raise ValidationError("EOX_TAGGING  |  Enrollment for user '{}' and courseID '{}' does not exist"
+                raise ValidationError("EOX_TAGGING | Enrollment for user '{}' and courseID '{}' does not exist"
                                       .format(data["username"], data["course_id"]))
         except Exception:
-            raise ValidationError("EOX_TAGGING  |   Error getting enrollment for user '{}' and courseID '{}'"
+            raise ValidationError("EOX_TAGGING | Error getting enrollment for user '{}' and courseID '{}'"
                                   .format(data["username"], data["course_id"]))
 
     def __validate_site_integrity(self, object_name):
@@ -236,14 +235,14 @@ class TagValidators(object):
         try:
             Site.objects.get(id=site_id)
         except ObjectDoesNotExist:
-            raise ValidationError("EOX_TAGGING  |   Site '{}' does not exist".format(site_id))
+            raise ValidationError("EOX_TAGGING | Site '{}' does not exist".format(site_id))
 
     # Other validations
     def validate_no_updating(self):
         """Function that validates that the save is not an update."""
         if self.instance.id:
             #  Exception raised when trying to update
-            raise ValidationError("EOX_TAGGING  |   Can't update tag. Tags are inmutable by definition")
+            raise ValidationError("EOX_TAGGING | Can't update tag. Tags are inmutable by definition")
 
     def validate_fields(self):
         """ Function that validates all fields for the current definition."""
@@ -294,7 +293,7 @@ class TagValidators(object):
         if formatted_field_value not in formatted_values:
             # Values allowed is list of values (at least one)
 
-            raise ValidationError("EOX_TAGGING  |   The field '{}' is not in tag definitions.".format(field))
+            raise ValidationError("EOX_TAGGING | The field '{}' is not in tag definitions.".format(field))
 
     def validate_exist(self, field, value):  # pylint: disable=unused-argument
         """
@@ -307,7 +306,7 @@ class TagValidators(object):
         field_value = self.instance.get_attribute(field)
 
         if not field_value:
-            raise ValidationError("EOX_TAGGING  |   The field '{}' is required.".format(field))
+            raise ValidationError("EOX_TAGGING | The field '{}' is required.".format(field))
 
     def validate_equals(self, field, value):
         """
@@ -320,10 +319,10 @@ class TagValidators(object):
         field_value = self.instance.get_attribute(field, name=True)
 
         if not field_value:
-            raise ValidationError("EOX_TAGGING  |   The field '{}' is required and must be equal to '{}'."
+            raise ValidationError("EOX_TAGGING | The field '{}' is required and must be equal to '{}'."
                                   .format(field, value))
         elif field_value.lower() != value.lower():
-            raise ValidationError("EOX_TAGGING  |   The field '{}' must be equal to '{}'.".format(field, value))
+            raise ValidationError("EOX_TAGGING | The field '{}' must be equal to '{}'.".format(field, value))
 
     def validate_regex(self, field, value):
         """
@@ -337,4 +336,4 @@ class TagValidators(object):
 
         if not re.search(value, field_value):
             # Values allowed is regex pattern
-            raise ValidationError("EOX_TAGGING  |   The field '{}' is not in tag definitions.".format(field))
+            raise ValidationError("EOX_TAGGING | The field '{}' is not in tag definitions.".format(field))
