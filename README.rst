@@ -140,7 +140,7 @@ This means that:
             "validate_activation_date":{
                 "exist":true,
                 "in":[
-                    "Dec 4 2020",
+                    "Dec 04 2020",
                     "Oct 19 2020"
                 ]
             }
