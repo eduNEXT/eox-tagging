@@ -74,7 +74,11 @@ class TagAdmin(admin.ModelAdmin):
         """
         Custom method to handle the specific case of tagging course_keys
 
-        Explanation: TODO mjo
+        The POST request is modified to add the target object if and only if an opaque_key is defined
+        and no target_object_id is specified.
+
+        We decided to do this because we needed to add the target object before the Tag instance was
+        created.
         """
         should_intervene = True
 
