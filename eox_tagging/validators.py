@@ -15,19 +15,19 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from eox_core.edxapp_wrapper.enrollments import get_enrollment
 from eox_core.edxapp_wrapper.users import get_edxapp_user
-from opaque_keys import InvalidKeyError  # pylint: disable=ungrouped-imports
+from opaque_keys import InvalidKeyError  # pylint: disable=ungrouped-imports, useless-suppression
 
 log = logging.getLogger(__name__)
 
 try:
     from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 except ImportError:
-    from eox_tagging.test_utils import CourseOverview  # pylint: disable=ungrouped-imports
+    from eox_tagging.test_utils import CourseOverview  # pylint: disable=ungrouped-imports, useless-suppression
 try:
     # Python 2: "unicode" is built-in
-    unicode
+    unicode  # pylint: disable=undefined-variable, useless-suppression
 except NameError:
-    unicode = str  # pylint: disable=redefined-builtin
+    unicode = str  # pylint: disable=redefined-builtin, useless-suppression
 
 
 class TagValidators(object):
@@ -43,7 +43,7 @@ class TagValidators(object):
         self.instance = instance
         self.model_validations = {
             'User': self.__validate_user_integrity,
-            'CourseOverview': self.__validate_proxy_model,
+            'OpaqueKeyProxyModel': self.__validate_proxy_model,
             'CourseEnrollment': self.__validate_enrollment_integrity,
             'Site': self.__validate_site_integrity,
         }

@@ -26,7 +26,7 @@ from eox_tagging.test_utils import CourseEnrollment, CourseOverview
         {
             "tag_type": "example_tag_2",
             "owner_object": "Site",
-            "validate_target_object": "CourseOverview",
+            "validate_target_object": "OpaqueKeyProxyModel",
             "validate_tag_value": {"opaque_key": "CourseKey"},
         },
         {
@@ -37,9 +37,9 @@ from eox_tagging.test_utils import CourseEnrollment, CourseOverview
         },
         {
             "tag_type": "example_tag_4",
-            "validate_tag_value": {"in": ["example_tag_value", "example_tag_value_1"]},
-            "validate_resource_locator": {"opaque_key": "CourseKey"},
-        },
+            "validate_tag_value": {"in": ["example_tag_value", "example_tag_value_2"]},
+            "validate_target_object": "OpaqueKeyProxyModel",
+        }
     ])
 @CourseOverview.fake_me
 @CourseEnrollment.fake_me
@@ -72,9 +72,9 @@ class TestTag(TestCase):
     @override_settings(
         EOX_TAGGING_DEFINITIONS=[
             {
-                "tag_type": "example_tag_5",
-                "validate_tag_value": {"belongs": ["example_tag_value", "example_tag_value_1"]},
-                "validate_resource_locator": {"opaque_key": "CourseKey"},
+                "tag_type": "example_tag_4",
+                "validate_tag_value": {"belongs": ["example_tag_value", "example_tag_value_2"]},
+                "validate_target_object": "OpaqueKeyProxyModel",
             }
         ])
     def test_bad_validation_config(self):
@@ -85,16 +85,17 @@ class TestTag(TestCase):
         with self.assertRaises(ValidationError):
             Tag.objects.create_tag(
                 tag_value="example_tag_value",
-                tag_type="example_tag_5",
-                resource_locator="course-v1:demo-courses+DM101+2017",
+                tag_type="example_tag_4",
+                target_object=self.fake_object_target_course,
+                owner_object=self.fake_owner_object
             )
 
     @override_settings(
         EOX_TAGGING_DEFINITIONS=[
             {
-                "tag_type": "example_tag_6",
-                "validate_tag_name": {"in": ["example_tag_value", "example_tag_value_1"]},
-                "validate_resource_locator": {"opaque_key": "CourseKey"},
+                "tag_type": "example_tag_4",
+                "validate_tag_name": {"in": ["example_tag_value", "example_tag_value_2"]},
+                "validate_target_object": "OpaqueKeyProxyModel",
             }
         ])
     def test_bad_field_config(self):
@@ -105,8 +106,9 @@ class TestTag(TestCase):
         with self.assertRaises(ValidationError):
             Tag.objects.create_tag(
                 tag_value="example_tag_value",
-                tag_type="example_tag_6",
-                resource_locator="course-v1:demo-courses+DM101+2017",
+                tag_type="example_tag_4",
+                target_object=self.fake_object_target_course,
+                owner_object=self.fake_owner_object
             )
 
     @override_settings(EOX_TAGGING_DEFINITIONS=[])
@@ -128,7 +130,7 @@ class TestTag(TestCase):
         EOX_TAGGING_DEFINITIONS=[
             {
                 "tag_type": "example_tag_7",
-                "validate_owner_object": {"object": "User"},
+                "validate_owner_object": "User",
                 "validate_access": {"equals": "PRIVATE"},
                 "validate_tag_value": {"in": ["example_tag_value", "example_tag_value_1"]},
             }]
@@ -262,36 +264,9 @@ class TestTag(TestCase):
         # Exists in invalid objects
         Tag.objects.invalid().get(id=1)
 
-    def test_only_resource_locator(self):
+    def test_create_tag_without_target_object(self):
         """
-        Used to test that a tag can be created using as the `target object` a resource locator.
-        This means that target_object can be None. For this, EOX_TAGGING_DEFINITIONS must not contain
-        a definition for target_object.
-        """
-        Tag.objects.create_tag(
-            tag_value="example_tag_value",
-            tag_type="example_tag_4",
-            owner_object=self.fake_owner_object,
-            resource_locator="course-v1:demo-courses+DM101+2017",
-        )
-
-    def test_resource_locator_validation_fail(self):
-        """
-        Used to test that if added to settings a resource locator can be validated as a course_key.
-        Given that the resource_locator it's not a course_key, it raises a validation error.
-        """
-        with self.assertRaises(ValidationError):
-            Tag.objects.create_tag(
-                tag_value="example_tag_value",
-                tag_type="example_tag_4",
-                owner_object=self.fake_owner_object,
-                resource_locator="resourceLocatorFail",
-            )
-
-    def test_create_tag_without_resource_or_target_object(self):
-        """
-        Used to test that a tag can't be created without a resource locator or
-        a model.
+        Used to test that a tag can't be created without a target.
         """
         with self.assertRaises(ValidationError):
             Tag.objects.create_tag(
@@ -308,8 +283,8 @@ class TestTag(TestCase):
         Tag.objects.create_tag(
             tag_value="example_tag_value",
             tag_type="example_tag_4",
-            owner_object=self.fake_owner_object,  # Owner type: Site
-            resource_locator="course-v1:demo-courses+DM101+2017",
+            target_object=self.fake_object_target_course,
+            owner_object=self.fake_owner_object,
         )
 
     def test_create_without_matching_default_owner(self):
@@ -321,8 +296,8 @@ class TestTag(TestCase):
             Tag.objects.create_tag(
                 tag_value="example_tag_value",
                 tag_type="example_tag_4",
-                owner_object=self.owner_object,  # Owner type: user
-                resource_locator="course-v1:demo-courses+DM101+2017",
+                target_object=self.fake_object_target_course,
+                owner_object=self.owner_object,
             )
 
     def test_create_without_default_owner(self):
@@ -334,7 +309,7 @@ class TestTag(TestCase):
             Tag.objects.create_tag(
                 tag_value="example_tag_value",
                 tag_type="example_tag_4",
-                resource_locator="course-v1:demo-courses+DM101+2017",
+                target_object=self.fake_object_target_course,
             )
 
     @override_settings(

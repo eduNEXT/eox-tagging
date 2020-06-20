@@ -16,12 +16,12 @@ class AccessLevel(IntEnum):
     @classmethod
     def choices(cls):
         """Returns choices for the class"""
-        return [(key.value, key.name) for key in cls]  # pylint: disable=not-an-iterable
+        return [(key.value, key.name) for key in cls]  # pylint: disable=not-an-iterable, useless-suppression
 
     @classmethod
     def get_choice(cls, value):
         """Function that gets choice value for AccessLevel"""
-        for key in cls:  # pylint: disable=not-an-iterable
+        for key in cls:  # pylint: disable=not-an-iterable, useless-suppression
             if key.value == value:
                 return key.name
         return None
@@ -39,4 +39,4 @@ class Status(IntEnum):
     @classmethod
     def choices(cls):
         """Returns choices for the class."""
-        return [(key.value, key.name) for key in cls]  # pylint: disable=not-an-iterable
+        return [(key.value, key.name) for key in cls]  # pylint: disable=not-an-iterable, useless-suppression

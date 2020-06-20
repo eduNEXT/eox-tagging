@@ -14,13 +14,16 @@ from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from opaque_keys.edx.django.models import CourseKeyField
-from opaque_keys.edx.keys import CourseKey
 
 from eox_tagging.constants import AccessLevel, Status
 from eox_tagging.helpers import get_model_name
 from eox_tagging.validators import TagValidators
 
 log = logging.getLogger(__name__)
+
+OPAQUE_KEY_PROXY_MODEL_TARGETS = [
+    "CourseOverview"
+]
 
 
 class TagQuerySet(QuerySet):
@@ -29,7 +32,7 @@ class TagQuerySet(QuerySet):
     def create_tag(self, **kwargs):
         """Method used to create tags."""
         target = kwargs.pop('target_object', None)
-        if target and target.__class__.__name__ == "CourseOverview":
+        if target and target.__class__.__name__ in OPAQUE_KEY_PROXY_MODEL_TARGETS:
             kwargs['target_object'] = OpaqueKeyProxyModel.objects.create(opaque_key=target.course_id)
         else:
             kwargs['target_object'] = target
@@ -56,7 +59,7 @@ class TagQuerySet(QuerySet):
 
     def find_all_tags_for(self, target_object):
         """Returns all valid on an object."""
-        if get_model_name(target_object) == 'CourseOverview':
+        if get_model_name(target_object) in OPAQUE_KEY_PROXY_MODEL_TARGETS:
             model = OpaqueKeyProxyModel
             target_id = OpaqueKeyProxyModel.objects.get(opaque_key=target_object.course_id).id
         else:
@@ -82,7 +85,7 @@ class OpaqueKeyProxyModel(models.Model):
 
     def __str__(self):
         """Method that returns the opaque_key string representation."""
-        return unicode(self.opaque_key)
+        return str(self.opaque_key)
 
 
 @python_2_unicode_compatible
@@ -156,7 +159,7 @@ class Tag(models.Model):
 
     objects = TagQuerySet().as_manager()
 
-    class Meta:  # pylint: disable=old-style-class
+    class Meta:  # pylint: disable=old-style-class, useless-suppression
         """Meta class. """
         verbose_name = "tag"
         verbose_name_plural = "tags"
@@ -168,18 +171,7 @@ class Tag(models.Model):
     @property
     def target_object_type(self):
         """Obtain the name of the object target by the `Tag`."""
-        target_type = self.target_object.__class__.__name__ if self.target_object else None
-
-        if target_type == 'OpaqueKeyProxyModel':
-            return self.__opaque_key_target()
-
-        return target_type
-
-    def __opaque_key_target(self):
-        if self.target_object.__class__.__name__ == 'OpaqueKeyProxyModel' and \
-           isinstance(self.target_object.opaque_key, CourseKey):
-            return 'CourseOverview'
-        return None
+        return self.target_object.__class__.__name__ if self.target_object else None
 
     @property
     def owner_object_type(self):

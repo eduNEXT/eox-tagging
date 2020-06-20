@@ -8,7 +8,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from eox_tagging.forms import TagForm
-from eox_tagging.models import Tag, OpaqueKeyProxyModel
+from eox_tagging.models import OpaqueKeyProxyModel, Tag
 
 
 class TagAdmin(admin.ModelAdmin):
@@ -21,12 +21,20 @@ class TagAdmin(admin.ModelAdmin):
         "status",
     ]
     readonly_fields = (
+        'target_as_nice_string',
         'status',
+        'created_at',
         'invalidated_at',
     )
     search_fields = ('tag_type', 'tag_value', 'status')
 
     form = TagForm
+
+    def target_as_nice_string(self, tag):
+        """
+        Render the opaque key proxy as a nice Course Key or any other target as its unicode.
+        """
+        return str(tag.target_object)
 
     def get_search_results(self, request, queryset, search_term):
         """
@@ -65,29 +73,33 @@ class TagAdmin(admin.ModelAdmin):
     def add_view(self, request, *args, **kwargs):  # pylint: disable=arguments-differ
         """
         Custom method to handle the specific case of tagging course_keys
+
+        Explanation: TODO mjo
         """
-        if request.POST:
-            selected_object = request.POST['target_type'] and request.POST['target_object_id']
+        should_intervene = True
 
-            # If is post request and there's only opaque key
-            opaque_key_target = request.POST['opaque_key'] and not selected_object
+        if not request.POST:
+            should_intervene = False
 
-            if opaque_key_target:
+        if request.POST.get('target_type', None) and request.POST.get('target_object_id', None):
+            should_intervene = False
 
-                try:
-                    course_key = CourseKey.from_string(request.POST['opaque_key'])
-                except InvalidKeyError:
-                    message = u"EOX_TAGGING | Error: Opaque Key %s does not match with opaque_keys.edx definition." \
-                              % request.POST['opaque_key']
-                    messages.error(request, message)
-                    return HttpResponseRedirect(request.path)
+        if not request.POST.get('opaque_key', None):
+            should_intervene = False
 
-                _mutable = request.POST._mutable  # pylint: disable=protected-access
-                request.POST._mutable = True  # pylint: disable=protected-access
-                model_instance = OpaqueKeyProxyModel.objects.create(opaque_key=course_key)
-                request.POST['target_type'] = ContentType.objects.get(model='OpaqueKeyProxyModel').id
-                request.POST['target_object_id'] = model_instance.id
-                request.POST._mutable = _mutable  # pylint: disable=protected-access
+        if should_intervene:
+            try:
+                course_key = CourseKey.from_string(request.POST.get('opaque_key'))
+                opaque_key_proxy, _ = OpaqueKeyProxyModel.objects.get_or_create(opaque_key=course_key)
+            except InvalidKeyError:
+                message = u"EOX_TAGGING | Error: Opaque Key %s does not match with opaque_keys.edx definition." \
+                          % request.POST['opaque_key']
+                messages.error(request, message)
+                return HttpResponseRedirect(request.path)
+
+            request.POST = request.POST.copy()
+            request.POST['target_type'] = ContentType.objects.get(model='OpaqueKeyProxyModel').id
+            request.POST['target_object_id'] = opaque_key_proxy.id
 
         return super(TagAdmin, self).add_view(request, *args, **kwargs)
 
