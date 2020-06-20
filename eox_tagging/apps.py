@@ -1,7 +1,6 @@
 """
 App configuration for eox_tagging.
 """
-
 from __future__ import unicode_literals
 
 from django.apps import AppConfig
@@ -13,7 +12,6 @@ class EoxTaggingConfig(AppConfig):
     """
     name = 'eox_tagging'
     verbose_name = 'eduNEXT OpenedX Tagging'
-
     plugin_app = {
         'url_config': {
             'lms.djangoapp': {

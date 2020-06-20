@@ -7,7 +7,6 @@ https://docs.djangoproject.com/en/1.11/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.11/ref/settings/
 """
-
 from __future__ import unicode_literals
 
 # Quick-start development settings - unsuitable for production
@@ -19,10 +18,13 @@ SECRET_KEY = 'secret-key'
 
 # Application definition
 
-INSTALLED_APPS = []
+INSTALLED_APPS = [
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'eox_tagging'
+]
 
 ROOT_URLCONF = 'eox_tagging.urls'
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
@@ -34,9 +36,10 @@ TIME_ZONE = 'UTC'
 USE_TZ = True
 
 
-def plugin_settings(settings):  # pylint: disable=unused-argument
+def plugin_settings(settings):
     """
     Set of plugin settings used by the Open Edx platform.
     More info: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
     """
-    pass
+    # Plugin settings
+    settings.EOX_TAGGING_DEFINITIONS = []

@@ -11,8 +11,12 @@
 # Django version 2.0.0 dropped support for python 2.7
 Django<2.0
 
-# TODO: Add contraint explanation
-pylint==1.9.3
-pycodestyle==2.5.0
+# Version used in Ironwood version of edx-platform
+edx-opaque-keys<1.0.0
+
 # Already in python3 standard library
 futures; python_version == "2.7"
+
+# pylint version 2.0.0 dropped support for python 2.7
+# See: https://github.com/PyCQA/pylint/blob/master/doc/whatsnew/2.0.rst
+pylint<2.0
