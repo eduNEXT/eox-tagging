@@ -232,6 +232,18 @@ class TestTag(TestCase):
                 expiration_date=datetime.date(2020, 10, 19),
             )
 
+    def test_tag_validation_owner_must_be_site(self):
+        """ Used to confirm that a tag must have a site as owner."""
+        fake_object_target_enroll = CourseEnrollment.objects.create()  # pylint: disable=no-member
+        with self.assertRaises(ValidationError):
+            Tag.objects.create_tag(
+                tag_value="example by eduNEXT",
+                tag_type="example_tag_3",
+                target_object=fake_object_target_enroll,
+                owner_object=fake_object_target_enroll,
+                expiration_date=datetime.date(2020, 10, 19),
+            )
+
     def test_tag_inmutable(self):
         """ Used to confirm that the tags can't be updated."""
         setattr(self.test_tag, "tag_value", "value")
@@ -240,16 +252,17 @@ class TestTag(TestCase):
 
     def test_find_by_owner(self):
         """ Used to confirm that can retrieve tags by owner_object."""
-        tags_owned = Tag.objects.find_by_owner(self.owner_object)
-        tags_owned_fake = Tag.objects.find_by_owner(self.fake_owner_object)
+        tags_owned = Tag.objects.find_by_owner(owner_type="user", owner_id={"username": "User"})
+        tags_owned_fake = Tag.objects.find_by_owner(owner_type="site", owner_id={"id": 2})
 
         self.assertEqual(tags_owned.first().owner_object_id, self.owner_object.id)
         self.assertEqual(tags_owned_fake.first().owner_object_id, self.fake_owner_object.id)
 
     def test_find_all_tags_for(self):
         """Used to confirm that can retrieve tags by target object."""
-        tags = Tag.objects.find_all_tags_for(self.target_object)
-        tags_fake = Tag.objects.find_all_tags_for(self.fake_object_target_course)
+        tags = Tag.objects.find_all_tags_for(target_type="user", target_id={"username": "Tag"})
+        tags_fake = Tag.objects.find_all_tags_for(target_type="CourseOverview",
+                                                  target_id={"course_id": "course-v1:edX+FUN101x+3T2017"})
 
         self.assertEqual(tags.first().target_object_id, self.target_object.id)
         self.assertEqual(tags_fake.first().target_object_id, self.fake_object_target_course.id)
