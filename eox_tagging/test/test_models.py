@@ -26,7 +26,7 @@ from eox_tagging.test_utils import CourseEnrollment, CourseOverview
         {
             "tag_type": "example_tag_2",
             "owner_object": "Site",
-            "validate_target_object": "OpaqueKeyProxyModel",
+            "validate_target_object": "User",
             "validate_tag_value": {"opaque_key": "CourseKey"},
         },
         {
@@ -38,7 +38,7 @@ from eox_tagging.test_utils import CourseEnrollment, CourseOverview
         {
             "tag_type": "example_tag_4",
             "validate_tag_value": {"in": ["example_tag_value", "example_tag_value_2"]},
-            "validate_target_object": "OpaqueKeyProxyModel",
+            "validate_target_object": "User",
         }
     ])
 @CourseOverview.fake_me
@@ -52,7 +52,6 @@ class TestTag(TestCase):
         self.owner_object = User.objects.create(username="User")
         self.fake_owner_object = Site.objects.create()
         self.course_key = CourseKey.from_string('course-v1:edX+FUN101x+3T2017')
-        self.fake_object_target_course = CourseOverview.objects.create(course_id=self.course_key)  # pylint: disable=no-member
 
         self.test_tag = Tag.objects.create_tag(
             tag_value="example_tag_value",
@@ -62,12 +61,6 @@ class TestTag(TestCase):
             access=AccessLevel.PRIVATE,
         )
 
-        Tag.objects.create_tag(
-            tag_value="course-v1:demo-courses+DM101+2017",
-            tag_type="example_tag_2",
-            target_object=self.fake_object_target_course,
-            owner_object=self.fake_owner_object,
-        )
 
     @override_settings(
         EOX_TAGGING_DEFINITIONS=[
@@ -86,7 +79,7 @@ class TestTag(TestCase):
             Tag.objects.create_tag(
                 tag_value="example_tag_value",
                 tag_type="example_tag_4",
-                target_object=self.fake_object_target_course,
+                target_object=self.target_object,
                 owner_object=self.fake_owner_object
             )
 
@@ -107,7 +100,7 @@ class TestTag(TestCase):
             Tag.objects.create_tag(
                 tag_value="example_tag_value",
                 tag_type="example_tag_4",
-                target_object=self.fake_object_target_course,
+                target_object=self.target_object,
                 owner_object=self.fake_owner_object
             )
 
@@ -252,29 +245,15 @@ class TestTag(TestCase):
 
     def test_find_by_owner(self):
         """ Used to confirm that can retrieve tags by owner_object."""
-<<<<<<< HEAD
         tags_owned = Tag.objects.find_by_owner(owner_type="user", owner_id={"username": "User"})
-        tags_owned_fake = Tag.objects.find_by_owner(owner_type="site", owner_id={"id": 2})
-=======
-        tags_owned = Tag.objects.find_by_owner(owner_type="user", owner_id="User")
-        tags_owned_fake = Tag.objects.find_by_owner(owner_type="site", owner_id=2)
->>>>>>> Added custom search for contenttype objects and get_or_create to proxymodel creation
 
         self.assertEqual(tags_owned.first().owner_object_id, self.owner_object.id)
-        self.assertEqual(tags_owned_fake.first().owner_object_id, self.fake_owner_object.id)
 
     def test_find_all_tags_for(self):
         """Used to confirm that can retrieve tags by target object."""
-<<<<<<< HEAD
         tags = Tag.objects.find_all_tags_for(target_type="user", target_id={"username": "Tag"})
-=======
-        tags = Tag.objects.find_all_tags_for(target_type="user", target_id="Tag")
->>>>>>> Added custom search for contenttype objects and get_or_create to proxymodel creation
-        tags_fake = Tag.objects.find_all_tags_for(target_type="CourseOverview",
-                                                  target_id={"course_id": "course-v1:edX+FUN101x+3T2017"})
 
         self.assertEqual(tags.first().target_object_id, self.target_object.id)
-        self.assertEqual(tags_fake.first().target_object_id, self.fake_object_target_course.id)
 
     def test_tag_soft_delete(self):
         """ Used to confirm that the tags can be invalidated soft deleting them."""
@@ -305,7 +284,7 @@ class TestTag(TestCase):
         Tag.objects.create_tag(
             tag_value="example_tag_value",
             tag_type="example_tag_4",
-            target_object=self.fake_object_target_course,
+            target_object=self.target_object,
             owner_object=self.fake_owner_object,
         )
 
@@ -318,7 +297,7 @@ class TestTag(TestCase):
             Tag.objects.create_tag(
                 tag_value="example_tag_value",
                 tag_type="example_tag_4",
-                target_object=self.fake_object_target_course,
+                target_object=self.target_object,
                 owner_object=self.owner_object,
             )
 
@@ -331,7 +310,7 @@ class TestTag(TestCase):
             Tag.objects.create_tag(
                 tag_value="example_tag_value",
                 tag_type="example_tag_4",
-                target_object=self.fake_object_target_course,
+                target_object=self.target_object,
             )
 
     @override_settings(

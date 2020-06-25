@@ -21,7 +21,7 @@ Open edX devstack
 
 
 Usage
-=====
+======
 
 Important notes:
 ----------------
@@ -90,7 +90,7 @@ Examples
             "validate_access":{
                 "equals":"PRIVATE"
             },
-            "validate_target_object":"CourseOverview",
+            "validate_target_object":"OpaqueKeyProxyModel",
             "owner_object":"User",
             "tag_type":"tag_by_example"
         }
@@ -153,6 +153,17 @@ This means that:
 * The target type must be equal to `CourseEnrollment`
 * Tag type must be equal to tag_by_edunext.
 * The tag activation date must exist and be in the values defined in the array
+
+Rest API usage
+==============
+
+
+
+Filters example usage:
+/eox_tagging/api/v1/tags/?created_at_after=2020-10-10
+/eox_tagging/api/v1/tags/?access=1
+/eox_tagging/api/v1/tags/?target_type=user
+
 
 ##Contributing
 

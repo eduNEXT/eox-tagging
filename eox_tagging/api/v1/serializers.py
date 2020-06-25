@@ -1,89 +1,70 @@
 """
 Serializers for tags and related objects.
 """
+import crum
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
-from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
 
-from eox_tagging.constants import AccessLevel
 from eox_tagging.api.v1 import fields
+from eox_tagging.constants import AccessLevel, Status
 from eox_tagging.edxapp_accessors import get_object
-from eox_tagging.models import OpaqueKeyProxyModel, Tag
+from eox_tagging.models import Tag
 
 PROXY_MODEL_NAME = "opaquekeyproxymodel"
 
 
-class RelatedObject(object):
-    """Class to use with related objects."""
-    def __init__(self, object_id, object_type):
-        self.object_id = object_id
-        self.object_type = object_type
-
-
-class RelatedObjectSerializer(serializers.Serializer):  # pylint: disable=abstract-method
-    """Reladed objects serializer."""
-
-    object_id = serializers.CharField(max_length=200)
-    object_type = serializers.CharField(max_length=200)
-
-
 class TagSerializer(serializers.ModelSerializer):
     """Serializer for tag objects."""
-    target = serializers.SerializerMethodField()
-    owner = serializers.SerializerMethodField()
+    target_id = serializers.CharField(source='target_object')
+    owner_id = serializers.CharField(source='owner_object', required=False)
+    owner_type = serializers.CharField(source='owner_object_type')
+    target_type = serializers.CharField(source='target_object_type')
     access = fields.EnumField(enum=AccessLevel)
+    status = fields.EnumField(enum=Status, required=False)
 
-    #TODO: hacer el PR del modelo y hacer rebase
-    # Hacer las propuestas:
-    # 1: writeonly fields con target_type, target_owner y los tipos de id que corresponden al target
-    # Tambien se deberia cambiar el get_target y get_owner
-    # Intentar serializer get_target a json sin el serializador
+    # Write only fields used to create tags
+    username = serializers.CharField(write_only=True, required=False)
+    course_id = serializers.CharField(write_only=True, required=False)
 
     class Meta:  # pylint: disable=old-style-class, useless-suppression
         """Meta class."""
         model = Tag
         fields = ('key', 'tag_value', 'tag_type', 'access', 'activation_date', 'expiration_date',
-                  'target', 'owner')
-
-    # Generic Foreign Key formatted values
-    def get_target(self, tag):
-        """Function that returns the serialized version of the identification and type of the target."""
-        target_type = tag.target_object_type
-        target_id = tag.target_object_id
-
-        if target_type.lower() == PROXY_MODEL_NAME:
-            target_id = str(OpaqueKeyProxyModel.objects.get(id=target_id).opaque_key)
-
-        target_object = RelatedObject(object_id=target_id, object_type=target_type)
-        serializer = RelatedObjectSerializer(target_object)
-        return serializer.data
-
-    def get_owner(self, tag):
-        """Function that returns the serialized version of identification and type of the owner."""
-        owner_object = RelatedObject(object_id=tag.owner_object_id, object_type=tag.owner_object_type)
-        serializer = RelatedObjectSerializer(owner_object)
-        return serializer.data
+                  'target_id', 'owner_id', 'owner_type', 'target_type', 'username', 'course_id', 'status')
 
     # Validation and creation of tags
-    def to_internal_value(self, data):
-        """Function that helps with object deserialization."""
-        target = get_object(data.get("target"), "target")
-        owner = get_object(data.get("owner"), "owner")
-
-        ret = super(TagSerializer, self).to_internal_value(data)
-
-        ret["target"] = target
-        ret["owner"] = owner
-
-        return ret
-
     def create(self, validated_data):
         """Function that creates a Tag instance."""
-        validated_data['target_object'] = validated_data.pop("target")
-        validated_data['owner_object'] = validated_data.pop("owner")
+
+        # Finding target and owner objects
+        target_object = None
+        owner_object = None
+        target_type = validated_data.pop("target_object_type")
+        owner_type = validated_data.pop("owner_object_type", None)
+
+        data = {
+            "target_id": validated_data.pop("target_object", None),
+        }
         try:
-            tag = Tag.objects.create_tag(**validated_data)
+            target_object = get_object(target_type, **data)
+        except Exception:  # pylint: disable=broad-except
+            serializers.ValidationError({"Target": _("Error getting {} object."
+                                         .format(target_type))})
+
+        if owner_type == "user":
+            owner_object = self.context.get("request").user
+        else:
+            owner_object = crum.get_current_request().site
+
+        # Set objects
+        tag_object = {
+            "target_object": target_object,
+            "owner_object": owner_object,
+        }
+        tag_object.update(validated_data)
+        try:
+            tag = Tag.objects.create_tag(**tag_object)
         except ValidationError as e:
             raise serializers.ValidationError({"Tag": _("{}".format(e.message))})
         return tag

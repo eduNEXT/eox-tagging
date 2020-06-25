@@ -9,7 +9,7 @@ class EnumField(serializers.ChoiceField):
         kwargs['choices'] = [(e.value, e.name) for e in enum]
         super(EnumField, self).__init__(**kwargs)
 
-    def to_representation(self, obj):
+    def to_representation(self, obj):  # pylint: disable=arguments-differ
         """Function that helps with choice serialization."""
         try:
             value = obj.name

@@ -1,10 +1,9 @@
 """ File to define validations for tag model fields.
 """
-import crum
-
 import logging
 import re
 
+import crum
 import opaque_keys.edx.keys as all_opaque_keys
 import six
 from django.conf import settings

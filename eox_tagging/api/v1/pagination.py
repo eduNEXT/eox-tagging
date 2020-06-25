@@ -1,8 +1,9 @@
-from rest_framework.pagination import PageNumberPagination
+""" Pagination class for Tag API."""
 from django.conf import settings
+from rest_framework.pagination import PageNumberPagination
 
 
-class DataApiResultsSetPagination(PageNumberPagination):
+class TagApiPagination(PageNumberPagination):
     """
     A subset of data of any queryset
     """

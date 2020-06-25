@@ -28,6 +28,7 @@ OPAQUE_KEY_PROXY_MODEL_TARGETS = [
 
 PROXY_MODEL_NAME = "opaquekeyproxymodel"
 
+
 class TagQuerySet(QuerySet):
     """ Tag queryset used as manager."""
 
@@ -35,7 +36,7 @@ class TagQuerySet(QuerySet):
         """Method used to create tags."""
         target = kwargs.pop("target_object", None)
         if target and target.__class__.__name__ in OPAQUE_KEY_PROXY_MODEL_TARGETS:
-            kwargs["target_object"], _ = OpaqueKeyProxyModel.objects.get_or_create(opaque_key=target.course_id)
+            kwargs['target_object'], _ = OpaqueKeyProxyModel.objects.get_or_create(opaque_key=target.id)
         else:
             kwargs["target_object"] = target
         instance = self.create(**kwargs)
@@ -70,10 +71,9 @@ class TagQuerySet(QuerySet):
 
         return self.filter(target_type=ctype, target_object_id=target.id,)
 
-    def find_tags_by_type(self, target_type):
-        """Returns all targets with a specific type."""
-        ctype = ContentType.objects.get(model="courseenrollment")
-        # ctype = Tag.objects.filter(target_type__exact=)
+    def find_all_tags_by_type(self, object_type):
+        """Returns all tags with target_type equals to object_type."""
+        return self.filter(target_type__model__exact=object_type)
 
     def hard_delete(self):
         """ Method for deleting Tag objects"""

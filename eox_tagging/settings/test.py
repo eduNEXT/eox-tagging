@@ -33,6 +33,7 @@ DATABASES = {
 }
 
 EOX_TAGGING_SKIP_VALIDATIONS = True
+TEST_SITE = 1
 
 
 def plugin_settings(settings):  # pylint: disable=function-redefined, unused-argument
