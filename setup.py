@@ -9,6 +9,9 @@ import re
 
 from setuptools import setup
 
+with open("README.rst", "r") as fh:
+    README = fh.read()
+
 
 def load_requirements(*requirements_paths):
     """
@@ -63,8 +66,22 @@ setup(
     name='eox_tagging',
     version=VERSION,
     description='eox-tagging',
+    long_description=README,
+    long_description_content_type='text/x-rst',
+    license="AGPL",
     author='eduNEXT',
     author_email='contact@edunext.co',
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Framework :: Django :: 1.11',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: GNU Affero General Public License v3',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+    ],
     packages=[
         'eox_tagging',
     ],
