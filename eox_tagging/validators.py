@@ -1,13 +1,9 @@
 """ File to define validations for tag model fields.
 """
-try:
-    import crum
-except ImportError:
-    crum = object
-
 import logging
 import re
 
+import crum
 import opaque_keys.edx.keys as all_opaque_keys
 import six
 from django.conf import settings
@@ -22,7 +18,7 @@ log = logging.getLogger(__name__)
 try:
     from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 except ImportError:
-    from eox_tagging.test_utils import CourseOverview  # pylint: disable=ungrouped-imports, useless-suppression
+    from eox_tagging.test.test_utils import CourseOverview  # pylint: disable=ungrouped-imports, useless-suppression
 try:
     # Python 2: "unicode" is built-in
     unicode  # pylint: disable=undefined-variable, useless-suppression
@@ -327,7 +323,6 @@ class TagValidators(object):
     def validate_regex(self, field, value):
         """
         Function that validates that the field matches value.
-
         Arguments:
             - field: field to validate
             - value: validations defined for the field

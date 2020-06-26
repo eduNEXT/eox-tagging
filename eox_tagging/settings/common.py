@@ -21,8 +21,15 @@ SECRET_KEY = 'secret-key'
 INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'eox_tagging'
+    'rest_framework',
+    'eox_tagging',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAdminUser',
+    ]
+}
 
 ROOT_URLCONF = 'eox_tagging.urls'
 
@@ -35,6 +42,8 @@ TIME_ZONE = 'UTC'
 
 USE_TZ = True
 
+ALLOWED_HOSTS = ['*']
+
 
 def plugin_settings(settings):
     """
@@ -43,3 +52,5 @@ def plugin_settings(settings):
     """
     # Plugin settings
     settings.EOX_TAGGING_DEFINITIONS = []
+    settings.DATA_API_DEF_PAGE_SIZE = 1000
+    settings.DATA_API_MAX_PAGE_SIZE = 5000

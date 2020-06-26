@@ -7,3 +7,7 @@ pylint
 pycodestyle
 coverage
 django-fake-model
+django-crum
+django-filter
+djangorestframework-oauth
+django-oauth2-provider

@@ -6,7 +6,7 @@
 #
 amqp==2.6.0               # via kombu
 billiard==3.6.3.0         # via celery
-celery==4.4.5             # via eox-core
+celery==4.4.6             # via eox-core
 configparser==4.0.2       # via importlib-metadata
 contextlib2==0.6.0.post1  # via importlib-metadata, zipp
 django==1.11.29           # via -c requirements/constraints.txt, edx-opaque-keys, eox-core
@@ -15,7 +15,7 @@ edx-opaque-keys[django]==0.4.4  # via -c requirements/constraints.txt, eox-core
 eox-core==2.13.0          # via -r requirements/base.in
 future==0.18.2            # via celery
 importlib-metadata==1.6.1  # via kombu
-kombu==4.6.10             # via celery
+kombu==4.6.11             # via celery
 pathlib2==2.3.5           # via importlib-metadata
 pbr==5.4.5                # via stevedore
 pymongo==3.10.1           # via edx-opaque-keys

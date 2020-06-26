@@ -21,7 +21,7 @@ Open edX devstack
 
 
 Usage
-=====
+======
 
 Important notes:
 ----------------
@@ -90,7 +90,7 @@ Examples
             "validate_access":{
                 "equals":"PRIVATE"
             },
-            "validate_target_object":"CourseOverview",
+            "validate_target_object":"OpaqueKeyProxyModel",
             "owner_object":"User",
             "tag_type":"tag_by_example"
         }
@@ -153,6 +153,112 @@ This means that:
 * The target type must be equal to `CourseEnrollment`
 * Tag type must be equal to tag_by_edunext.
 * The tag activation date must exist and be in the values defined in the array
+
+Tagging REST API
+================
+
+Get list of tags
+----------------
+
+**Request**
+
+``curl -H 'Accept: application/json' -H "Authorization: Bearer AUTHENTICATION_TOKEN" http://BASE_URL_SITE/eox_tagging/api/v1/tags/``
+
+**Response**
+
+.. code-block:: JSON
+
+        {
+            "count": 1,
+            "next": null,
+            "previous": null,
+            "results": [
+                {
+                    "key": "8a265b65-9555-4cd1-9d64-ee2009d80301",
+                    "tag_value": "example_tag_value",
+                    "tag_type": "tag_by_example",
+                    "access": "PRIVATE",
+                    "activation_date": null,
+                    "expiration_date": null,
+                    "target_id": "course-v1:edX+DemoX+Demo_Course",
+                    "owner_id": "reporting",
+                    "owner_type": "User",
+                    "target_type": "OpaqueKeyProxyModel",
+                    "status": "VALID"
+                }
+            ]
+        }
+
+Create tag
+----------
+
+**Request**
+
+``curl -H 'Accept: application/json' -H "Authorization: Bearer AUTHENTICATION_TOKEN" --data TAG_DATA http://BASE_URL_SITE/eox_tagging/api/v1/tags/``
+
+Where TAG_DATA:
+
+.. code-block:: JSON
+
+        {
+            "tag_type": "tag_by_example",
+            "tag_value": "example_tag_value",
+            "target_type": "courseoverview",
+            "target_id": "course-v1:edX+DemoX+Demo_Course",
+            "access": "PRIVATE",
+            "owner_type": "user"
+        }
+
+
+**Response**:
+
+``Status 201 Created``
+
+.. code-block:: JSON
+
+        {
+            "key": "6a41e775-cc2b-42df-b62d-d3e92e1bc484",
+            "tag_value": "example_tag_value",
+            "tag_type": "tag_by_example",
+            "access": "PRIVATE",
+            "activation_date": null,
+            "expiration_date": null,
+            "target_id": "course-v1:edX+DemoX+Demo_Course",
+            "owner_id": "reporting",
+            "owner_type": "User",
+            "target_type": "OpaqueKeyProxyModel",
+            "status": "VALID"
+        }
+
+Delete tag
+----------
+
+**Request**
+
+``curl -X DELETE  http://BASE_URL_SITE/eox_tagging/api/v1/tags/EXISTING_KEY_TAG/``
+
+**Response**
+
+``Status 204 No Content``
+
+
+
+Filters example usage:
+----------------------
+
+``/eox_tagging/api/v1/tags/?created_at_after=2020-10-10``
+
+``/eox_tagging/api/v1/tags/?activated_at_after=2020-10-10``
+
+``/eox_tagging/api/v1/tags/?target_type=MODEL_TYPE``
+
+``/eox_tagging/api/v1/tags/?course_id=COURSE_ID``
+
+``/eox_tagging/api/v1/tags/?username=USERNAME``
+
+``/eox_tagging/api/v1/tags/?access=ACCESS_TYPE``
+
+``/eox_tagging/api/v1/tags/?enrollments=COURSE_ID``
 
 ##Contributing
 
