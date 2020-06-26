@@ -1,21 +1,26 @@
 """
 Serializers for tags and related objects.
 """
-import crum
+import re
+
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from eox_tagging.api.v1 import fields
 from eox_tagging.constants import AccessLevel, Status
-from eox_tagging.edxapp_accessors import get_object
+from eox_tagging.edxapp_wrappers import get_object, get_site
 from eox_tagging.models import Tag
 
 PROXY_MODEL_NAME = "opaquekeyproxymodel"
+MODELS_WITH_COMPOUND_KEYS = {
+    "courseenrollment": ["username", "course_id"],  # Compound keys
+}
 
 
 class TagSerializer(serializers.ModelSerializer):
     """Serializer for tag objects."""
+
     target_id = serializers.CharField(source='target_object')
     owner_id = serializers.CharField(source='owner_object', required=False)
     owner_type = serializers.CharField(source='owner_object_type')
@@ -23,15 +28,11 @@ class TagSerializer(serializers.ModelSerializer):
     access = fields.EnumField(enum=AccessLevel)
     status = fields.EnumField(enum=Status, required=False)
 
-    # Write only fields used to create tags
-    username = serializers.CharField(write_only=True, required=False)
-    course_id = serializers.CharField(write_only=True, required=False)
-
     class Meta:  # pylint: disable=old-style-class, useless-suppression
         """Meta class."""
         model = Tag
         fields = ('key', 'tag_value', 'tag_type', 'access', 'activation_date', 'expiration_date',
-                  'target_id', 'owner_id', 'owner_type', 'target_type', 'username', 'course_id', 'status')
+                  'target_id', 'owner_id', 'owner_type', 'target_type', 'status')
 
     # Validation and creation of tags
     def create(self, validated_data):
@@ -42,10 +43,15 @@ class TagSerializer(serializers.ModelSerializer):
         owner_object = None
         target_type = validated_data.pop("target_object_type")
         owner_type = validated_data.pop("owner_object_type", None)
+        target = validated_data.pop("target_object", None)
 
-        data = {
-            "target_id": validated_data.pop("target_object", None),
-        }
+        if target_type in MODELS_WITH_COMPOUND_KEYS:
+            data = self.__convert_compound_keys(target, target_type)
+        else:
+            data = {
+                "target_id": target,
+            }
+
         try:
             target_object = get_object(target_type, **data)
         except Exception:  # pylint: disable=broad-except
@@ -55,7 +61,7 @@ class TagSerializer(serializers.ModelSerializer):
         if owner_type == "user":
             owner_object = self.context.get("request").user
         else:
-            owner_object = crum.get_current_request().site
+            owner_object = get_site()
 
         # Set objects
         tag_object = {
@@ -63,8 +69,17 @@ class TagSerializer(serializers.ModelSerializer):
             "owner_object": owner_object,
         }
         tag_object.update(validated_data)
+
         try:
-            tag = Tag.objects.create_tag(**tag_object)
+            return Tag.objects.create_tag(**tag_object)
         except ValidationError as e:
             raise serializers.ValidationError({"Tag": _("{}".format(e.message))})
-        return tag
+
+    def __convert_compound_keys(self, ids, object_type):
+        """
+        Function that converts strings with format: `key1: key2` into a dictionary.
+        """
+        target_id = re.split(r':\s', ids)
+        target_labels = MODELS_WITH_COMPOUND_KEYS.get(object_type)
+        target_pairs = zip(target_labels, target_id)
+        return dict(target_pairs)

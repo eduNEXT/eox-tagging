@@ -11,7 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from eox_tagging.constants import AccessLevel
 from eox_tagging.models import Tag
-from eox_tagging.test_utils import CourseEnrollment, CourseOverview
+from eox_tagging.test.test_utils import CourseEnrollment, CourseOverview
 
 
 @override_settings(
@@ -60,7 +60,6 @@ class TestTag(TestCase):
             owner_object=self.owner_object,
             access=AccessLevel.PRIVATE,
         )
-
 
     @override_settings(
         EOX_TAGGING_DEFINITIONS=[

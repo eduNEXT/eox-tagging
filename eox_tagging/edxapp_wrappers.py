@@ -11,15 +11,14 @@ from opaque_keys.edx.keys import CourseKey
 try:
     from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 except ImportError:
-    from eox_tagging.test_utils import CourseOverview  # pylint: disable=ungrouped-imports, useless-suppression
+    from eox_tagging.test.test_utils import CourseOverview  # pylint: disable=ungrouped-imports, useless-suppression
 
 
 def get_user(**kwargs):
     """Function used to get users."""
     user_id = kwargs.get("target_id")
     if getattr(settings, "EOX_TAGGING_SKIP_VALIDATIONS", False):  # Skip these validations while testing
-        user = User.objects.get(username=user_id)
-        return user
+        return User.objects.get(username=user_id)
 
     site = crum.get_current_request().site
     user = get_edxapp_user(username=user_id, site=site)
@@ -37,11 +36,12 @@ def get_course(**kwargs):
     return course
 
 
-def get_site(**kwargs):
-    """Function used to get sites."""
-    site_id = kwargs.get("id")
-
-    site = Site.objects.get(id=site_id)
+def get_site():
+    """Function used to get current site."""
+    if getattr(settings, "EOX_TAGGING_SKIP_VALIDATIONS", False):  # Use TEST_SITE while testing
+        site = Site.objects.get(id=settings.TEST_SITE)
+    else:
+        site = crum.get_current_request().site
     return site
 
 
@@ -54,7 +54,14 @@ def get_course_enrollment(**kwargs):
         return object
 
     enrollment, _ = get_enrollment(username=username, course_id=course_id)
-    return enrollment
+    try:
+        # Temporary method to get CourseEnrollment objects. This should be a backend.
+        from student.models import CourseEnrollment
+        user = get_user(**{"target_id": username})
+        course_id = CourseKey.from_string(course_id)
+        return CourseEnrollment.objects.get(user_id=user.id, course_id=course_id)
+    except ImportError:
+        return enrollment
 
 
 def get_object(related_object_type, **kwargs):

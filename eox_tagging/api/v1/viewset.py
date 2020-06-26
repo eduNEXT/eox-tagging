@@ -1,9 +1,6 @@
 """
 Viewset for Tags.
 """
-import crum
-from django.conf import settings
-from django.contrib.sites.models import Site
 from django_filters import rest_framework as filters
 from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication
@@ -13,6 +10,7 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 from eox_tagging.api.v1.filters import TagFilter
 from eox_tagging.api.v1.pagination import TagApiPagination
 from eox_tagging.api.v1.serializers import TagSerializer
+from eox_tagging.edxapp_wrappers import get_site
 from eox_tagging.models import Tag
 
 
@@ -30,25 +28,27 @@ class TagViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Restricts the returned tags."""
-        queryset = Tag.objects.all()
-        owner_type = self.request.query_params.get('owner_type', None)
+        owner_type = self.request.query_params.get("owner_type")
+        include_invalid = self.request.query_params.get("include_invalid")
         user = self.request.user
+        site = get_site()
 
-        if getattr(settings, "EOX_TAGGING_SKIP_VALIDATIONS", False):  # Use TEST_SITE while testing
-            site = Site.objects.get(id=settings.TEST_SITE)
+        if include_invalid and include_invalid.lower() in ["true", "1"]:
+            queryset = Tag.objects.all()
         else:
-            site = crum.get_current_request().site
+            queryset = Tag.objects.valid()
 
         if owner_type:
             owner_id = user.username if owner_type == "user" else site.id
             try:
-                queryset = queryset.find_by_owner(owner_type="user", owner_id=owner_id)
+                queryset = queryset.find_by_owner(owner_type=owner_type, owner_id=owner_id)
                 return queryset
             except Exception:  # pylint: disable=broad-except
                 return queryset.none()
 
         try:
-            return queryset.find_by_owner(owner_type="site", owner_id=site.id) \
-                | queryset.find_by_owner(owner_type="user", owner_id=user.username)
+            queryset = queryset.find_by_owner(owner_type="site", owner_id={"id": site.id}) \
+                | queryset.find_by_owner(owner_type="user", owner_id={"username": user.username})
+            return queryset
         except Exception:  # pylint: disable=broad-except
             return queryset.none()

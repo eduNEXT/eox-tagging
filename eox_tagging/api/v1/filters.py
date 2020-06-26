@@ -18,8 +18,7 @@ class TagFilter(filters.FilterSet):
     target_type = filters.CharFilter(method="filter_target_types")  # Tags associated to this type
     created_at = filters.DateTimeFromToRangeFilter(name="created_at")
     activated_at = filters.DateTimeFromToRangeFilter(name="activated_at")
-    status = filters.NumberFilter(name="status")
-    access = filters.ChoiceFilter(choices=AccessLevel.choices())
+    access = filters.CharFilter(method="filter_access_type")
 
     class Meta:  # pylint: disable=old-style-class
         """Meta class."""
@@ -31,8 +30,7 @@ class TagFilter(filters.FilterSet):
         if value:
             try:
                 queryset = Tag.objects.find_all_tags_for(target_type="CourseOverview",
-                                                         target_id=str(value))
-                return queryset
+                                                         target_id={"course_id": str(value)})
             except Exception:  # pylint: disable=broad-except
                 return queryset.none()
 
@@ -43,8 +41,7 @@ class TagFilter(filters.FilterSet):
         if value:
             try:
                 queryset = Tag.objects.find_all_tags_for(target_type="user",
-                                                         target_id=str(value))
-                return queryset
+                                                         target_id={"username": str(value)})
             except Exception:  # pylint: disable=broad-except
                 return queryset.none()
 
@@ -60,7 +57,6 @@ class TagFilter(filters.FilterSet):
             try:
                 queryset = Tag.objects.find_all_tags_for(target_type="courseenrollment",
                                                          target_id=enrollment)
-                return queryset
             except Exception:  # pylint: disable=broad-except
                 return queryset.none()
 
@@ -71,8 +67,16 @@ class TagFilter(filters.FilterSet):
         if value:
             try:
                 ctype = ContentType.objects.get(model="courseenrollment")
-                queryset = ctype.get_object_for_this_type(course_id=str(value))
-                return queryset
+                enrollments_queryset = Tag.objects.find_all_tags_by_type("courseenrollment")
+
+                query_enrollments = []
+                for tag_enrollment in enrollments_queryset:
+                    target_id = tag_enrollment.target_object_id
+                    enrollment = ctype.get_object_for_this_type(id=target_id)
+                    if str(enrollment.course_id) == str(value):
+                        query_enrollments.append(tag_enrollment)
+
+                return query_enrollments
             except Exception:  # pylint: disable=broad-except
                 return queryset.none()
 
@@ -83,7 +87,16 @@ class TagFilter(filters.FilterSet):
         if value:
             try:
                 queryset = Tag.objects.find_all_tags_by_type(str(value))
-                return queryset
             except Exception:  # pylint: disable=broad-except
                 return queryset.none()
+
+        return queryset
+
+    def filter_access_type(self, queryset, name, value):  # pylint: disable=unused-argument
+        """Filters targets by their access type."""
+        if value:
+            value_map = {v.lower(): k for k, v in AccessLevel.choices()}
+            value = value_map[value.lower()]
+            queryset = queryset.filter(access=value)
+
         return queryset

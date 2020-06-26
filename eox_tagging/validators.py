@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 try:
     from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 except ImportError:
-    from eox_tagging.test_utils import CourseOverview  # pylint: disable=ungrouped-imports, useless-suppression
+    from eox_tagging.test.test_utils import CourseOverview  # pylint: disable=ungrouped-imports, useless-suppression
 try:
     # Python 2: "unicode" is built-in
     unicode  # pylint: disable=undefined-variable, useless-suppression

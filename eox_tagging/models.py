@@ -23,7 +23,7 @@ from eox_tagging.validators import TagValidators
 log = logging.getLogger(__name__)
 
 OPAQUE_KEY_PROXY_MODEL_TARGETS = [
-    "CourseOverview"
+    "CourseOverview",
 ]
 
 PROXY_MODEL_NAME = "opaquekeyproxymodel"
@@ -82,7 +82,6 @@ class TagQuerySet(QuerySet):
     def __get_object_for_this_type(self, object_type, object_id):
         """Function that returns the correct content type given a type."""
         ctype = ContentType.objects.get(model=object_type)
-<<<<<<< HEAD
 
         if object_type == PROXY_MODEL_NAME:
             object_id = object_id.get("course_id")
@@ -93,26 +92,6 @@ class TagQuerySet(QuerySet):
         object_instance = ctype.get_object_for_this_type(**object_id)
 
         return object_instance, ctype
-=======
-        if object_type == "user":
-            object_instance = ctype.get_object_for_this_type(username=object_id)
-            return object_instance, ctype
-
-        if object_type == "courseenrollment":
-            object_instance = ctype.get_object_for_this_type(username=object_id.get("username"),
-                                                             course_id=object_id.get("course_id"))
-            return object_instance, ctype
-        if object_type == "opaquekeyproxymodel":
-            opaque_key = CourseKey.from_string(object_id)
-            object_instance = ctype.get_object_for_this_type(opaque_key=opaque_key)
-            return object_instance, ctype
-
-        if object_type == "site":
-            object_instance = ctype.get_object_for_this_type(id=object_id)
-            return object_instance, ctype
-
-        return None
->>>>>>> Added custom search for contenttype objects and get_or_create to proxymodel creation
 
 
 @python_2_unicode_compatible
@@ -171,7 +150,7 @@ class Tag(models.Model):
     target_type = models.ForeignKey(
         ContentType,
         on_delete=models.CASCADE,
-        related_name="target_%(class)s_type",
+        related_name="%(class)s_type",
         null=True,
         blank=True,
     )

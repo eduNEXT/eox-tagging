@@ -3,12 +3,11 @@ import datetime
 
 from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
-from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APIClient
 
 from eox_tagging.constants import AccessLevel
 from eox_tagging.models import Tag
-from eox_tagging.test_utils import CourseEnrollment, CourseOverview
+from eox_tagging.test.test_utils import CourseOverview
 
 
 @override_settings(
@@ -74,7 +73,6 @@ class TestTagViewSet(TestCase):
             "expiration_date": "2020-12-04"
         }
         response = self.client.post("/api/v1/tags/", data, format='json')
-        import pudb; pu.db
         self.assertEqual(response.status_code, 201)
 
     def test_patch_tag(self):
