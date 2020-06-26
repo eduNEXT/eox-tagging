@@ -39,7 +39,7 @@ class TagViewSet(viewsets.ModelViewSet):
             queryset = Tag.objects.valid()
 
         if owner_type:
-            owner_id = user.username if owner_type == "user" else site.id
+            owner_id = {"username": user.username} if owner_type == "user" else {"id": site.id}
             try:
                 queryset = queryset.find_by_owner(owner_type=owner_type, owner_id=owner_id)
                 return queryset
