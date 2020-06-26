@@ -9,14 +9,15 @@ import uuid
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from opaque_keys.edx.django.models import CourseKeyField
+from opaque_keys.edx.keys import CourseKey
 
 from eox_tagging.constants import AccessLevel, Status
-from eox_tagging.helpers import get_model_name
 from eox_tagging.validators import TagValidators
 
 log = logging.getLogger(__name__)
@@ -25,17 +26,19 @@ OPAQUE_KEY_PROXY_MODEL_TARGETS = [
     "CourseOverview"
 ]
 
+PROXY_MODEL_NAME = "opaquekeyproxymodel"
+
 
 class TagQuerySet(QuerySet):
     """ Tag queryset used as manager."""
 
     def create_tag(self, **kwargs):
         """Method used to create tags."""
-        target = kwargs.pop('target_object', None)
+        target = kwargs.pop("target_object", None)
         if target and target.__class__.__name__ in OPAQUE_KEY_PROXY_MODEL_TARGETS:
-            kwargs['target_object'] = OpaqueKeyProxyModel.objects.create(opaque_key=target.course_id)
+            kwargs["target_object"], _ = OpaqueKeyProxyModel.objects.get_or_create(opaque_key=target.course_id)
         else:
-            kwargs['target_object'] = target
+            kwargs["target_object"] = target
         instance = self.create(**kwargs)
         return instance
 
@@ -47,34 +50,44 @@ class TagQuerySet(QuerySet):
         """Returns all invalid tags."""
         return self.exclude(invalidated_at=None)
 
-    def find_by_owner(self, owner):
+    def find_by_owner(self, owner_type, owner_id):
         """Returns all valid tags owned by owner_id."""
-        model = owner.__class__
-        ctype = ContentType.objects.get_for_model(model)
 
-        return self.valid().filter(
-            owner_type=ctype,
-            owner_object_id=owner.id,
-        )
+        try:
+            owner, ctype = self.__get_object_for_this_type(owner_type, owner_id)
+        except ObjectDoesNotExist:
+            return self.none()
 
-    def find_all_tags_for(self, target_object):
-        """Returns all valid on an object."""
-        if get_model_name(target_object) in OPAQUE_KEY_PROXY_MODEL_TARGETS:
-            model = OpaqueKeyProxyModel
-            target_id = OpaqueKeyProxyModel.objects.get(opaque_key=target_object.course_id).id
-        else:
-            model = target_object.__class__
-            target_id = target_object.id
-        ctype = ContentType.objects.get_for_model(model)
+        return self.filter(owner_type=ctype, owner_object_id=owner.id,)
 
-        return self.valid().filter(
-            target_type=ctype,
-            target_object_id=target_id,
-        )
+    def find_all_tags_for(self, target_type, target_id):
+        """Returns all valid tags on an object."""
+        target_type = PROXY_MODEL_NAME if target_type in OPAQUE_KEY_PROXY_MODEL_TARGETS else target_type
+
+        try:
+            target, ctype = self.__get_object_for_this_type(target_type, target_id)
+        except ObjectDoesNotExist:
+            return self.none()
+
+        return self.filter(target_type=ctype, target_object_id=target.id,)
 
     def hard_delete(self):
         """ Method for deleting Tag objects"""
         return super(TagQuerySet, self).delete()
+
+    def __get_object_for_this_type(self, object_type, object_id):
+        """Function that returns the correct content type given a type."""
+        ctype = ContentType.objects.get(model=object_type)
+
+        if object_type == PROXY_MODEL_NAME:
+            object_id = object_id.get("course_id")
+            object_id = {
+                "opaque_key": CourseKey.from_string(object_id),
+            }
+
+        object_instance = ctype.get_object_for_this_type(**object_id)
+
+        return object_instance, ctype
 
 
 @python_2_unicode_compatible
