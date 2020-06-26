@@ -14,9 +14,7 @@ contextlib2==0.6.0.post1  # via -r requirements/base.txt, importlib-metadata, zi
 coverage==5.1             # via -r requirements/test.in
 django-crum==0.7.6        # via -r requirements/test.in
 django-fake-model==0.1.4  # via -r requirements/test.in
-django-filter==1.1.0      # via -c requirements/constraints.txt, -r requirements/test.in
 django-oauth2-provider==0.2.6.1  # via -r requirements/test.in
-django==1.11.29           # via -c requirements/constraints.txt, -r requirements/base.txt, -r requirements/test.in, django-crum, edx-opaque-keys, eox-core
 djangorestframework-oauth==1.1.0  # via -r requirements/test.in
 djangorestframework==3.9.4  # via -r requirements/base.txt, eox-core
 edx-opaque-keys[django]==0.4.4  # via -c requirements/constraints.txt, -r requirements/base.txt, -r requirements/test.in, eox-core
@@ -24,7 +22,7 @@ enum34==1.1.10            # via astroid
 eox-core==2.13.0          # via -r requirements/base.txt
 future==0.18.2            # via -r requirements/base.txt, celery
 futures==3.3.0 ; python_version == "2.7"  # via -c requirements/constraints.txt, isort
-importlib-metadata==1.6.1  # via -r requirements/base.txt, kombu
+importlib-metadata==1.7.0  # via -r requirements/base.txt, kombu
 isort==4.3.21             # via pylint
 kombu==4.6.11             # via -r requirements/base.txt, celery
 lazy-object-proxy==1.5.0  # via astroid

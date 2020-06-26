@@ -1,0 +1,2 @@
+django-filter==1.1.0      # via -c requirements/constraints.txt, -r requirements/test.in
+django==1.11.29           # via -c requirements/constraints.txt, -r requirements/base.txt, -r requirements/test.in, django-crum, edx-opaque-keys, eox-core
