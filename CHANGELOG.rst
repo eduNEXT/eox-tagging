@@ -13,8 +13,12 @@ Change Log
 Unreleased
 ----------
 
-- REST API to create, get, filter and delete tags.
-- New filters in Tag queryset.
+
+[0.2.0] - 2020-06-26
+---------------------
+
+* REST API to create, get, filter and delete tags.
+* New filters in Tag queryset.
 
 * First PyPI release.
 
