@@ -3,6 +3,7 @@ import datetime
 
 from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
+from django.urls import reverse
 from rest_framework.test import APIClient
 
 from eox_tagging.constants import AccessLevel
@@ -22,10 +23,11 @@ from eox_tagging.test.test_utils import CourseOverview
         },
         {
             "tag_type": "example_tag_2",
-            "validate_owner_object": "User",
-            "validate_target_object": "OpaqueKeyProxyModel",
+            "validate_owner_object": "Site",
             "validate_access": {"equals": "PRIVATE"},
             "validate_tag_value": {"in": ["example_tag_value", "example_tag_value_1"]},
+            "validate_target_object": "User",
+            "validate_expiration_date": {"exist": True},
         },
     ])
 @CourseOverview.fake_me
@@ -51,6 +53,9 @@ class TestTagViewSet(TestCase):
             expiration_date=datetime.date(2020, 10, 19),
         )
 
+        # Test URLs
+        self.URL = reverse("tag-list")
+
     def test_get_all_tags(self):
         """Used to test getting all tags."""
         response = self.client.get("/api/v1/tags/")
@@ -58,7 +63,7 @@ class TestTagViewSet(TestCase):
 
     def test_retreive_tag(self):
         """Used to test getting a tag given its key."""
-        response = self.client.get("/api/v1/tags/{key}/".format(key=self.example_tag.key.hex))
+        response = self.client.get("{URL}{key}/".format(URL=self.URL, key=self.example_tag.key.hex))
         self.assertEqual(response.status_code, 200)
 
     def test_create_tag(self):
@@ -70,41 +75,61 @@ class TestTagViewSet(TestCase):
             "target_id": "user_test",
             "owner_type": "user",  # default is site
             "access": "PRIVATE",
-            "expiration_date": "2020-12-04"
+            "expiration_date": "2020-12-04",
         }
+
         response = self.client.post("/api/v1/tags/", data, format='json')
+
         self.assertEqual(response.status_code, 201)
+
+    def test_create_tag_without_owner(self):
+        """"
+        Used to test creating a tag without an owner. The owner should be set as a default
+        to be the site.
+        """
+        data = {
+            "tag_type": "example_tag_2",
+            "tag_value": "example_tag_value",
+            "target_type": "user",
+            "target_id": "user_test",
+            "access": "PRIVATE",
+            "expiration_date": "2020-12-04",
+        }
+
+        response = self.client.post(self.URL, data, format='json')
+
+        self.assertEqual(response.data["owner_type"].lower(), "site")
 
     def test_patch_tag(self):
         """Used to test that a tag can't be updated."""
-        response = self.client.patch("/api/v1/tags/{key}/".format(key=self.example_tag.key.hex))
+        response = self.client.patch("{URL}{key}/".format(URL=self.URL, key=self.example_tag.key.hex))
         self.assertEqual(response.status_code, 405)
 
     def test_put_tag(self):
         """Used to test that a tag can't be updated."""
-        response = self.client.put("/api/v1/tags/{key}/".format(key=self.example_tag.key.hex))
+        response = self.client.put("{URL}{key}/".format(URL=self.URL, key=self.example_tag.key.hex))
         self.assertEqual(response.status_code, 405)
 
     def test_filter_by_tag_key(self):
         """Used to test getting a tag given its key."""
-        url = "/api/v1/tags/?key={key}".format(key=self.example_tag.key.hex)
+        url = "{URL}?key={key}".format(URL=self.URL, key=self.example_tag.key.hex)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
     def test_filter_by_username(self):
         """Used to test getting a tag given its target."""
-        URL = "/api/v1/tags/?username={user}".format(user="user_test")
+        URL = "{URL}?username={user}".format(URL=self.URL, user="user_test")
         response = self.client.get(URL)
         self.assertEqual(response.status_code, 200)
 
     def test_filter_by_type(self):
         """Used to test getting a tag given its target."""
-        URL = "/api/v1/tags/?target_type={}".format("user")
+        URL = "{URL}?target_type={type}".format(URL=self.URL, type="user")
         response = self.client.get(URL)
         self.assertEqual(response.status_code, 200)
 
     def test_soft_delete(self):
         """Used to test a tag soft deletion."""
-        URL = "/api/v1/tags/{key}/".format(key=self.example_tag.key.hex)
+        URL = "{URL}{key}/".format(URL=self.URL, key=self.example_tag.key.hex)
         response = self.client.delete(URL)
         self.assertEqual(response.status_code, 204)
