@@ -70,7 +70,7 @@ class TestTagViewSet(TestCase):
             "target_id": "user_test",
             "owner_type": "user",  # default is site
             "access": "PRIVATE",
-            "expiration_date": "2020-12-04"
+            "expiration_date": "2020-12-04 10:20:30"
         }
         response = self.client.post("/api/v1/tags/", data, format='json')
         self.assertEqual(response.status_code, 201)

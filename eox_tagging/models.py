@@ -136,8 +136,8 @@ class Tag(models.Model):
     access = models.PositiveIntegerField(
         choices=AccessLevel.choices(), default=AccessLevel.PUBLIC,
     )
-    activation_date = models.DateField(null=True, blank=True)
-    expiration_date = models.DateField(null=True, blank=True)
+    activation_date = models.DateTimeField(null=True, blank=True)
+    expiration_date = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
 
     status = models.PositiveIntegerField(
@@ -217,7 +217,7 @@ class Tag(models.Model):
     def __get_dates(self, attr):
         """Function that gets formatted dates for the model."""
         date = getattr(self, attr)
-        date_format = "%b %d %Y"
+        date_format = "%b %d %Y %H:%M:%S"
         try:
             date_str = datetime.datetime.strftime(date, date_format)
         except TypeError:
