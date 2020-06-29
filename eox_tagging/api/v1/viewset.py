@@ -36,7 +36,7 @@ class TagViewSet(viewsets.ModelViewSet):
         if include_invalid and include_invalid.lower() in ["true", "1"]:
             queryset = Tag.objects.all()
         else:
-            queryset = Tag.objects.valid()
+            queryset = Tag.objects.active()
 
         if owner_type:
             owner_id = {"username": user.username} if owner_type == "user" else {"id": site.id}

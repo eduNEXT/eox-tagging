@@ -259,10 +259,10 @@ class TestTag(TestCase):
         self.test_tag.delete()
 
         with self.assertRaises(ObjectDoesNotExist):
-            Tag.objects.valid().get(id=1)
+            Tag.objects.active().get(id=1)
 
         # Exists in invalid objects
-        Tag.objects.invalid().get(id=1)
+        Tag.objects.inactive().get(id=1)
 
     def test_create_tag_without_target_object(self):
         """

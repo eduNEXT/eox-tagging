@@ -15,6 +15,7 @@ Unreleased
 
 * Changed Date fields like expiration date and activation date to DateTime fields
 * Added validations only for DateTime fields
+* Changed STATUS from valid/invalid to active/inactive
 
 [0.2.0] - 2020-06-26
 ---------------------
