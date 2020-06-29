@@ -318,8 +318,8 @@ class TestTag(TestCase):
                 "tag_type": "example_tag_3",
                 "validate_tag_value": {"regex": r".*eduNEXT$"},
                 "validate_target_object": "CourseEnrollment",
-                "validate_expiration_date": {"exist": True, "in": ["Dec 04 2020", "Oct 19 2020"]},
-                "validate_activation_date": "Jun 16 2020"
+                "validate_expiration_date": {"exist": True, "in": ["Dec 04 2020 10:20:30", "Oct 19 2020 10:20:30"]},
+                "validate_activation_date": "Jun 16 2020 10:20:30"
             }]
     )
     def test_validation_list_with_date(self):
@@ -330,6 +330,6 @@ class TestTag(TestCase):
             tag_type="example_tag_3",
             target_object=fake_object_target_enroll,
             owner_object=self.fake_owner_object,
-            expiration_date=datetime.date(2020, 10, 19),
-            activation_date=datetime.date(2020, 6, 16),
+            expiration_date=datetime.datetime(2020, 10, 19, 10, 20, 30),
+            activation_date=datetime.datetime(2020, 6, 16, 10, 20, 30),
         )

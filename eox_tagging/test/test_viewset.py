@@ -58,12 +58,14 @@ class TestTagViewSet(TestCase):
 
     def test_get_all_tags(self):
         """Used to test getting all tags."""
-        response = self.client.get("/api/v1/tags/")
+        response = self.client.get(self.URL)
+
         self.assertEqual(response.status_code, 200)
 
     def test_retreive_tag(self):
         """Used to test getting a tag given its key."""
         response = self.client.get("{URL}{key}/".format(URL=self.URL, key=self.example_tag.key.hex))
+
         self.assertEqual(response.status_code, 200)
 
     def test_create_tag(self):
@@ -73,12 +75,12 @@ class TestTagViewSet(TestCase):
             "tag_value": "example_tag_value",
             "target_type": "user",
             "target_id": "user_test",
-            "owner_type": "user",  # default is site
+            "owner_type": "user",
             "access": "PRIVATE",
-            "expiration_date": "2020-12-04",
+            "expiration_date": "2020-12-04 10:20:30",
         }
 
-        response = self.client.post("/api/v1/tags/", data, format='json')
+        response = self.client.post(self.URL, data, format='json')
 
         self.assertEqual(response.status_code, 201)
 
@@ -93,43 +95,88 @@ class TestTagViewSet(TestCase):
             "target_type": "user",
             "target_id": "user_test",
             "access": "PRIVATE",
-            "expiration_date": "2020-12-04",
+            "expiration_date": "2020-12-04 10:20:30",
         }
 
         response = self.client.post(self.URL, data, format='json')
 
-        self.assertEqual(response.data["owner_type"].lower(), "site")
+        self.assertEqual(response.data.get("owner_type").lower(), "site")
+
+    def test_create_tag_with_iso_datetime_format(self):
+        """"Used to test creating a tag using ISO format in datetime fields."""
+        data = {
+            "tag_type": "example_tag_1",
+            "tag_value": "example_tag_value",
+            "target_type": "user",
+            "target_id": "user_test",
+            "owner_type": "user",
+            "access": "PRIVATE",
+            "expiration_date": "2020-12-04T10:20:30.15785",
+        }
+
+        response = self.client.post(self.URL, data, format='json')
+
+        self.assertEqual(response.status_code, 201)
+
+    def test_create_tag_with_wrong_datetime_format(self):
+        """"
+        Used to test creating a tag using wrong format in datetime fields. This results in a
+        bad request.
+        """
+        data = {
+            "tag_type": "example_tag_1",
+            "tag_value": "example_tag_value",
+            "target_type": "user",
+            "target_id": "user_test",
+            "owner_type": "user",
+            "access": "PRIVATE",
+            "expiration_date": "12-04-2020 10:20:30",
+        }
+
+        response = self.client.post(self.URL, data, format='json')
+
+        self.assertEqual(response.status_code, 400)
 
     def test_patch_tag(self):
         """Used to test that a tag can't be updated."""
         response = self.client.patch("{URL}{key}/".format(URL=self.URL, key=self.example_tag.key.hex))
+
         self.assertEqual(response.status_code, 405)
 
     def test_put_tag(self):
         """Used to test that a tag can't be updated."""
         response = self.client.put("{URL}{key}/".format(URL=self.URL, key=self.example_tag.key.hex))
+
         self.assertEqual(response.status_code, 405)
 
     def test_filter_by_tag_key(self):
         """Used to test getting a tag given its key."""
         url = "{URL}?key={key}".format(URL=self.URL, key=self.example_tag.key.hex)
+
         response = self.client.get(url)
+
         self.assertEqual(response.status_code, 200)
 
     def test_filter_by_username(self):
         """Used to test getting a tag given its target."""
         URL = "{URL}?username={user}".format(URL=self.URL, user="user_test")
+
         response = self.client.get(URL)
+
         self.assertEqual(response.status_code, 200)
 
     def test_filter_by_type(self):
         """Used to test getting a tag given its target."""
         URL = "{URL}?target_type={type}".format(URL=self.URL, type="user")
+
         response = self.client.get(URL)
+
         self.assertEqual(response.status_code, 200)
 
     def test_soft_delete(self):
         """Used to test a tag soft deletion."""
         URL = "{URL}{key}/".format(URL=self.URL, key=self.example_tag.key.hex)
+
         response = self.client.delete(URL)
+
         self.assertEqual(response.status_code, 204)
