@@ -66,8 +66,15 @@ class TestTagViewSet(TestCase):
             expiration_date=datetime.date(2020, 10, 19),
         )
 
+        self.example_tag_2 = Tag.objects.create(
+            tag_value="example_tag_value",
+            tag_type="example_tag_2",
+            target_object=self.target_object,
+            owner_object=self.owner_site,
+            access=AccessLevel.PRIVATE,
+            expiration_date=datetime.date(2020, 10, 19),
+        )
         self.KEY = self.example_tag.key.hex
-
         # Test URLs
         self.URL = reverse("tag-list")
         self.URL_DETAILS = reverse("tag-detail", args=[self.KEY])
