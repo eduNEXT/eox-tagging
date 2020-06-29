@@ -99,8 +99,8 @@ class TestTagViewSet(TestCase):
         }
 
         response = self.client.post(self.URL, data, format='json')
-
-        self.assertEqual(response.data.get("owner_type").lower(), "site")
+        owner_type = response.data.get("meta").get("owner_type").lower()
+        self.assertEqual(owner_type, "site")
 
     def test_create_tag_with_iso_datetime_format(self):
         """"Used to test creating a tag using ISO format in datetime fields."""

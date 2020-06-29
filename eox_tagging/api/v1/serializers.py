@@ -21,18 +21,30 @@ MODELS_WITH_COMPOUND_KEYS = {
 class TagSerializer(serializers.ModelSerializer):
     """Serializer for tag objects."""
 
-    target_id = serializers.CharField(source='target_object')
-    owner_id = serializers.CharField(source='owner_object', required=False)
-    owner_type = serializers.CharField(source='owner_object_type', required=False)
-    target_type = serializers.CharField(source='target_object_type')
+    target_id = serializers.CharField(source='target_object', write_only=True)
+    owner_id = serializers.CharField(source='owner_object', required=False, write_only=True)
+    owner_type = serializers.CharField(source='owner_object_type', write_only=True, required=False)
+    target_type = serializers.CharField(source='target_object_type', write_only=True)
+    meta = serializers.SerializerMethodField()
     access = fields.EnumField(enum=AccessLevel)
     status = fields.EnumField(enum=Status, required=False)
 
     class Meta:  # pylint: disable=old-style-class, useless-suppression
         """Meta class."""
         model = Tag
-        fields = ('key', 'tag_value', 'tag_type', 'access', 'activation_date', 'expiration_date',
+        fields = ('meta', 'key', 'tag_value', 'tag_type', 'access', 'activation_date', 'expiration_date',
                   'target_id', 'owner_id', 'owner_type', 'target_type', 'status')
+
+    def get_meta(self, instance):
+        """Getter of read-only field that returns technical information."""
+        return {
+            "target_id": instance.target_object_id,
+            "target_type": instance.target_object_type,
+            "owner_id": instance.owner_object_id,
+            "owner_type": instance.owner_object_type,
+            "created_at": instance.created_at,
+            "inactivated_at": instance.inactivated_at,
+        }
 
     # Validation and creation of tags
     def create(self, validated_data):
