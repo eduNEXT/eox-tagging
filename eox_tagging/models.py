@@ -1,7 +1,6 @@
 """
 Model to store tags in the database.
 """
-import datetime
 import logging
 import re
 import uuid
@@ -217,9 +216,8 @@ class Tag(models.Model):
     def __get_dates(self, attr):
         """Function that gets formatted dates for the model."""
         date = getattr(self, attr)
-        date_format = "%b %d %Y %H:%M:%S"
         try:
-            date_str = datetime.datetime.strftime(date, date_format)
+            date_str = date.isoformat()
         except TypeError:
             return None
         return date_str

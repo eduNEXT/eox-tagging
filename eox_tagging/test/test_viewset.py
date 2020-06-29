@@ -48,7 +48,7 @@ class TestTagViewSet(TestCase):
             target_object=self.target_object,
             owner_object=self.admin,
             access=AccessLevel.PRIVATE,
-            expiration_date=datetime.date(2020, 10, 19),
+            expiration_date=datetime.datetime(2020, 6, 29, 10, 52, 29, 589494),
         )
 
     def test_get_all_tags(self):
@@ -70,7 +70,7 @@ class TestTagViewSet(TestCase):
             "target_id": "user_test",
             "owner_type": "user",  # default is site
             "access": "PRIVATE",
-            "expiration_date": "2020-12-04 10:20:30"
+            "expiration_date": "2020-02-15T20:26:08.937881+1030"
         }
         response = self.client.post("/api/v1/tags/", data, format='json')
         self.assertEqual(response.status_code, 201)

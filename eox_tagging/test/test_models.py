@@ -209,7 +209,7 @@ class TestTag(TestCase):
             tag_type="example_tag_3",
             target_object=fake_object_target_enroll,
             owner_object=self.fake_owner_object,
-            expiration_date=datetime.date(2020, 10, 19),
+            expiration_date=datetime.datetime(2020, 6, 29, 10, 52, 29, 589494),
         )
 
     def test_tag_validation_regex_accepts_pattern_fail(self):
@@ -221,7 +221,7 @@ class TestTag(TestCase):
                 tag_type="example_tag_3",
                 target_object=fake_object_target_enroll,
                 owner_object=self.owner_object,
-                expiration_date=datetime.date(2020, 10, 19),
+                expiration_date=datetime.datetime(2020, 6, 29, 10, 52, 29, 589494),
             )
 
     def test_tag_validation_owner_must_be_site(self):
@@ -233,7 +233,7 @@ class TestTag(TestCase):
                 tag_type="example_tag_3",
                 target_object=fake_object_target_enroll,
                 owner_object=fake_object_target_enroll,
-                expiration_date=datetime.date(2020, 10, 19),
+                expiration_date=datetime.datetime(2020, 6, 29, 10, 52, 29, 589494),
             )
 
     def test_tag_inmutable(self):
@@ -318,8 +318,9 @@ class TestTag(TestCase):
                 "tag_type": "example_tag_3",
                 "validate_tag_value": {"regex": r".*eduNEXT$"},
                 "validate_target_object": "CourseEnrollment",
-                "validate_expiration_date": {"exist": True, "in": ["Dec 04 2020 10:20:30", "Oct 19 2020 10:20:30"]},
-                "validate_activation_date": "Jun 16 2020 10:20:30"
+                "validate_expiration_date": {"exist": True,
+                                             "in": ["2020-06-29T10:52:29.589494", "2020-02-15T20:26:08.937881"]},
+                "validate_activation_date": "2020-02-15T20:26:08.937881"
             }]
     )
     def test_validation_list_with_date(self):
@@ -330,6 +331,6 @@ class TestTag(TestCase):
             tag_type="example_tag_3",
             target_object=fake_object_target_enroll,
             owner_object=self.fake_owner_object,
-            expiration_date=datetime.datetime(2020, 10, 19, 10, 20, 30),
-            activation_date=datetime.datetime(2020, 6, 16, 10, 20, 30),
+            expiration_date=datetime.datetime(2020, 6, 29, 10, 52, 29, 589494),
+            activation_date=datetime.datetime(2020, 2, 15, 20, 26, 8, 937881),
         )
