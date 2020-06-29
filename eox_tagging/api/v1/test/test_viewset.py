@@ -255,7 +255,8 @@ class TestTagViewSet(TestCase):
 
         response = self.client.get(self.URL, query_params)
 
-        self.assertEqual(response.status_code, 200)
+        data = response.json().get("results")[0].get("meta")
+        self.assertEqual(data.get("target_id"), "user_test")
 
     @patch_permissions
     def test_filter_by_owner_user(self, _):

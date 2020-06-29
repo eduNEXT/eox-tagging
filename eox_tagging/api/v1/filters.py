@@ -11,11 +11,11 @@ PROXY_MODEL_NAME = "opaquekeyproxymodel"
 class TagFilter(filters.FilterSet):
     """Filter class for tags."""
 
-    course_id = filters.CharFilter(method="filter_course_id")  # Tags associated to this course
-    username = filters.CharFilter(method="filter_username")  # Tags associated to this username
-    enrolled = filters.CharFilter(method="filter_enrolled")  # Tags associated to this username
-    enrollments = filters.CharFilter(method="filter_enrollments")  # Tags associated to this username
-    target_type = filters.CharFilter(method="filter_target_types")  # Tags associated to this type
+    course_id = filters.CharFilter(name="course_id", method="filter_by_target_object")
+    username = filters.CharFilter(name="username", method="filter_by_target_object")
+    enrolled = filters.CharFilter(name="enrollment", method="filter_by_target_object")
+    enrollments = filters.CharFilter(method="filter_enrollments")
+    target_type = filters.CharFilter(method="filter_target_types")
     created_at = filters.DateTimeFromToRangeFilter(name="created_at")
     activated_at = filters.DateTimeFromToRangeFilter(name="activated_at")
     access = filters.CharFilter(method="filter_access_type")
@@ -25,38 +25,29 @@ class TagFilter(filters.FilterSet):
         model = Tag
         fields = ['key', 'created_at', 'activated_at', 'status', 'course_id', 'enrolled', 'enrollments', 'username']
 
-    def filter_course_id(self, queryset, name, value):  # pylint: disable=unused-argument
-        """Filter that returns the tags associated with course_id."""
+    def filter_by_target_object(self, queryset, name, value):
+        """Filter that returns the tags associated with target."""
+        TARGET_TYPES = {
+            "course_id": "courseoverview",
+            "username": "user",
+            "enrollment": "courseenrollment",
+        }
         if value:
-            try:
-                queryset = queryset.find_all_tags_for(target_type="CourseOverview",
-                                                      target_id={"course_id": str(value)})
-            except Exception:  # pylint: disable=broad-except
-                return queryset.none()
-
-        return queryset
-
-    def filter_username(self, queryset, name, value):  # pylint: disable=unused-argument
-        """Filter that returns the tags associated with username."""
-        if value:
-            try:
-                queryset = queryset.find_all_tags_for(target_type="user",
-                                                      target_id={"username": str(value)})
-            except Exception:  # pylint: disable=broad-except
-                return queryset.none()
-
-        return queryset
-
-    def filter_enrolled(self, queryset, name, value):  # pylint: disable=unused-argument
-        """Filter that returns tags in which the target is a course where the user is enrolled in."""
-        if value:
-            enrollment = {  # pylint: disable=broad-except
-                "username": self.request.user.username,
-                "course_id": str(value)
+            TARGET_IDENTIFICATION = {
+                "enrollment": {
+                    "username": self.request.user.username,
+                    "course_id": str(value),
+                },
+            }
+            DEFAULT = {
+                name: str(value),
             }
             try:
-                queryset = queryset.find_all_tags_for(target_type="courseenrollment",
-                                                      target_id=enrollment)
+                filter_params = {
+                    "target_type": TARGET_TYPES.get(name),
+                    "target_id": TARGET_IDENTIFICATION.get(name, DEFAULT),
+                }
+                queryset = queryset.find_all_tags_for(**filter_params)
             except Exception:  # pylint: disable=broad-except
                 return queryset.none()
 
