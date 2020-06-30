@@ -4,15 +4,16 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
-from eox_core.edxapp_wrapper.enrollments import get_enrollment
-from eox_core.edxapp_wrapper.users import get_edxapp_user
 from opaque_keys.edx.keys import CourseKey
 
-from eox_tagging.edxapp_wrappers.backends.courses import get_course_overview
-from eox_tagging.edxapp_wrappers.backends.enrollments import get_enrollment_object
+from eox_tagging.edxapp_wrappers.backends.course_overview_i_v1 import get_course_overview
+from eox_tagging.edxapp_wrappers.backends.enrollment_i_v1 import get_enrollment_dictionary, get_enrollment_object
+from eox_tagging.edxapp_wrappers.backends.users_i_v1 import get_platform_user
 
 CourseEnrollment = get_enrollment_object()
 CourseOverview = get_course_overview()
+get_enrollment = get_enrollment_dictionary()
+get_edxapp_user = get_platform_user()
 
 
 def get_user(**kwargs):

@@ -10,7 +10,7 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 from eox_tagging.api.v1.filters import TagFilter
 from eox_tagging.api.v1.pagination import TagApiPagination
 from eox_tagging.api.v1.serializers import TagSerializer
-from eox_tagging.edxapp_wrappers.edxapp_wrappers import get_site
+from eox_tagging.edxapp_accessors import get_site
 from eox_tagging.models import Tag
 
 

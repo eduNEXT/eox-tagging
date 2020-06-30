@@ -9,7 +9,7 @@ from rest_framework import serializers
 
 from eox_tagging.api.v1 import fields
 from eox_tagging.constants import AccessLevel, Status
-from eox_tagging.edxapp_wrappers.edxapp_wrappers import get_object, get_site
+from eox_tagging.edxapp_accessors import get_object, get_site
 from eox_tagging.models import Tag
 
 PROXY_MODEL_NAME = "opaquekeyproxymodel"

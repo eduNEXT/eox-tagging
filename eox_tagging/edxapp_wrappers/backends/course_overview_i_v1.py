@@ -1,4 +1,7 @@
-"""Backend abstraction."""
+"""
+Backend CourseOverview file, here are all the methods from
+openedx.core.djangoapps.content.course_overviews.
+"""
 
 
 def get_course_overview():
