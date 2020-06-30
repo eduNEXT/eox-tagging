@@ -68,6 +68,7 @@ class TestTagViewSet(TestCase):
 
     def test_create_tag(self):
         """"Used to test creating a tag."""
+
         data = {
             "tag_type": "example_tag_1",
             "tag_value": "example_tag_value",
@@ -92,6 +93,22 @@ class TestTagViewSet(TestCase):
             "tag_value": "example_tag_value",
             "target_type": "user",
             "target_id": "user_test",
+            "access": "PRIVATE",
+            "expiration_date": "2020-12-04",
+        }
+
+        response = self.client.post(self.URL, data, format='json')
+
+        self.assertEqual(response.data["owner_type"].lower(), "site")
+
+    def test_create_tag_with_wrong_owner(self):
+        """"Used to test creating a tag with wrong owner_type. This results in bad request."""
+        data = {
+            "tag_type": "example_tag_1",
+            "tag_value": "example_tag_value",
+            "target_type": "user",
+            "target_id": "user_test",
+            "owner_type": "course",  # default is site
             "access": "PRIVATE",
             "expiration_date": "2020-12-04",
         }
