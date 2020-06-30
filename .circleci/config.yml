@@ -15,7 +15,7 @@ workflows:
           matrix:
             parameters:
               python_version: ["2.7", "3.5"]
-              debian_version: ["stretch"]
+              django_version: ["django111"]
       - pypi:
           requires:
             - test
@@ -28,10 +28,13 @@ workflows:
 jobs:
   test:
     parameters:
+      django_version:
+        type: string
       python_version:
         type: string
       debian_version:
         type: string
+        default: stretch
     docker:
       # specify the version you desire here
       - image: circleci/python:<< parameters.python_version >>-<< parameters.debian_version >>
@@ -43,31 +46,39 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - test-<< parameters.python_version >>-{{ checksum "requirements/test.txt" }}
+          - test-tox-py<< parameters.python_version >>-<< parameters.django_version >>-{{ checksum "requirements/test.txt" }}
           # fallback to using the latest cache if no exact match is found
-          - test-<< parameters.python_version >>-
+          - test-tox-py<< parameters.python_version >>-<< parameters.django_version >>-
 
       - run:
           name: activate virtualenv and install dependencies.
           command: |
-            test -d venv || virtualenv ./venv
+            virtualenv ./venv
             . venv/bin/activate
-            make test_requirements
-
-      - save_cache:
-          paths:
-            - ./venv
-          key: test-<< parameters.python_version >>-{{ checksum "requirements/test.txt" }}
+            pip install -r requirements/tox.txt
 
       - run:
           name: Run tests
           command: |
             . venv/bin/activate
-            coverage run --source="." manage.py test
-            coverage report --fail-under=71 -m
-            pycodestyle ./eox_tagging
-            pylint ./eox_tagging --rcfile=./setup.cfg
-            isort --check-only --recursive --diff ./eox_tagging
+            export TOXENV=${TOX_ENV//./}
+            make run-test
+
+      - run:
+          name: Quality tests
+          command: |
+            . venv/bin/activate
+            export TOXENV=${TOX_ENV//./}
+            make run-quality-test
+
+      - save_cache:
+          paths:
+            - ./.tox
+          key: test-tox-py<< parameters.python_version >>-<< parameters.django_version >>-{{ checksum "requirements/test.txt" }}
+
+    environment:
+      - TOX_ENV: py<< parameters.python_version >>-<< parameters.django_version >>
+
 
   pypi:
     docker:
@@ -99,4 +110,4 @@ jobs:
           name: Upload to pypi
           command: |
             source venv/bin/activate
-            twine upload dist/
+            twine upload dist/*
