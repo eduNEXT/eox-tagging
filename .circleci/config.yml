@@ -61,11 +61,15 @@ jobs:
           name: Run tests
           command: |
             . venv/bin/activate
-            tox -e ${TOX_ENV//./} -- coverage run --source="." manage.py test
-            tox -e ${TOX_ENV//./} -- coverage report --fail-under=71 -m
-            tox -e ${TOX_ENV//./} -- pycodestyle ./eox_tagging
-            tox -e ${TOX_ENV//./} -- pylint ./eox_tagging --rcfile=./setup.cfg
-            tox -e ${TOX_ENV//./} -- isort --check-only --recursive --diff ./eox_tagging
+            export TOXENV=${TOX_ENV//./}
+            make run-test
+
+      - run:
+          name: Quality tests
+          command: |
+            . venv/bin/activate
+            export TOXENV=${TOX_ENV//./}
+            make run-quality-test
 
       - save_cache:
           paths:
