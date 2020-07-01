@@ -51,10 +51,8 @@ def plugin_settings(settings):
     More info: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
     """
     # Plugin settings
-    settings.GET_ENROLLMENT_OBJECT = "eox_tagging.edxapp_wrappers.backends.enrollment_i_v1"
-    settings.GET_ENROLLMENT = "eox_tagging.edxapp_wrappers.backends.enrollment_i_v1"
-    settings.GET_COURSE_OVERVIEW = "eox_tagging.edxapp_wrappers.backends.course_overview_i_v1"
-    settings.GET_EDXAPP_USERS = "eox_tagging.edxapp_wrappers.backends.users_i_v1"
+    settings.EOX_TAGGING_GET_ENROLLMENT_OBJECT = "eox_tagging.edxapp_wrappers.backends.enrollment_i_v1"
+    settings.EOX_TAGGING_GET_COURSE_OVERVIEW = "eox_tagging.edxapp_wrappers.backends.course_overview_i_v1"
     settings.EOX_TAGGING_DEFINITIONS = []
     settings.DATA_API_DEF_PAGE_SIZE = 1000
     settings.DATA_API_MAX_PAGE_SIZE = 5000
