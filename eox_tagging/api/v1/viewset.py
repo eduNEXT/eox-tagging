@@ -52,13 +52,14 @@ class TagViewSet(viewsets.ModelViewSet):
         site = self.__get_site()
         user = self.__get_user()
 
-        if owner_type is None:
+        if not owner_type:
             return [site, user]
 
         if owner_type.lower() == "user":
-            return user
-        elif owner_type.lower() == "site":
-            return site
+            return [user]
+
+        if owner_type.lower() == "site":
+            return [site]
 
         return None
 

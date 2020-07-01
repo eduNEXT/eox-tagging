@@ -1,7 +1,9 @@
 """ Test classes for Tags viewset. """
 import datetime
 
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient
@@ -37,6 +39,7 @@ class TestTagViewSet(TestCase):
     def setUp(self):
         """ Model setup used to create objects used in tests."""
         self.target_object = User.objects.create(username="user_test")
+        self.owner_object = Site.objects.get(id=settings.TEST_SITE)
 
         # Admin authentication
         password = 'mypassword'
@@ -101,6 +104,23 @@ class TestTagViewSet(TestCase):
 
         self.assertEqual(response.data["owner_type"].lower(), "site")
 
+    def test_create_tag_with_owner_site(self):
+        """"Used to test creating a tag with site as owner."""
+
+        data = {
+            "tag_type": "example_tag_2",
+            "tag_value": "example_tag_value",
+            "target_type": "user",
+            "target_id": "user_test",
+            "owner_type": "site",
+            "access": "PRIVATE",
+            "expiration_date": "2020-12-04",
+        }
+
+        response = self.client.post(self.URL, data, format='json')
+
+        self.assertEqual(response.data["owner_type"].lower(), "site")
+
     def test_create_tag_with_wrong_owner(self):
         """"Used to test creating a tag with wrong owner_type. This results in bad request."""
         data = {
@@ -138,6 +158,36 @@ class TestTagViewSet(TestCase):
         URL = "{URL}?username={user}".format(URL=self.URL, user="user_test")
         response = self.client.get(URL)
         self.assertEqual(response.status_code, 200)
+
+    def test_filter_by_owner_user(self):
+        """Used to test getting a tag given its owner of type user."""
+        URL = "/api/v1/tags/?owner_type=user"
+
+        response = self.client.get(URL)
+        data = response.json().get("results")[0]
+
+        self.assertEqual(data.get("owner_type").lower(), "user")
+
+    def test_filter_by_owner_site(self):
+        """Used to test getting a tag given its owner of type user."""
+        URL = "/api/v1/tags/?owner_type=site"
+
+        response = self.client.get(URL)
+        data = response.json().get("results")[0]
+
+        self.assertEqual(data.get("owner_type").lower(), "site")
+
+    def test_filter_by_wrong_owner(self):
+        """
+        Used to test getting a tag given an undefined type of owner. This returns an empty
+        queryset.
+        """
+        URL = "/api/v1/tags/?owner_type=course"
+
+        response = self.client.get(URL)
+        data = response.json().get("results")
+
+        self.assertFalse(data)
 
     def test_filter_by_type(self):
         """Used to test getting a tag given its target."""
