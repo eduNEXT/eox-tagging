@@ -1,7 +1,6 @@
 """
 Model to store tags in the database.
 """
-import datetime
 import logging
 import re
 import uuid
@@ -206,23 +205,10 @@ class Tag(models.Model):
         if attr and re.match(r".+object$|.+object_type$", attr):
             return self.__get_model(attr, name)
 
-        if attr in ['activation_date', 'expiration_date']:
-            return self.__get_dates(attr)
-
         if attr == 'access':
             return self.__get_field_choice(attr)
 
         return getattr(self, attr)
-
-    def __get_dates(self, attr):
-        """Function that gets formatted dates for the model."""
-        date = getattr(self, attr)
-        date_format = "%b %d %Y %H:%M:%S"
-        try:
-            date_str = datetime.datetime.strftime(date, date_format)
-        except TypeError:
-            return None
-        return date_str
 
     def __get_model(self, attr, name):
         """

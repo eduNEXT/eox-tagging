@@ -1,5 +1,6 @@
 """ File to define validations for tag model fields.
 """
+import datetime
 import logging
 import re
 
@@ -24,6 +25,8 @@ try:
     unicode  # pylint: disable=undefined-variable, useless-suppression
 except NameError:
     unicode = str  # pylint: disable=redefined-builtin, useless-suppression
+
+DATETIME_FORMAT_VALIDATION = "%Y-%m-%d %H:%M:%S"
 
 
 class TagValidators(object):
@@ -276,13 +279,17 @@ class TagValidators(object):
 
     def validate_in(self, field, values):
         """
-        Function that validates that the field is exists in values.
+        Function that validates that the field exists in values.
 
         Arguments:
             - field: field to validate
             - value: validations defined for the field
         """
         field_value = self.instance.get_attribute(field, name=True)
+
+        if isinstance(field_value, datetime.datetime):
+            field_value = str(field_value)
+
         formatted_values = [item.lower() for item in values]
         formatted_field_value = field_value.lower()
 
@@ -314,11 +321,55 @@ class TagValidators(object):
         """
         field_value = self.instance.get_attribute(field, name=True)
 
+        if isinstance(field_value, datetime.datetime):
+            self.__compare_equal_dates(field_value, value)
+            return
+
         if not field_value:
             raise ValidationError("EOX_TAGGING | The field '{}' is required and must be equal to '{}'."
                                   .format(field, value))
         elif field_value.lower() != value.lower():
             raise ValidationError("EOX_TAGGING | The field '{}' must be equal to '{}'.".format(field, value))
+
+    def validate_between(self, field, value):
+        """
+        Function that checks that a date must be in between two dates.
+
+        Arguments:
+            - field: field to validate
+            - value: validations defined for the field
+        """
+        field_value = self.instance.get_attribute(field)
+        datetime_obj = []
+
+        for datetime_str in value:
+            try:
+                datetime_obj.append(datetime.datetime.strptime(datetime_str, DATETIME_FORMAT_VALIDATION))
+            except TypeError:
+                raise ValidationError("EOX_TAGGING | The DateTime field '{}' must follow the format '{}'."
+                                      .format(datetime_str, DATETIME_FORMAT_VALIDATION))
+
+        if field_value < datetime_obj[0] or field_value > datetime_obj[-1]:
+            raise ValidationError("EOX_TAGGING | The DateTime field '{}' must be in between '{}' and '{}."
+                                  .format(field_value, str(datetime_obj[0]), str(datetime_obj[-1])))
+
+    def __compare_equal_dates(self, field_value, value):
+        """
+        Function that checks that a date must be equal to another date.
+
+        Arguments:
+            - field_value: datetime to validate.
+            - value: datetime strings to validate against.
+        """
+        try:
+            datetime_str = datetime.datetime.strptime(value, DATETIME_FORMAT_VALIDATION)
+        except TypeError:
+            raise ValidationError("EOX_TAGGING | The DateTime field '{}' must follow the format '{}'."
+                                  .format(value, DATETIME_FORMAT_VALIDATION))
+
+        if field_value != datetime_str:
+            raise ValidationError("EOX_TAGGING | The DateTime field '{}' must be equal to '{}'."
+                                  .format(field_value, str(value)))
 
     def validate_regex(self, field, value):
         """
