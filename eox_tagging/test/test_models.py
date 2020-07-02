@@ -242,18 +242,6 @@ class TestTag(TestCase):
         with self.assertRaises(ValidationError):
             self.test_tag.save()
 
-    def test_find_by_owner(self):
-        """ Used to confirm that can retrieve tags by owner_object."""
-        tags_owned = Tag.objects.find_by_owner(owner_type="user", owner_id={"username": "User"})
-
-        self.assertEqual(tags_owned.first().owner_object_id, self.owner_object.id)
-
-    def test_find_all_tags_for(self):
-        """Used to confirm that can retrieve tags by target object."""
-        tags = Tag.objects.find_all_tags_for(target_type="user", target_id={"username": "Tag"})
-
-        self.assertEqual(tags.first().target_object_id, self.target_object.id)
-
     def test_tag_soft_delete(self):
         """ Used to confirm that the tags can be invalidated soft deleting them."""
         self.test_tag.delete()

@@ -52,7 +52,6 @@ class TagQuerySet(QuerySet):
 
     def find_by_owner(self, owner_type, owner_id):
         """Returns all valid tags owned by owner_id."""
-
         try:
             owner, ctype = self.__get_object_for_this_type(owner_type, owner_id)
         except ObjectDoesNotExist:
