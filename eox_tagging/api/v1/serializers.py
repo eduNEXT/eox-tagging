@@ -23,7 +23,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     target_id = serializers.CharField(source='target_object')
     owner_id = serializers.CharField(source='owner_object', required=False)
-    owner_type = serializers.CharField(source='owner_object_type')
+    owner_type = serializers.CharField(source='owner_object_type', required=False)
     target_type = serializers.CharField(source='target_object_type')
     access = fields.EnumField(enum=AccessLevel)
     status = fields.EnumField(enum=Status, required=False)
