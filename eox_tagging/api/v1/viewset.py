@@ -61,7 +61,7 @@ class TagViewSet(viewsets.ModelViewSet):
         if owner_type.lower() == "site":
             return [site]
 
-        return None
+        return []
 
     def __get_site(self):
         """Returns the current site."""
