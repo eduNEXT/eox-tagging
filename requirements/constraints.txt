@@ -22,5 +22,7 @@ futures; python_version == "2.7"
 pylint<2.0
 
 # django-filter 2.0 release isn't compatible with python 2
-# See:
 django-filter<2.0
+
+# mock 4.0.0 release isn't compatible with python 2
+mock<4.0.0

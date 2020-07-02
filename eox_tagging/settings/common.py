@@ -25,11 +25,6 @@ INSTALLED_APPS = [
     'eox_tagging',
 ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAdminUser',
-    ]
-}
 
 ROOT_URLCONF = 'eox_tagging.urls'
 
@@ -52,5 +47,6 @@ def plugin_settings(settings):
     """
     # Plugin settings
     settings.EOX_TAGGING_DEFINITIONS = []
+    settings.EOX_TAGGING_LOAD_PERMISSIONS = True
     settings.DATA_API_DEF_PAGE_SIZE = 1000
     settings.DATA_API_MAX_PAGE_SIZE = 5000
