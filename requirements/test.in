@@ -9,5 +9,6 @@ coverage
 django-fake-model
 django-crum
 django-filter
+django-oauth2-provider
 djangorestframework-oauth
 mock
