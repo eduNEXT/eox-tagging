@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from mock import patch
 from rest_framework.test import APIClient
 
 from eox_tagging.constants import AccessLevel
@@ -35,6 +36,9 @@ from eox_tagging.test.test_utils import CourseOverview
 @CourseOverview.fake_me
 class TestTagViewSet(TestCase):
     """Test class for tags viewset."""
+
+    patch_permissions = patch("eox_tagging.api.v1.permissions.EoxTaggingAPIPermissionOrReadOnly.has_permission",
+                              return_value=True)
 
     def setUp(self):
         """ Model setup used to create objects used in tests."""
@@ -68,19 +72,22 @@ class TestTagViewSet(TestCase):
         # Test URLs
         self.URL = reverse("tag-list")
 
-    def test_get_all_tags(self):
+    @patch_permissions
+    def test_get_all_tags(self, _):
         """Used to test getting all tags."""
         response = self.client.get(self.URL)
 
         self.assertEqual(response.status_code, 200)
 
-    def test_retreive_tag(self):
+    @patch_permissions
+    def test_retreive_tag(self, _):
         """Used to test getting a tag given its key."""
         response = self.client.get("{URL}{key}/".format(URL=self.URL, key=self.example_tag.key.hex))
 
         self.assertEqual(response.status_code, 200)
 
-    def test_create_tag(self):
+    @patch_permissions
+    def test_create_tag(self, _):
         """"Used to test creating a tag."""
 
         data = {
@@ -97,7 +104,8 @@ class TestTagViewSet(TestCase):
 
         self.assertEqual(response.status_code, 201)
 
-    def test_create_tag_without_owner(self):
+    @patch_permissions
+    def test_create_tag_without_owner(self, _):
         """"
         Used to test creating a tag without an owner. The owner should be set as a default
         to be the site.
@@ -115,7 +123,8 @@ class TestTagViewSet(TestCase):
 
         self.assertEqual(response.data["owner_type"].lower(), "site")
 
-    def test_create_tag_with_owner_site(self):
+    @patch_permissions
+    def test_create_tag_with_owner_site(self, _):
         """"Used to test creating a tag with site as owner."""
 
         data = {
@@ -132,7 +141,8 @@ class TestTagViewSet(TestCase):
 
         self.assertEqual(response.data["owner_type"].lower(), "site")
 
-    def test_create_tag_with_wrong_owner(self):
+    @patch_permissions
+    def test_create_tag_with_wrong_owner(self, _):
         """"Used to test creating a tag with wrong owner_type. This results in bad request."""
         data = {
             "tag_type": "example_tag_1",
@@ -148,19 +158,22 @@ class TestTagViewSet(TestCase):
 
         self.assertEqual(response.status_code, 400)
 
-    def test_patch_tag(self):
+    @patch_permissions
+    def test_patch_tag(self, _):
         """Used to test that a tag can't be updated."""
         response = self.client.patch("{URL}{key}/".format(URL=self.URL, key=self.example_tag.key.hex))
 
         self.assertEqual(response.status_code, 405)
 
-    def test_put_tag(self):
+    @patch_permissions
+    def test_put_tag(self, _):
         """Used to test that a tag can't be updated."""
         response = self.client.put("{URL}{key}/".format(URL=self.URL, key=self.example_tag.key.hex))
 
         self.assertEqual(response.status_code, 405)
 
-    def test_filter_by_tag_key(self):
+    @patch_permissions
+    def test_filter_by_tag_key(self, _):
         """Used to test getting a tag given its key."""
         URL = "{URL}?key={key}".format(URL=self.URL, key=self.example_tag.key.hex)
 
@@ -168,7 +181,8 @@ class TestTagViewSet(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_filter_by_username(self):
+    @patch_permissions
+    def test_filter_by_username(self, _):
         """Used to test getting a tag given its target."""
         URL = "{URL}?username={user}".format(URL=self.URL, user="user_test")
 
@@ -176,7 +190,8 @@ class TestTagViewSet(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_filter_by_owner_user(self):
+    @patch_permissions
+    def test_filter_by_owner_user(self, _):
         """Used to test getting a tag given its owner of type user."""
         URL = "{}?owner_type=user".format(self.URL)
 
@@ -185,7 +200,8 @@ class TestTagViewSet(TestCase):
         data = response.json().get("results")[0]
         self.assertEqual(data.get("owner_type").lower(), "user")
 
-    def test_filter_by_owner_site(self):
+    @patch_permissions
+    def test_filter_by_owner_site(self, _):
         """Used to test getting a tag given its owner of type user."""
         URL = "{}?owner_type=site".format(self.URL)
 
@@ -194,7 +210,8 @@ class TestTagViewSet(TestCase):
         data = response.json().get("results")[0]
         self.assertEqual(data.get("owner_type").lower(), "site")
 
-    def test_filter_by_wrong_owner(self):
+    @patch_permissions
+    def test_filter_by_wrong_owner(self, _):
         """
         Used to test getting a tag given an undefined type of owner. This returns an empty
         queryset.
@@ -206,7 +223,8 @@ class TestTagViewSet(TestCase):
         data = response.json().get("results")
         self.assertFalse(data)
 
-    def test_filter_by_type(self):
+    @patch_permissions
+    def test_filter_by_type(self, _):
         """Used to test getting a tag given its target."""
         URL = "{URL}?target_type={type}".format(URL=self.URL, type="user")
 
@@ -214,7 +232,8 @@ class TestTagViewSet(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_soft_delete(self):
+    @patch_permissions
+    def test_soft_delete(self, _):
         """Used to test a tag soft deletion."""
         URL = "{URL}{key}/".format(URL=self.URL, key=self.example_tag.key.hex)
 

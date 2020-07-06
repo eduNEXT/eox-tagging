@@ -8,8 +8,9 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 
 from eox_tagging.api.v1.filters import TagFilter
 from eox_tagging.api.v1.pagination import TagApiPagination
-from eox_tagging.api.v1.permissions import EoxTaggingAPIPermission
+from eox_tagging.api.v1.permissions import EoxTaggingAPIPermissionOrReadOnly
 from eox_tagging.api.v1.serializers import TagSerializer
+from eox_tagging.constants import AccessLevel
 from eox_tagging.edxapp_wrappers import get_site
 from eox_tagging.models import Tag
 
@@ -19,7 +20,7 @@ class TagViewSet(viewsets.ModelViewSet):
 
     serializer_class = TagSerializer
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
-    permission_classes = (EoxTaggingAPIPermission,)
+    permission_classes = (EoxTaggingAPIPermissionOrReadOnly,)
     pagination_class = TagApiPagination
     filter_backends = (filters.DjangoFilterBackend,)
     filter_class = TagFilter
@@ -28,14 +29,33 @@ class TagViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Restricts the returned tags."""
-        owner_type = self.request.query_params.get("owner_type")
+        queryset = Tag.objects.all()
+
+        queryset = self.__get_objects_by_status(queryset)
+
+        queryset = self.__get_objects_by_permission(queryset)
+
+        return queryset
+
+    def __get_objects_by_status(self, queryset):
+        """Method that returns queryset filtered by tag status."""
         include_invalid = self.request.query_params.get("include_invalid")
 
-        if include_invalid and include_invalid.lower() in ["true", "1"]:
-            queryset = Tag.objects.all()
-        else:
-            queryset = Tag.objects.valid()
+        if not include_invalid or include_invalid.lower() not in ["true", "1"]:
+            queryset = queryset.valid()
 
+        return queryset
+
+    def __get_objects_by_permission(self, queryset):
+        """Method that returns queryset filtered by user permissions."""
+        if self.request.user.has_perm("auth.can_call_eox_tagging"):
+            return self.__get_objects_by_owner(queryset)
+        else:
+            return self.__get_objects_by_target(queryset)
+
+    def __get_objects_by_owner(self, queryset):
+        """Method that returns queryset filtered by tag owner"""
+        owner_type = self.request.query_params.get("owner_type")
         owner_information = self.__get_request_owner(owner_type)
 
         try:
@@ -47,36 +67,42 @@ class TagViewSet(viewsets.ModelViewSet):
         except Exception:  # pylint: disable=broad-except
             return queryset.none()
 
-    def __get_request_owner(self, owner_type):
-        """Returns the owners of the tag to filter the queryset."""
-        site = self.__get_site()
-        user = self.__get_user()
+    def __get_objects_by_target(self, queryset):
+        """Method that returns queryset filtered by tag owner"""
+        queryset = queryset.find_all_tags_for(**self.__get_user("target")) \
+                           .filter(access__in=[AccessLevel.PRIVATE, AccessLevel.PUBLIC])
+        return queryset
 
-        if not owner_type:
+    def __get_request_owner(self, object_type):
+        """Returns the owners of the tag to filter the queryset."""
+        site = self.__get_site("owner")
+        user = self.__get_user("owner")
+
+        if not object_type:
             return [site, user]
 
-        if owner_type.lower() == "user":
+        if object_type.lower() == "user":
             return [user]
 
-        if owner_type.lower() == "site":
+        if object_type.lower() == "site":
             return [site]
 
         return []
 
-    def __get_site(self):
+    def __get_site(self, role):
         """Returns the current site."""
         site = get_site()
 
         return {
-            "owner_id": {"id": site.id},
-            "owner_type": "site",
+            "%s_id" % role: {"id": site.id},
+            "%s_type" % role: "site",
         }
 
-    def __get_user(self):
+    def __get_user(self, role):
         """Returns the current user."""
         user = self.request.user
 
         return {
-            "owner_id": {"username": user.username},
-            "owner_type": "user",
+            "%s_id" % role: {"username": user.username},
+            "%s_type" % role: "user",
         }

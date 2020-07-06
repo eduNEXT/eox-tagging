@@ -3,7 +3,7 @@ from django.contrib.auth.models import Permission, User
 from django.test import TestCase, override_settings
 from mock import Mock
 
-from eox_tagging.api.v1.permissions import EoxTaggingAPIPermission, load_permissions
+from eox_tagging.api.v1.permissions import EoxTaggingAPIPermissionOrReadOnly, load_permissions
 
 
 @override_settings(EOX_TAGGING_LOAD_PERMISSIONS=True)
@@ -22,7 +22,7 @@ class TestAPIPermissions(TestCase):
         # Common user without permission
         self.common_user = User.objects.create(username="user_without_permission")
 
-        self.has_permission = EoxTaggingAPIPermission().has_permission
+        self.has_permission = EoxTaggingAPIPermissionOrReadOnly().has_permission
 
     def test_API_access_success(self):
         """Used to test that an authorized user can access to the Tag API."""

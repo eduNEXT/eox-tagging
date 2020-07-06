@@ -7,6 +7,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.utils import ProgrammingError
 from rest_framework import exceptions, permissions
 
+SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
+
 
 def load_permissions():
     """
@@ -27,7 +29,7 @@ def load_permissions():
             pass
 
 
-class EoxTaggingAPIPermission(permissions.BasePermission):
+class EoxTaggingAPIPermissionOrReadOnly(permissions.BasePermission):
     """
     Defines a custom permissions to access eox-tagging API
     These permissions make sure that a token is created with the client credentials of the same site is being used on.
@@ -38,7 +40,7 @@ class EoxTaggingAPIPermission(permissions.BasePermission):
         To grant access, checks if the requesting user either can call eox-tagging API or if it's an admin user.
         """
         try:
-            allowed_for_site = request.user.is_staff or request.get_host() in request.auth.client.url
+            allowed_for_site = request.get_host() in request.auth.client.url
         except Exception:  # pylint: disable=broad-except
             allowed_for_site = False
 
@@ -48,4 +50,4 @@ class EoxTaggingAPIPermission(permissions.BasePermission):
             # To prevent leaking important information we return the most basic message.
             raise exceptions.NotAuthenticated(detail="Invalid token")
 
-        return request.user.has_perm('auth.can_call_eox_tagging') or request.user.is_staff
+        return request.user.has_perm('auth.can_call_eox_tagging') or request.method in SAFE_METHODS
