@@ -67,6 +67,10 @@ Important notes:
 +---------------+-------------------------------------------------------+----------------------------------------------------------------+
 |``opaque_key`` | the field must be an opaque key                       |  ``validate_tag_value : {"opaque_key": "CourseKey"}``          |
 +---------------+-------------------------------------------------------+----------------------------------------------------------------+
+| ``between``   | the field must be greater than the first member of    |  ``validate_expiration_date : {"between": [DATE_1, DATE_2]}``  |
+|               | the list and less than the last member. Or can be     |                                                                |
+|               | equal to one of the two. The list must be sorted.     |                                                                |
++---------------+-------------------------------------------------------+----------------------------------------------------------------+
 
 
 * The available objects to tag and validate are: User, Site, CourseOverview and CourseEnrollment
@@ -152,7 +156,8 @@ This means that:
 * The field access can be `private` or `public`.
 * The target type must be equal to `CourseEnrollment`
 * Tag type must be equal to tag_by_edunext.
-* The tag activation date must exist and be in the values defined in the array
+* The tag activation date must exist and be between the values defined in the array. This means: value_1 <= activation_date <= value_2.
+  The array must be sorted or a validation error will be raised.
 
 Tagging REST API
 ================
