@@ -33,8 +33,8 @@ class Status(IntEnum):
     When a tag is created, is created with a valid tag, when someone soft deletes
     the tag, then is marked as invalid.
     """
-    VALID = 1
-    INVALID = 0
+    ACTIVE = 1
+    INACTIVE = 0
 
     @classmethod
     def choices(cls):

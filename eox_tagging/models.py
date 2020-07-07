@@ -41,16 +41,16 @@ class TagQuerySet(QuerySet):
         instance = self.create(**kwargs)
         return instance
 
-    def valid(self):
-        """Returns all valid tags."""
-        return self.filter(invalidated_at=None)
+    def active(self):
+        """Returns all active tags."""
+        return self.filter(inactivated_at=None)
 
-    def invalid(self):
-        """Returns all invalid tags."""
-        return self.exclude(invalidated_at=None)
+    def inactive(self):
+        """Returns all inactive tags."""
+        return self.exclude(inactivated_at=None)
 
     def find_by_owner(self, owner_type, owner_id):
-        """Returns all valid tags owned by owner_id."""
+        """Returns all tags owned by owner_id."""
 
         try:
             owner, ctype = self.__get_object_for_this_type(owner_type, owner_id)
@@ -60,7 +60,7 @@ class TagQuerySet(QuerySet):
         return self.filter(owner_type=ctype, owner_object_id=owner.id,)
 
     def find_all_tags_for(self, target_type, target_id):
-        """Returns all valid tags on an object."""
+        """Returns all tags defined on an object."""
         target_type = PROXY_MODEL_NAME if target_type in OPAQUE_KEY_PROXY_MODEL_TARGETS else target_type
 
         try:
@@ -140,10 +140,10 @@ class Tag(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
 
     status = models.PositiveIntegerField(
-        choices=Status.choices(), default=Status.VALID, editable=False,
+        choices=Status.choices(), default=Status.ACTIVE, editable=False,
     )
 
-    invalidated_at = models.DateTimeField(blank=True, null=True, editable=False)
+    inactivated_at = models.DateTimeField(blank=True, null=True, editable=False)
 
     # Generic foreign key for tagged objects
     target_type = models.ForeignKey(
@@ -271,8 +271,8 @@ class Tag(models.Model):
         super(Tag, self).save(*args, **kwargs)
 
     def delete(self):  # pylint: disable=arguments-differ
-        self.invalidated_at = timezone.now()
-        self.status = Status.INVALID
+        self.inactivated_at = timezone.now()
+        self.status = Status.INACTIVE
         super(Tag, self).save()
 
     def hard_delete(self):
