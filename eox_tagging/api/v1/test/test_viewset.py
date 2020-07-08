@@ -120,11 +120,6 @@ class TestTagViewSet(TestCase):
         owner_type = response.data.get("meta").get("owner_type").lower()
         self.assertEqual(owner_type, "site")
 
-<<<<<<< HEAD
-=======
-        self.assertEqual(response.data.get("owner_type").lower(), "site")
-
->>>>>>> Mocked permissions in viewset tests and added more tests to permission method
     @patch_permissions
     def test_create_tag_with_iso_datetime_format(self, _):
         """"Used to test creating a tag using ISO format in datetime fields."""
@@ -177,13 +172,8 @@ class TestTagViewSet(TestCase):
         }
 
         response = self.client.post(self.URL, data, format='json')
-<<<<<<< HEAD
         owner_type = response.data.get("meta").get("owner_type").lower()
         self.assertEqual(owner_type, "site")
-=======
-
-        self.assertEqual(response.data["owner_type"].lower(), "site")
->>>>>>> Mocked permissions in viewset tests and added more tests to permission method
 
     @patch_permissions
     def test_create_tag_with_wrong_owner(self, _):
@@ -219,17 +209,11 @@ class TestTagViewSet(TestCase):
     @patch_permissions
     def test_filter_by_tag_key(self, _):
         """Used to test getting a tag given its key."""
-<<<<<<< HEAD
         query_params = {
             "key": self.example_tag.key.hex,
         }
 
         response = self.client.get(self.URL, query_params)
-=======
-        URL = "{URL}?key={key}".format(URL=self.URL, key=self.example_tag.key.hex)
-
-        response = self.client.get(URL)
->>>>>>> Mocked permissions in viewset tests and added more tests to permission method
 
         self.assertEqual(response.status_code, 200)
 
@@ -247,7 +231,6 @@ class TestTagViewSet(TestCase):
     @patch_permissions
     def test_filter_by_owner_user(self, _):
         """Used to test getting a tag given its owner of type user."""
-<<<<<<< HEAD
         query_params = {
             "owner_type": "user",
         }
@@ -257,19 +240,10 @@ class TestTagViewSet(TestCase):
         data = response.json().get("results")[0]
         owner_type = data.get("meta").get("owner_type").lower()
         self.assertEqual(owner_type, "user")
-=======
-        URL = "{}?owner_type=user".format(self.URL)
-
-        response = self.client.get(URL)
-
-        data = response.json().get("results")[0]
-        self.assertEqual(data.get("owner_type").lower(), "user")
->>>>>>> Mocked permissions in viewset tests and added more tests to permission method
 
     @patch_permissions
     def test_filter_by_owner_site(self, _):
         """Used to test getting a tag given its owner of type user."""
-<<<<<<< HEAD
         query_params = {
             "owner_type": "site",
         }
@@ -279,14 +253,6 @@ class TestTagViewSet(TestCase):
         data = response.json().get("results")[0]
         owner_type = data.get("meta").get("owner_type").lower()
         self.assertEqual(owner_type, "site")
-=======
-        URL = "{}?owner_type=site".format(self.URL)
-
-        response = self.client.get(URL)
-
-        data = response.json().get("results")[0]
-        self.assertEqual(data.get("owner_type").lower(), "site")
->>>>>>> Mocked permissions in viewset tests and added more tests to permission method
 
     @patch_permissions
     def test_filter_by_wrong_owner(self, _):
@@ -294,17 +260,11 @@ class TestTagViewSet(TestCase):
         Used to test getting a tag given an undefined type of owner. This returns an empty
         queryset.
         """
-<<<<<<< HEAD
         query_params = {
             "owner_type": "course",
         }
 
         response = self.client.get(self.URL, query_params)
-=======
-        URL = "{}?owner_type=course".format(self.URL)
-
-        response = self.client.get(URL)
->>>>>>> Mocked permissions in viewset tests and added more tests to permission method
 
         data = response.json().get("results")
         self.assertFalse(data)

@@ -26,3 +26,6 @@ django-filter<2.0
 
 # mock 4.0.0 release isn't compatible with python 2
 mock<4.0.0
+
+# Version used in Ironwood version of edx-platform
+djangorestframework==3.6.3

@@ -241,7 +241,7 @@ class TagValidators(object):
         """Function that validates that the save is not an update."""
         if self.instance.id:
             #  Exception raised when trying to update
-            raise ValidationError("EOX_TAGGING | Can't update tag. Tags are inmutable by definition")
+            raise ValidationError("EOX_TAGGING | Can't update tag. Tags are immutable by definition")
 
     def validate_fields(self):
         """ Function that validates all fields for the current definition."""
