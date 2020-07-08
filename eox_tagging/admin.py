@@ -24,7 +24,7 @@ class TagAdmin(admin.ModelAdmin):
         'target_as_nice_string',
         'status',
         'created_at',
-        'invalidated_at',
+        'inactivated_at',
     )
     search_fields = ('tag_type', 'tag_value', 'status')
 
