@@ -13,9 +13,22 @@ Change Log
 Unreleased
 ----------
 
-* Changed Date fields like expiration date and activation date to DateTime fields
-* Added validations only for DateTime fields
-* Changed STATUS from valid/invalid to active/inactive
+*
+
+[0.3.0] - 2020-07-08
+--------------------
+
+Added
+_____
+
+* Added validations only for DateTime fields.
+* Added custom permissions to access the tag API.
+
+Changed
+_______
+
+* Changed Date fields like expiration date and activation date to DateTime fields.
+* Changed STATUS from valid/invalid to active/inactive.
 
 [0.2.0] - 2020-06-26
 ---------------------
