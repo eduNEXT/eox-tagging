@@ -29,11 +29,11 @@ class TagViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Restricts the returned tags."""
         owner_type = self.request.query_params.get("owner_type")
-        include_invalid = self.request.query_params.get("include_invalid")
+        include_inactive = self.request.query_params.get("include_inactive")
         user = self.request.user
         site = get_site()
 
-        if include_invalid and include_invalid.lower() in ["true", "1"]:
+        if include_inactive and include_inactive.lower() in ["true", "1"]:
             queryset = Tag.objects.all()
         else:
             queryset = Tag.objects.active()
