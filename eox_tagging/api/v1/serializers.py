@@ -38,9 +38,9 @@ class TagSerializer(serializers.ModelSerializer):
     def get_meta(self, instance):
         """Getter of read-only field that returns technical information."""
         return {
-            "target_id": instance.target_object_id,
+            "target_id": str(instance.target_object),
             "target_type": instance.target_object_type,
-            "owner_id": instance.owner_object_id,
+            "owner_id": str(instance.owner_object),
             "owner_type": instance.owner_object_type,
             "created_at": instance.created_at,
             "inactivated_at": instance.inactivated_at,
