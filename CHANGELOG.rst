@@ -14,6 +14,7 @@ Unreleased
 ----------
 
 * The user can force a value in a field using the configuration.
+* Fixed datetime filters for activation_date and creation_date.
 
 [0.5.0] - 2020-07-14
 --------------------
