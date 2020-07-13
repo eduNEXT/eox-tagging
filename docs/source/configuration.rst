@@ -1,0 +1,175 @@
+CONFIGURATIONS
+===============
+
+This plugin can't be used without setting the right configuration, if this happens then the application using
+the plugin won't be able to tag any object.
+
+This configuration defines the possible tags that can be created and the validations used in the process. This
+object also has validations, so to be able to tag it must be created correctly or a validation error will be raised
+while creating tags.
+
+Configuration object
+--------------------
+
+The configuration object is an array of JSON objects that looks like this:
+
+.. code-block:: JSON
+
+        {
+            "validate_<FIELD_NAME>": "<VALIDATION>"
+        }
+
+Where <FIELD_NAME> can be any editable tag field, and <VALIDATION> any of the defined validations.
+
+Validations
+^^^^^^^^^^^
++---------------+-------+-----------------------------------------------+----------------------------------------------------------------+
+| Name          | Description                                           | Example                                                        |
++===============+=======================================================+================================================================+
+| ``in``        | the field must be equal to one of the strings defined | ``validate_tag_value : {"in": ["tag_value_1", "tag_value_2"]}``|
+|               | inside the array                                      |                                                                |
++---------------+-------------------------------------------------------+----------------------------------------------------------------+
+| ``exists``    | the field must be different to None                   |  ``validate_tag_value : {"exists": true}``                     |
++---------------+-------------------------------------------------------+----------------------------------------------------------------+
+|  ``equals``   | the field must be equal to the dictionary value       |  ``validate_tag_value : {"equals": "tag_value"}``              |
++---------------+-------------------------------------------------------+----------------------------------------------------------------+
+|  ``regex``    | the field must match the pattern defined              |  ``validate_tag_value : {"regex": ".+eduNEXT"}``               |
++---------------+-------------------------------------------------------+----------------------------------------------------------------+
+|``opaque_key`` | the field must be an opaque key                       |  ``validate_tag_value : {"opaque_key": "CourseKey"}``          |
++---------------+-------------------------------------------------------+----------------------------------------------------------------+
+| ``between``   | the field must be greater than the first member of    |  ``validate_expiration_date : {"between": [DATE_1, DATE_2]}``  |
+|               | the list and less than the last member. Or can be     |                                                                |
+|               | equal to one of the two. The list must be sorted.     |                                                                |
++---------------+-------------------------------------------------------+----------------------------------------------------------------+
+
+**Important note:** the validation `equals` can be replaced with: <FIELD_NAME>: <VALUE>.
+
+Fields
+^^^^^^
+
++-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
+| Name(s)                 | Description                             |  Value/Format         | Possible validators                        |
++=========================+=========================================+=======================+============================================+
+| validate_tag_value      | Contains possible values for the field  | Not specified         | in, exists, equals, regex, opaque          |
+|                         |                                         |                       | any validation that can validate a string. |
++-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
+| validate_access         | Contains possible values for the field  | Public, private,      | Any validator but must have at least one   |
+|                         |                                         | protected.            | of the values defined.                     |
++-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
+| validate_deactivation   | Contains possible datetime values for   | Year-month-day H:M:S  | in, exists, equals, between. If apply, the |
+| _date                   | the field.                              |                       | values must match the format specified.    |
++-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
+| validate_activation_date| Contains possible datetime values for   | Year-month-day H:M:S  | in, exists, equals, between. If apply, the |
+|                         | the field.                              |                       | values must match the format specified.    |
++-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
+| validate_target_object  | Contains the only possible target value | User, site,           | equals. The values must match the targets  |
+|                         | of that tag.                            | CourseEnrollment,     | predefined.                                |
+|                         |                                         | OpaqueKeyProxyModel*  |                                            |
++-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
+| validate_owner_object   | Contains the only possible owner value  | User, site,           | equals. The values must match the targets  |
+|                         | of that tag.                            |                       | predefined.                                |
++-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
+| tag_type                | Contains the only possible type         | Not specified         | equals. The tag_type must always exist and |
+|                         | of that tag.                            |                       | needs to be unique in the config array.    |
++-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
+
+
+* In the configuration, if the user wants to create a tag on a course it must use OpaqueKeyProxyModel as the target_object.
+
+**Important note:** as mentioned above the validations can or not have ``validate_`` in front of the <FIELD_NAME>, if they don't have it,
+the program will assume that the field must be equal to the value. For example:
+
+.. code-block:: JSON
+
+        {
+            "FIELD_NAME": "VALUE"
+        }
+
+This means that the FIELD with FIELD_NAME must be equal to VALUE.
+
+
+Errors
+------
+
+If a validation is not fulfilled, then a validation error will be raised and the tag won't be created. Please, make sure that the tag configuration
+is correct.
+
+Examples
+--------
+
+.. code-block:: JSON
+
+        {
+            "validate_tag_value":{
+                "in":[
+                    "example_tag_value",
+                    "example_tag_value_1"
+                ]
+            },
+            "validate_access":{
+                "equals":"PRIVATE"
+            },
+            "validate_target_object":"OpaqueKeyProxyModel",
+            "owner_object":"User",
+            "tag_type":"tag_by_example"
+        }
+
+This means that:
+
+* Tag value must be in the array
+* The field access must be equal to `private`
+* The target type must be equal to `CourseOverview`
+* The owner type must be equal to `User`
+* Tag_type must be equal to `tag_by_example`
+
+**Example 2:**
+
+.. code-block:: JSON
+
+        {
+            "validate_tag_value":{
+                "exist":true
+            },
+            "validate_access":"Public",
+            "validate_target_object":"User",
+            "tag_type":"tag_by_edunext"
+        }
+
+This means that:
+
+* The tag value must exist, it can take any value.
+* The field access must be equal to `public`.
+* The target type must be equal to `User`.
+* Tag type must be equal to tag_by_edunext.
+
+**Example 3:**
+
+.. code-block:: JSON
+
+        {
+            "validate_tag_value":"tag_value",
+            "validate_access":{
+                "in":[
+                    "Private",
+                    "Public"
+                ]
+            },
+            "validate_target_object":"CourseEnrollment",
+            "tag_type":"tag_by_edunext",
+            "validate_activation_date":{
+                "exist":true,
+                "in":[
+                    "Dec 04 2020 10:30:40",
+                    "Oct 19 2020 10:30:40"
+                ]
+            }
+        }
+
+This means that:
+
+* The tag value must be equal to tag_value.
+* The field access can be `private` or `public`.
+* The target type must be equal to `CourseEnrollment`
+* Tag type must be equal to tag_by_edunext.
+* The tag activation date must exist and be between the values defined in the array. This means: value_1 <= activation_date <= value_2.
+  The array must be sorted or a validation error will be raised.

@@ -27,6 +27,9 @@ requirements: ## install environment requirements
 test_requirements:
 	pip install -r requirements/test.txt
 
+docs_requirements:
+	pip install -r requirements/docs.txt
+
 # Define PIP_COMPILE_OPTS=-v to get more information during make upgrade.
 PIP_COMPILE = pip-compile --rebuild --upgrade $(PIP_COMPILE_OPTS)
 
@@ -38,6 +41,7 @@ upgrade: ## update the requirements/*.txt files with the latest packages satisfy
 	$(PIP_COMPILE) -o requirements/base.txt requirements/base.in
 	$(PIP_COMPILE) -o requirements/test.txt requirements/test.in
 	$(PIP_COMPILE) -o requirements/tox.txt requirements/tox.in
+	$(PIP_COMPILE) -o requirements/docs.txt requirements/docs.in
 	# Let tox control the Django, and django-filter version for tests
 	grep -e "^django==" -e "^django-filter==" requirements/test.txt > requirements/django.txt
 	sed '/^[dD]jango==/d;/^django-filter==/d' requirements/test.txt > requirements/test.tmp
@@ -53,3 +57,8 @@ run-quality-test: clean ## Run quality test.
 	$(TOX) pycodestyle ./eox_tagging
 	$(TOX) pylint ./eox_tagging --rcfile=./setup.cfg
 	$(TOX) isort --check-only --recursive --diff ./eox_tagging
+
+build-docs:
+	make docs_requirements
+	cd docs/ && make clean
+	cd docs/ && make html

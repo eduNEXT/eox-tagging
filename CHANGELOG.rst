@@ -13,7 +13,7 @@ Change Log
 Unreleased
 ----------
 
-*
+* Added eox-tagging plugin documentation
 
 [0.3.0] - 2020-07-08
 --------------------
