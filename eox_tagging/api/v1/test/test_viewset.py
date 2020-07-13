@@ -66,8 +66,11 @@ class TestTagViewSet(TestCase):
             expiration_date=datetime.date(2020, 10, 19),
         )
 
+        self.KEY = self.example_tag.key.hex
+
         # Test URLs
         self.URL = reverse("tag-list")
+        self.URL_DETAILS = reverse("tag-detail", args=[self.KEY])
 
     @patch_permissions
     def test_get_all_tags(self, _):
@@ -79,7 +82,7 @@ class TestTagViewSet(TestCase):
     @patch_permissions
     def test_retreive_tag(self, _):
         """Used to test getting a tag given its key."""
-        response = self.client.get("{URL}{key}/".format(URL=self.URL, key=self.example_tag.key.hex))
+        response = self.client.get(self.URL_DETAILS)
 
         self.assertEqual(response.status_code, 200)
 
@@ -195,14 +198,14 @@ class TestTagViewSet(TestCase):
     @patch_permissions
     def test_patch_tag(self, _):
         """Used to test that a tag can't be updated."""
-        response = self.client.patch("{URL}{key}/".format(URL=self.URL, key=self.example_tag.key.hex))
+        response = self.client.patch(self.URL_DETAILS)
 
         self.assertEqual(response.status_code, 405)
 
     @patch_permissions
     def test_put_tag(self, _):
         """Used to test that a tag can't be updated."""
-        response = self.client.put("{URL}{key}/".format(URL=self.URL, key=self.example_tag.key.hex))
+        response = self.client.put(self.URL_DETAILS)
 
         self.assertEqual(response.status_code, 405)
 
@@ -283,8 +286,19 @@ class TestTagViewSet(TestCase):
     @patch_permissions
     def test_soft_delete(self, _):
         """Used to test a tag soft deletion."""
-        URL = "{URL}{key}/".format(URL=self.URL, key=self.example_tag.key.hex)
 
-        response = self.client.delete(URL)
+        response = self.client.delete(self.URL_DETAILS)
 
         self.assertEqual(response.status_code, 204)
+
+    @patch_permissions
+    def test_getting_meta_field(self, _):
+        """Used to test getting tag most important technical information."""
+        response = self.client.get(self.URL_DETAILS)
+
+        data = response.json().get("meta")
+        self.assertIsNotNone(data)
+        self.assertEqual(data.get("target_id"), str(self.example_tag.target_object))
+        self.assertEqual(data.get("target_type"), self.example_tag.target_object_type)
+        self.assertEqual(data.get("owner_id"), str(self.example_tag.owner_object))
+        self.assertEqual(data.get("owner_type"), self.example_tag.target_object_type)
