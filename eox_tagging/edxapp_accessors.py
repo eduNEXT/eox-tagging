@@ -4,14 +4,11 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
-from eox_core.edxapp_wrapper.enrollments import get_enrollment
 from eox_core.edxapp_wrapper.users import get_edxapp_user
 from opaque_keys.edx.keys import CourseKey
 
-try:
-    from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-except ImportError:
-    from eox_tagging.test.test_utils import CourseOverview  # pylint: disable=ungrouped-imports, useless-suppression
+from eox_tagging.edxapp_wrappers.course_overview import CourseOverview
+from eox_tagging.edxapp_wrappers.enrollments import CourseEnrollment
 
 
 def get_user(**kwargs):
@@ -53,15 +50,9 @@ def get_course_enrollment(**kwargs):
     if getattr(settings, "EOX_TAGGING_SKIP_VALIDATIONS", False):
         return object
 
-    enrollment, _ = get_enrollment(username=username, course_id=course_id)
-    try:
-        # Temporary method to get CourseEnrollment objects. This should be a backend.
-        from student.models import CourseEnrollment
-        user = get_user(**{"target_id": username})
-        course_id = CourseKey.from_string(course_id)
-        return CourseEnrollment.objects.get(user_id=user.id, course_id=course_id)
-    except ImportError:
-        return enrollment
+    user = get_user(**{"target_id": username})
+    course_id = CourseKey.from_string(course_id)
+    return CourseEnrollment.objects.get(user_id=user.id, course_id=course_id)
 
 
 def get_object(related_object_type, **kwargs):
