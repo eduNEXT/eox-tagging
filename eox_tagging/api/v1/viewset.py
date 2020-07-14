@@ -28,27 +28,67 @@ class TagViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Restricts the returned tags."""
+        queryset = Tag.objects.all()
+
+        queryset = self.__get_objects_by_status(queryset)
+
+        queryset = self.__get_objects_by_owner(queryset)
+
+        return queryset
+
+    def __get_objects_by_status(self, queryset):
+        """Method that returns queryset filtered by tag status."""
+        include_inactive = self.request.query_params.get("include_inactive")
+
+        if not include_inactive or include_inactive.lower() not in ["true", "1"]:
+            queryset = queryset.active()
+
+        return queryset
+
+    def __get_objects_by_owner(self, queryset):
+        """Method that returns queryset filtered by tag owner"""
         owner_type = self.request.query_params.get("owner_type")
-        include_invalid = self.request.query_params.get("include_invalid")
-        user = self.request.user
-        site = get_site()
-
-        if include_invalid and include_invalid.lower() in ["true", "1"]:
-            queryset = Tag.objects.all()
-        else:
-            queryset = Tag.objects.active()
-
-        if owner_type:
-            owner_id = {"username": user.username} if owner_type == "user" else {"id": site.id}
-            try:
-                queryset = queryset.find_by_owner(owner_type=owner_type, owner_id=owner_id)
-                return queryset
-            except Exception:  # pylint: disable=broad-except
-                return queryset.none()
+        owner_information = self.__get_request_owner(owner_type)
 
         try:
-            queryset = queryset.find_by_owner(owner_type="site", owner_id={"id": site.id}) \
-                | queryset.find_by_owner(owner_type="user", owner_id={"username": user.username})
-            return queryset
+            queryset_union = queryset.none()
+            for owner in owner_information:
+                queryset_union |= queryset.find_by_owner(**owner)
+
+            return queryset_union
         except Exception:  # pylint: disable=broad-except
             return queryset.none()
+
+    def __get_request_owner(self, owner_type):
+        """Returns the owners of the tag to filter the queryset."""
+        site = self.__get_site()
+        user = self.__get_user()
+
+        if not owner_type:
+            return [site, user]
+
+        if owner_type.lower() == "user":
+            return [user]
+
+        if owner_type.lower() == "site":
+            return [site]
+
+        return []
+
+    def __get_site(self):
+        """Returns the current site."""
+        site = get_site()
+
+        return {
+            "owner_id": {"id": site.id},
+            "owner_type": "site",
+        }
+
+    def __get_user(self):
+        """Returns the current user."""
+        user = self.request.user
+
+        return {
+            "owner_id": {"username": user.username},
+            "owner_type": "user",
+        }
