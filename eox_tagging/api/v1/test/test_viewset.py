@@ -266,55 +266,41 @@ class TestTagViewSet(TestCase):
 
         response = self.client.get(self.URL, query_params)
 
-        data = response.json().get("results")[0]
-        owner_type = data.get("meta").get("owner_type").lower()
-        self.assertEqual(owner_type, "user")
+        results = response.json().get("results")
+        owner_is_user = [tag.get("meta").get("owner_type") == "User" for tag in results]
+        self.assertTrue(all(owner_is_user))
 
     @patch_permissions
     def test_filter_by_owner_user_and_target(self, _):
         """Used to test getting a tag given its owner of type user and target type."""
-        query_params_with_target = {
+        query_params = {
             "owner_type": "user",
             "target_type": "user",
         }
-        query_params_without_target = {
-            "owner_type": "user",
-        }
 
-        response_with_target = self.client.get(self.URL, query_params_with_target)
-        response_without_target = self.client.get(self.URL, query_params_without_target)
+        response = self.client.get(self.URL, query_params)
 
-        results_with_target = response_with_target.json().get("results")
-        results_without_target = response_without_target.json().get("results")
-        owner_type = results_with_target[0].get("meta").get("owner_type")
-        target_type = results_with_target[0].get("meta").get("target_type")
-        self.assertEqual(len(results_with_target), 1)
-        self.assertEqual(len(results_without_target), 2)
-        self.assertEqual(owner_type, "User")
-        self.assertEqual(target_type, "User")
+        results = response.json().get("results")
+        owner_is_user = [tag.get("meta").get("owner_type") == "User" for tag in results]
+        target_is_user = [tag.get("meta").get("target_type") == "User" for tag in results]
+        self.assertTrue(all(owner_is_user))
+        self.assertTrue(all(target_is_user))
 
     @patch_permissions
     def test_filter_by_owner_user_and_username(self, _):
         """Used to test getting a tag given its owner of type user and target username."""
-        query_params_with_username = {
+        query_params = {
             "owner_type": "user",
             "username": "user_test",
         }
-        query_params_without_username = {
-            "owner_type": "user",
-        }
 
-        response_with_username = self.client.get(self.URL, query_params_with_username)
-        response_without_username = self.client.get(self.URL, query_params_without_username)
+        response = self.client.get(self.URL, query_params)
 
-        results_with_username = response_with_username.json().get("results")
-        results_without_username = response_without_username.json().get("results")
-        owner_type = results_with_username[0].get("meta").get("owner_type")
-        target_type = results_with_username[0].get("meta").get("target_type")
-        self.assertEqual(len(results_with_username), 1)
-        self.assertEqual(len(results_without_username), 2)
+        results = response.json().get("results")
+        owner_type = results[0].get("meta").get("owner_type")
+        username = results[0].get("meta").get("target_id")
         self.assertEqual(owner_type, "User")
-        self.assertEqual(target_type, "User")
+        self.assertEqual(username, "user_test")
 
     @patch_permissions
     def test_filter_by_owner_site(self, _):
@@ -404,12 +390,19 @@ class TestTagViewSet(TestCase):
             "include_inactive": "true"
         }
 
-        self.client.delete(self.URL_DETAILS)
-        response_exclude_inactive = self.client.get(self.URL)
+        self.client.delete(self.URL_DETAILS)  # To deactivate the tag
         response_include_inactive = self.client.get(self.URL, query_params)
 
-        exclude_inactive = [tag.get("key") for tag in response_exclude_inactive.json().get("results")]
         include_inactive = [tag.get("key") for tag in response_include_inactive.json().get("results")]
         serialized_tag = TagSerializer(self.example_tag).data
-        self.assertNotIn(serialized_tag.get("key"), exclude_inactive)
         self.assertIn(serialized_tag.get("key"), include_inactive)
+
+    @patch_permissions
+    def test_listing_just_active_tags(self, _):
+        """Used to test getting just active tags using as the only inactive tag the tag in URL_DETAILS."""
+        self.client.delete(self.URL_DETAILS)  # To deactivate the tag
+        response_exclude_inactive = self.client.get(self.URL)
+
+        exclude_inactive = [tag.get("key") for tag in response_exclude_inactive.json().get("results")]
+        serialized_tag = TagSerializer(self.example_tag).data
+        self.assertNotIn(serialized_tag.get("key"), exclude_inactive)
