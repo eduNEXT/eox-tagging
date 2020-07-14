@@ -31,6 +31,14 @@ from eox_tagging.models import Tag
             "validate_target_object": "User",
             "validate_expiration_date": {"exist": True},
         },
+        {
+            "tag_type": "example_tag_3",
+            "validate_owner_object": "User",
+            "validate_access": {"equals": "PRIVATE"},
+            "validate_tag_value": {"in": ["example_tag_value", "example_tag_value_1"]},
+            "validate_target_object": "Site",
+            "validate_expiration_date": {"exist": True},
+        },
     ])
 class TestTagViewSet(TestCase):
     """Test class for tags viewset."""
@@ -71,6 +79,15 @@ class TestTagViewSet(TestCase):
             tag_type="example_tag_2",
             target_object=self.target_object,
             owner_object=self.owner_site,
+            access=AccessLevel.PRIVATE,
+            expiration_date=datetime.date(2020, 10, 19),
+        )
+
+        self.example_tag_3 = Tag.objects.create(
+            tag_value="example_tag_value",
+            tag_type="example_tag_3",
+            target_object=self.owner_site,
+            owner_object=self.owner_user,
             access=AccessLevel.PRIVATE,
             expiration_date=datetime.date(2020, 10, 19),
         )
@@ -250,6 +267,52 @@ class TestTagViewSet(TestCase):
         data = response.json().get("results")[0]
         owner_type = data.get("meta").get("owner_type").lower()
         self.assertEqual(owner_type, "user")
+
+    @patch_permissions
+    def test_filter_by_owner_user_and_target(self, _):
+        """Used to test getting a tag given its owner of type user and target type."""
+        query_params_with_target = {
+            "owner_type": "user",
+            "target_type": "user",
+        }
+        query_params_without_target = {
+            "owner_type": "user",
+        }
+
+        response_with_target = self.client.get(self.URL, query_params_with_target)
+        response_without_target = self.client.get(self.URL, query_params_without_target)
+
+        results_with_target = response_with_target.json().get("results")
+        results_without_target = response_without_target.json().get("results")
+        owner_type = results_with_target[0].get("meta").get("owner_type")
+        target_type = results_with_target[0].get("meta").get("target_type")
+        self.assertEqual(len(results_with_target), 1)
+        self.assertEqual(len(results_without_target), 2)
+        self.assertEqual(owner_type, "User")
+        self.assertEqual(target_type, "User")
+
+    @patch_permissions
+    def test_filter_by_owner_user_and_username(self, _):
+        """Used to test getting a tag given its owner of type user and target username."""
+        query_params_with_username = {
+            "owner_type": "user",
+            "username": "user_test",
+        }
+        query_params_without_username = {
+            "owner_type": "user",
+        }
+
+        response_with_username = self.client.get(self.URL, query_params_with_username)
+        response_without_username = self.client.get(self.URL, query_params_without_username)
+
+        results_with_username = response_with_username.json().get("results")
+        results_without_username = response_without_username.json().get("results")
+        owner_type = results_with_username[0].get("meta").get("owner_type")
+        target_type = results_with_username[0].get("meta").get("target_type")
+        self.assertEqual(len(results_with_username), 1)
+        self.assertEqual(len(results_without_username), 2)
+        self.assertEqual(owner_type, "User")
+        self.assertEqual(target_type, "User")
 
     @patch_permissions
     def test_filter_by_owner_site(self, _):
