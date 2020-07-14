@@ -15,13 +15,13 @@ class EoxTaggingConfig(AppConfig):
     plugin_app = {
         'url_config': {
             'lms.djangoapp': {
-                'namespace': 'eox_tagging',
-                'regex': r'^eox_tagging/',
+                'namespace': 'eox-tagging',
+                'regex': r'^eox-tagging/',
                 'relative_path': 'urls',
             },
             'cms.djangoapp': {
-                'namespace': 'eox_tagging',
-                'regex': r'^eox_tagging/',
+                'namespace': 'eox-tagging',
+                'regex': r'^eox-tagging/',
                 'relative_path': 'urls',
             }
         },
