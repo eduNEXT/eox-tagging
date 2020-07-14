@@ -174,23 +174,44 @@ Get list of tags
 .. code-block:: JSON
 
         {
-            "count": 1,
+            "count": 2,
             "next": null,
             "previous": null,
             "results": [
                 {
-                    "key": "8a265b65-9555-4cd1-9d64-ee2009d80301",
-                    "tag_value": "example_tag_value",
-                    "tag_type": "tag_by_example",
-                    "access": "PRIVATE",
-                    "activation_date": null,
+                    "meta": {
+                        "created_at": "2020-07-10T13:25:54.057846Z",
+                        "target_id": 2,
+                        "target_type": "User",
+                        "inactivated_at": null,
+                        "owner_type": "User",
+                        "owner_id": 7
+                    },
+                    "key": "55a20579-ce8e-4f0b-830e-78fe79adac46",
+                    "tag_value": "tag_value",
+                    "tag_type": "tag_by_edunext",
+                    "access": "PUBLIC",
+                    "activation_date": "2020-12-04T15:20:30Z",
                     "expiration_date": null,
-                    "target_id": "course-v1:edX+DemoX+Demo_Course",
-                    "owner_id": "reporting",
-                    "owner_type": "User",
-                    "target_type": "OpaqueKeyProxyModel",
-                    "status": "VALID"
-                }
+                    "status": "ACTIVE"
+                },
+                {
+                    "meta": {
+                        "created_at": "2020-07-10T13:33:44.277374Z",
+                        "target_id": 2,
+                        "target_type": "User",
+                        "inactivated_at": null,
+                        "owner_type": "Site",
+                        "owner_id": 1
+                    },
+                    "key": "2bec10f5-a9e0-4e42-9c24-f9643bb13537",
+                    "tag_value": "tag_value",
+                    "tag_type": "tag_by_edunext",
+                    "access": "PUBLIC",
+                    "activation_date": "2020-12-04T15:20:30Z",
+                    "expiration_date": null,
+                    "status": "ACTIVE"
+                },
             ]
         }
 
@@ -206,12 +227,13 @@ Where TAG_DATA:
 .. code-block:: JSON
 
         {
-            "tag_type": "tag_by_example",
-            "tag_value": "example_tag_value",
-            "target_type": "courseoverview",
-            "target_id": "course-v1:edX+DemoX+Demo_Course",
-            "access": "PRIVATE",
-            "owner_type": "user"
+            "tag_type": "tag_by_edunext",
+            "tag_value": "tag_value",
+            "target_type": "user",
+            "target_id": "edx",
+            "access": "public",
+            "owner_type": "user",
+            "activation_date": "2020-12-04 10:20:30"
         }
 
 
@@ -222,17 +244,21 @@ Where TAG_DATA:
 .. code-block:: JSON
 
         {
-            "key": "6a41e775-cc2b-42df-b62d-d3e92e1bc484",
-            "tag_value": "example_tag_value",
-            "tag_type": "tag_by_example",
-            "access": "PRIVATE",
-            "activation_date": null,
+            "meta": {
+                "created_at": "2020-07-10T13:25:54.057846Z",
+                "target_id": 2,
+                "target_type": "User",
+                "inactivated_at": null,
+                "owner_type": "User",
+                "owner_id": 7
+            },
+            "key": "55a20579-ce8e-4f0b-830e-78fe79adac46",
+            "tag_value": "tag_value",
+            "tag_type": "tag_by_edunext",
+            "access": "PUBLIC",
+            "activation_date": "2020-12-04T10:20:30-05:00",
             "expiration_date": null,
-            "target_id": "course-v1:edX+DemoX+Demo_Course",
-            "owner_id": "reporting",
-            "owner_type": "User",
-            "target_type": "OpaqueKeyProxyModel",
-            "status": "VALID"
+            "status": "ACTIVE"
         }
 
 Delete tag
@@ -247,13 +273,8 @@ Delete tag
 ``Status 204 No Content``
 
 
-
 Filters example usage:
 ----------------------
-
-``/eox_tagging/api/v1/tags/?created_at_after=2020-10-10``
-
-``/eox_tagging/api/v1/tags/?activated_at_after=2020-10-10``
 
 ``/eox_tagging/api/v1/tags/?target_type=MODEL_TYPE``
 
