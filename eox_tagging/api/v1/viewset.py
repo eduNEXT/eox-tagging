@@ -40,6 +40,9 @@ class TagViewSet(viewsets.ModelViewSet):
         """Method that returns queryset filtered by tag status."""
         include_inactive = self.request.query_params.get("include_inactive")
 
+        if "key" in self.request.query_params or self.action == "retrieve":
+            include_inactive = "true"
+
         if not include_inactive or include_inactive.lower() not in ["true", "1"]:
             queryset = queryset.active()
 

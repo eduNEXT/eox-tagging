@@ -9,6 +9,7 @@ from django.urls import reverse
 from mock import patch
 from rest_framework.test import APIClient
 
+from eox_tagging.api.v1.serializers import TagSerializer
 from eox_tagging.constants import AccessLevel
 from eox_tagging.models import Tag
 
@@ -54,7 +55,7 @@ class TestTagViewSet(TestCase):
             target_object=self.target_object,
             owner_object=self.owner_user,
             access=AccessLevel.PRIVATE,
-            expiration_date=datetime.date(2020, 10, 19),
+            expiration_date=datetime.datetime(2020, 10, 19, 10, 20, 30),
         )
 
         self.example_tag_1 = Tag.objects.create(
@@ -63,7 +64,7 @@ class TestTagViewSet(TestCase):
             target_object=self.target_object,
             owner_object=self.owner_site,
             access=AccessLevel.PRIVATE,
-            expiration_date=datetime.date(2020, 10, 19),
+            expiration_date=datetime.datetime(2020, 10, 19, 10, 30, 40),
         )
 
         self.example_tag_2 = Tag.objects.create(
@@ -127,8 +128,8 @@ class TestTagViewSet(TestCase):
         }
 
         response = self.client.post(self.URL, data, format='json')
-        owner_type = response.data.get("meta").get("owner_type").lower()
-        self.assertEqual(owner_type, "site")
+        owner_type = response.data.get("meta").get("owner_type")
+        self.assertEqual(owner_type, "Site")
 
     @patch_permissions
     def test_create_tag_with_iso_datetime_format(self, _):
@@ -225,7 +226,8 @@ class TestTagViewSet(TestCase):
 
         response = self.client.get(self.URL, query_params)
 
-        self.assertEqual(response.status_code, 200)
+        data = response.json().get("results")[0]
+        self.assertEqual(data.get("key").replace("-", ""), self.KEY)
 
     @patch_permissions
     def test_filter_by_username(self, _):
@@ -293,7 +295,6 @@ class TestTagViewSet(TestCase):
     @patch_permissions
     def test_soft_delete(self, _):
         """Used to test a tag soft deletion."""
-
         response = self.client.delete(self.URL_DETAILS)
 
         self.assertEqual(response.status_code, 204)
@@ -309,3 +310,43 @@ class TestTagViewSet(TestCase):
         self.assertEqual(data.get("target_type"), self.example_tag.target_object_type)
         self.assertEqual(data.get("owner_id"), str(self.example_tag.owner_object))
         self.assertEqual(data.get("owner_type"), self.example_tag.target_object_type)
+
+    @patch_permissions
+    def test_retreive_inactive_tag(self, _):
+        """Used to test getting a tag given its key."""
+        self.client.delete(self.URL_DETAILS)
+        response = self.client.get(self.URL_DETAILS)
+
+        self.assertEqual(response.data.get("key").replace("-", ""), self.KEY)
+        self.assertEqual(response.data.get("status"), "INACTIVE")
+
+    @patch_permissions
+    def test_get_inactive_tag_with_filter(self, _):
+        """Used to test getting a tag given its key."""
+        query_params = {
+            "key": self.KEY,
+        }
+
+        self.client.delete(self.URL_DETAILS)
+        response = self.client.get(self.URL, query_params)
+
+        data = response.json().get("results")[0]
+        self.assertEqual(data.get("status"), "INACTIVE")
+        self.assertEqual(data.get("key").replace("-", ""), self.KEY)
+
+    @patch_permissions
+    def test_listing_inactive_tags(self, _):
+        """Used to test adding inactive tags to the list of tags."""
+        query_params = {
+            "include_inactive": "true"
+        }
+
+        self.client.delete(self.URL_DETAILS)
+        response_exclude_inactive = self.client.get(self.URL)
+        response_include_inactive = self.client.get(self.URL, query_params)
+
+        exclude_inactive = [tag.get("key") for tag in response_exclude_inactive.json().get("results")]
+        include_inactive = [tag.get("key") for tag in response_include_inactive.json().get("results")]
+        serialized_tag = TagSerializer(self.example_tag).data
+        self.assertNotIn(serialized_tag.get("key"), exclude_inactive)
+        self.assertIn(serialized_tag.get("key"), include_inactive)

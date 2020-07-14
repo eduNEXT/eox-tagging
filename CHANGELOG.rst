@@ -13,7 +13,8 @@ Change Log
 Unreleased
 ----------
 
-* Added eox-tagging plugin documentation
+* Added eox-tagging plugin documentation.
+* Now invalid tags can be return using the `key` filter.
 
 [0.3.0] - 2020-07-08
 --------------------
