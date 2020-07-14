@@ -29,8 +29,8 @@ class TagFilter(filters.FilterSet):
         """Filter that returns the tags associated with course_id."""
         if value:
             try:
-                queryset = Tag.objects.find_all_tags_for(target_type="CourseOverview",
-                                                         target_id={"course_id": str(value)})
+                queryset = queryset.find_all_tags_for(target_type="CourseOverview",
+                                                      target_id={"course_id": str(value)})
             except Exception:  # pylint: disable=broad-except
                 return queryset.none()
 
@@ -40,8 +40,8 @@ class TagFilter(filters.FilterSet):
         """Filter that returns the tags associated with username."""
         if value:
             try:
-                queryset = Tag.objects.find_all_tags_for(target_type="user",
-                                                         target_id={"username": str(value)})
+                queryset = queryset.find_all_tags_for(target_type="user",
+                                                      target_id={"username": str(value)})
             except Exception:  # pylint: disable=broad-except
                 return queryset.none()
 
@@ -55,8 +55,8 @@ class TagFilter(filters.FilterSet):
                 "course_id": str(value)
             }
             try:
-                queryset = Tag.objects.find_all_tags_for(target_type="courseenrollment",
-                                                         target_id=enrollment)
+                queryset = queryset.find_all_tags_for(target_type="courseenrollment",
+                                                      target_id=enrollment)
             except Exception:  # pylint: disable=broad-except
                 return queryset.none()
 
@@ -67,7 +67,7 @@ class TagFilter(filters.FilterSet):
         if value:
             try:
                 ctype = ContentType.objects.get(model="courseenrollment")
-                enrollments_queryset = Tag.objects.find_all_tags_by_type("courseenrollment")
+                enrollments_queryset = queryset.find_all_tags_by_type("courseenrollment")
 
                 query_enrollments = []
                 for tag_enrollment in enrollments_queryset:
@@ -86,7 +86,7 @@ class TagFilter(filters.FilterSet):
         """Filter that returns targets by their type."""
         if value:
             try:
-                queryset = Tag.objects.find_all_tags_by_type(str(value))
+                queryset = queryset.find_all_tags_by_type(str(value))
             except Exception:  # pylint: disable=broad-except
                 return queryset.none()
 
