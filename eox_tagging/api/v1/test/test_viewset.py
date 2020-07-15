@@ -35,7 +35,7 @@ from eox_tagging.models import Tag
         {
             "tag_type": "example_tag_3",
             "validate_owner_object": "User",
-            "validate_access": {"equals": "PRIVATE"},
+            "validate_access": {"equals": "PUBLIC"},
             "validate_tag_value": {"in": ["example_tag_value", "example_tag_value_1"]},
             "validate_target_object": "Site",
             "validate_expiration_date": {"exist": True},
@@ -89,7 +89,7 @@ class TestTagViewSet(TestCase):
             tag_type="example_tag_3",
             target_object=self.owner_site,
             owner_object=self.owner_user,
-            access=AccessLevel.PRIVATE,
+            access=AccessLevel.PUBLIC,
             expiration_date=datetime.date(2020, 10, 19),
         )
         self.KEY = self.example_tag.key.hex
@@ -340,6 +340,30 @@ class TestTagViewSet(TestCase):
         response = self.client.get(self.URL, query_params)
 
         self.assertEqual(response.status_code, 200)
+
+    @patch_permissions
+    def test_filter_by_existent_access(self, _):
+        """Used to test filters with valid access level."""
+        query_params = {
+            "access": "public",
+        }
+
+        response = self.client.get(self.URL, query_params)
+
+        data = response.json().get("results")[0]
+        self.assertEqual(data.get("key").replace("-", ""), self.example_tag_3.key.hex)
+
+    @patch_permissions
+    def test_filter_by_non_existent_access(self, _):
+        """Used to test filters with invalid access level."""
+        query_params = {
+            "access": "pub",
+        }
+
+        response = self.client.get(self.URL, query_params)
+
+        data = response.json().get("results")
+        self.assertFalse(data)
 
     @patch_permissions
     def test_soft_delete(self, _):

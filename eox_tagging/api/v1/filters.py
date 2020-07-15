@@ -96,7 +96,7 @@ class TagFilter(filters.FilterSet):
         """Filters targets by their access type."""
         if value:
             value_map = {v.lower(): k for k, v in AccessLevel.choices()}
-            value = value_map[value.lower()]
-            queryset = queryset.filter(access=value)
+            access = value_map.get(value.lower())
+            queryset = queryset.filter(access=access) if access else queryset.none()
 
         return queryset
