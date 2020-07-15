@@ -87,7 +87,6 @@ class TagQuerySet(QuerySet):
             object_id = {
                 "opaque_key": CourseKey.from_string(object_id),
             }
-
         object_instance = ctype.get_object_for_this_type(**object_id)
 
         return object_instance, ctype
