@@ -13,9 +13,30 @@ Change Log
 Unreleased
 ----------
 
+*
+
+[0.5.0] - 2020-07-14
+--------------------
+
+Changed
+_______
+
+* Using - instead of _ for the urls namespace.
+
+[0.4.0] - 2020-07-14
+--------------------
+
+Added
+_____
+
 * Added eox-tagging plugin documentation.
 * Now invalid tags can be return using the `key` filter.
 * Added info-view for the plugin.
+
+Changed
+_______
+
+* The Technical information for the tag now is returned in a meta field.
 
 [0.3.0] - 2020-07-08
 --------------------
