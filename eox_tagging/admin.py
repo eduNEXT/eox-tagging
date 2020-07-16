@@ -14,6 +14,7 @@ from eox_tagging.models import OpaqueKeyProxyModel, Tag
 class TagAdmin(admin.ModelAdmin):
     """Tag admin."""
     list_display = [
+        "key",
         "tag_type",
         "tag_value",
         "tagged_object",
