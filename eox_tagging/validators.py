@@ -57,20 +57,44 @@ class TagValidators(object):
         self.set_configuration()
 
     def set_configuration(self):
-        """Function that sets and validates configuracion for model instance."""
+        """Function that sets and validates configuration for model instance."""
         self.validate_no_updating()  # Don't validate if trying to update
         self.__select_configuration()
+        self.__force_configuration_values()
         self.__validate_configuration_types()
         self.__validate_configuration()
 
     def __select_configuration(self):
-        """Function that selects the correct configuracion for model instance."""
+        """Function that selects the correct configuration for model instance."""
         for tag_def in settings.EOX_TAGGING_DEFINITIONS:
             tag_type = tag_def.get('tag_type')
             if tag_type == self.instance.tag_type:
                 self.current_tag_definitions = tag_def
                 return
         raise ValidationError("Tag_type '{}' not configured".format(self.instance.tag_type))
+
+    def __force_configuration_values(self):
+        """
+        Function that sets tag values defined in the configuration.
+
+        For example:
+        {
+            "force_access": "public"
+        }
+        Then the access level of the tag must be set tu public, no matter if it had a value before.
+        Also, using force the validations are skipped.
+        """
+        pattern = "force_"
+        configurations_copy = dict(self.current_tag_definitions)
+
+        for key, value in configurations_copy.items():
+            if key.startswith(pattern):
+                try:
+                    self.instance.set_attribute(key.replace(pattern, ""), value)
+                except Exception:
+                    raise ValidationError(u"EOX_TAGGING | The field {} with value `{}` is wrongly configured."
+                                          .format(key, value))
+                del self.current_tag_definitions[key]
 
     def __validate_required(self):
         """Function that validates the configuration for the required fields target and owner."""

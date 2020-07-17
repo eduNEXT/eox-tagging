@@ -4,6 +4,7 @@ Model to store tags in the database.
 import logging
 import re
 import uuid
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -192,6 +193,22 @@ class Tag(models.Model):
     def owner_object_type(self):
         """Obtain the name of the object which the tag belongs to."""
         return self.owner_object.__class__.__name__ if self.owner_object else None
+
+    def set_attribute(self, attr, value):
+        """Function that takes a value and sets it to the instance attribute."""
+        if attr == "access":
+            self.access = AccessLevel.get_access_object(value)
+            return
+
+        if attr == "activation_date":
+            self.activation_date = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+            return
+
+        if attr == "expiration_date":
+            self.expiration_date = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+            return
+
+        setattr(self, attr, value)
 
     def get_attribute(self, attr, name=False):
         """

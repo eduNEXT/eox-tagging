@@ -51,6 +51,10 @@ Important notes:
   * If a key in the settings dictionary has as prefix `validate` it means that the <key, value> can have a dictionary of validations as value. If not, is assume that
       value is a string.
 
+* force_<FIELD_VALUE> meaning:
+
+    * This allows to set a value to a field without running validations or directly specifying it in the tag object.
+
 * The validations available are:
 
 +---------------+-------+-----------------------------------------------+----------------------------------------------------------------+
