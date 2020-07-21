@@ -49,6 +49,11 @@ class TagQuerySet(QuerySet):
         """Returns all inactive tags."""
         return self.exclude(inactivated_at=None)
 
+    def delete(self):
+        """Used to delete a set of tags."""
+        return super(TagQuerySet, self).update(inactivated_at=timezone.now(),
+                                               status=Status.INACTIVE)
+
     def find_by_owner(self, owner_type, owner_id):
         """Returns all tags owned by owner_id."""
 

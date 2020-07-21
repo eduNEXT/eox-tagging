@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.test import TestCase, override_settings
+from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 
 from eox_tagging.constants import AccessLevel
@@ -255,14 +256,16 @@ class TestTag(TestCase):
         self.assertEqual(tags.first().target_object_id, self.target_object.id)
 
     def test_tag_soft_delete(self):
-        """ Used to confirm that the tags can be invalidated soft deleting them."""
+        """
+        Used to confirm that the tags can be invalidated soft deleting them.
+        This also means that they will no longer exist in active tags set.
+        """
         self.test_tag.delete()
 
+        deleted_tag = Tag.objects.inactive().get(id=self.test_tag.id)
         with self.assertRaises(ObjectDoesNotExist):
-            Tag.objects.active().get(id=1)
-
-        # Exists in invalid objects
-        Tag.objects.inactive().get(id=1)
+            Tag.objects.active().get(id=self.test_tag.id)
+        self.assertGreater(timezone.now(), deleted_tag.inactivated_at)
 
     def test_create_tag_without_target_object(self):
         """
@@ -422,3 +425,9 @@ class TestTag(TestCase):
                 expiration_date=datetime.datetime(2020, 4, 19, 10, 20, 30),
                 activation_date=datetime.datetime(2020, 6, 16, 10, 20, 30),
             )
+
+    def test_soft_delete_queryset(self):
+        """Used to test deactivating tags using a tag queryset."""
+        Tag.objects.delete()
+
+        self.assertFalse(Tag.objects.active())
