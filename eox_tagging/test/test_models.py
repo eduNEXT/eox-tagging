@@ -121,6 +121,94 @@ class TestTag(TestCase):
     @override_settings(
         EOX_TAGGING_DEFINITIONS=[
             {
+                "tag_type": "subscription_tier",
+                "force_access": "private",
+                "validate_tag_value": {"in": ["free", "private"]},
+                "validate_owner_object": "User",
+                "validate_target_object": "User",
+            },
+        ])
+    def test_force_access_configuration(self):
+        """
+        Used to test that if a field is `forced` then it must be set to the value
+        specified."""
+        tag = Tag.objects.create_tag(
+            tag_value="free",
+            tag_type="subscription_tier",
+            target_object=self.target_object,
+            owner_object=self.owner_object,
+        )
+
+        self.assertIsNotNone(tag.id)
+        self.assertEqual(tag.access.name, "PRIVATE")
+
+    @override_settings(
+        EOX_TAGGING_DEFINITIONS=[
+            {
+                "tag_type": "subscription_tier",
+                "force_activation_date": "2020-10-19 10:20:30",
+                "validate_tag_value": {"in": ["free", "private"]},
+                "validate_owner_object": "User",
+                "validate_target_object": "User",
+            },
+        ])
+    def test_force_activation_date_configuration(self):
+        """Used to test that if a field is `forced` the must be set to the value specified."""
+        tag = Tag.objects.create_tag(
+            tag_value="free",
+            tag_type="subscription_tier",
+            target_object=self.target_object,
+            owner_object=self.owner_object,
+        )
+
+        self.assertIsNotNone(tag.id)
+        self.assertEqual(str(tag.activation_date), "2020-10-19 10:20:30")
+
+    @override_settings(
+        EOX_TAGGING_DEFINITIONS=[
+            {
+                "tag_type": "subscription_tier",
+                "force_expiration_date": "2020-10-19 10:20:30",
+                "validate_tag_value": {"in": ["free", "private"]},
+                "validate_owner_object": "User",
+                "validate_target_object": "User",
+            },
+        ])
+    def test_force_expiration_date_configuration(self):
+        """Used to test that if a field is `forced` the must be set to the value specified."""
+        tag = Tag.objects.create_tag(
+            tag_value="free",
+            tag_type="subscription_tier",
+            target_object=self.target_object,
+            owner_object=self.owner_object,
+        )
+
+        self.assertIsNotNone(tag.id)
+        self.assertEqual(str(tag.expiration_date), "2020-10-19 10:20:30")
+
+    @override_settings(
+        EOX_TAGGING_DEFINITIONS=[
+            {
+                "tag_type": "subscription_tier",
+                "force_tag_value": "free",
+                "validate_owner_object": "User",
+                "validate_target_object": "User",
+            },
+        ])
+    def test_force_tag_value_configuration(self):
+        """Used to test that if a field is `forced` the must be set to the value specified."""
+        tag = Tag.objects.create_tag(
+            tag_type="subscription_tier",
+            target_object=self.target_object,
+            owner_object=self.owner_object,
+        )
+
+        self.assertIsNotNone(tag.id)
+        self.assertEqual(tag.tag_value, "free")
+
+    @override_settings(
+        EOX_TAGGING_DEFINITIONS=[
+            {
                 "tag_type": "example_tag_7",
                 "validate_owner_object": "User",
                 "validate_access": {"equals": "PRIVATE"},
@@ -236,7 +324,7 @@ class TestTag(TestCase):
                 expiration_date=datetime.date(2020, 10, 19),
             )
 
-    def test_tag_inmutable(self):
+    def test_tag_immutable(self):
         """ Used to confirm that the tags can't be updated."""
         setattr(self.test_tag, "tag_value", "value")
         with self.assertRaises(ValidationError):

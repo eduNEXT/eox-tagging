@@ -13,7 +13,7 @@ Change Log
 Unreleased
 ----------
 
-*
+* The user can force a value in a field using the configuration.
 
 [0.5.0] - 2020-07-14
 --------------------

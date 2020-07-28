@@ -26,6 +26,14 @@ class AccessLevel(IntEnum):
                 return key.name
         return None
 
+    @classmethod
+    def get_access_object(cls, value):
+        """Function that given a key name returns an access object."""
+        for key in cls:  # pylint: disable=not-an-iterable, useless-suppression
+            if key.name.lower() == value.lower():
+                return key
+        return None
+
 
 class Status(IntEnum):
     """

@@ -87,6 +87,21 @@ the program will assume that the field must be equal to the value. For example:
 
 This means that the FIELD with FIELD_NAME must be equal to VALUE.
 
+Setting values using the configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The configuration object can also be used to set TAG values. For example, if I want all the tags to have access level `PRIVATE`
+then I would do the following:
+
+In the configuration object:
+
+.. code-block:: JSON
+
+        {
+            "force_access": "PRIVATE"
+        }
+
+This helps to set constant values across tags without doing it explicitly while creating each one.
 
 Errors
 ------
