@@ -64,6 +64,7 @@ class TestTagViewSet(TestCase):
             owner_object=self.owner_user,
             access=AccessLevel.PRIVATE,
             expiration_date=datetime.datetime(2020, 10, 19, 10, 20, 30),
+            activation_date=datetime.datetime(2020, 10, 19, 10, 20, 30),
         )
 
         self.example_tag_1 = Tag.objects.create(
@@ -72,7 +73,8 @@ class TestTagViewSet(TestCase):
             target_object=self.target_object,
             owner_object=self.owner_site,
             access=AccessLevel.PRIVATE,
-            expiration_date=datetime.datetime(2020, 10, 19, 10, 30, 40),
+            expiration_date=datetime.datetime(2020, 9, 19, 10, 30, 40),
+            activation_date=datetime.datetime(2020, 9, 19, 10, 30, 40),
         )
 
         self.example_tag_2 = Tag.objects.create(
@@ -81,7 +83,7 @@ class TestTagViewSet(TestCase):
             target_object=self.target_object,
             owner_object=self.owner_site,
             access=AccessLevel.PRIVATE,
-            expiration_date=datetime.date(2020, 10, 19),
+            expiration_date=datetime.datetime(2020, 8, 19, 10, 30, 40),
         )
 
         self.example_tag_3 = Tag.objects.create(
@@ -90,7 +92,7 @@ class TestTagViewSet(TestCase):
             target_object=self.owner_site,
             owner_object=self.owner_user,
             access=AccessLevel.PUBLIC,
-            expiration_date=datetime.date(2020, 10, 19),
+            expiration_date=datetime.datetime(2020, 7, 19, 10, 30, 40),
         )
         self.KEY = self.example_tag.key.hex
         # Test URLs
@@ -365,6 +367,44 @@ class TestTagViewSet(TestCase):
 
         data = response.json().get("results")
         self.assertFalse(data)
+
+    @patch_permissions
+    def test_filter_using_after_datetime(self, _):
+        """
+        Used to test filtering tags using a range datetime filter. In this case, the filter is
+        before a specific datetime.
+        """
+        query_params = {
+            "activation_date_0": "2020-10-10 10:20:30",
+        }
+        datetime_value = datetime.datetime(2020, 10, 10, 10, 20, 30)
+        datetime_format = "%Y-%m-%dT%H:%M:%SZ"
+
+        response = self.client.get(self.URL, query_params)
+
+        results = response.json().get("results")
+        datetimes = [datetime.datetime.strptime(tag.get("activation_date"), datetime_format) > datetime_value
+                     for tag in results]
+        self.assertTrue(all(datetimes))
+
+    @patch_permissions
+    def test_filter_using_before_datetime(self, _):
+        """
+        Used to test filtering tags using a range datetime filter. In this case, the filter is
+        after a specific datetime.
+        """
+        query_params = {
+            "activation_date_1": "2020-10-10 10:20:30",
+        }
+        datetime_value = datetime.datetime(2020, 10, 10, 10, 20, 30)
+        datetime_format = "%Y-%m-%dT%H:%M:%SZ"
+
+        response = self.client.get(self.URL, query_params)
+
+        results = response.json().get("results")
+        datetimes = [datetime.datetime.strptime(tag.get("activation_date"), datetime_format) < datetime_value
+                     for tag in results]
+        self.assertTrue(all(datetimes))
 
     @patch_permissions
     def test_soft_delete(self, _):

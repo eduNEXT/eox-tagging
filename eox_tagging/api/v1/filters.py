@@ -17,13 +17,13 @@ class TagFilter(filters.FilterSet):
     enrollments = filters.CharFilter(method="filter_enrollments")
     target_type = filters.CharFilter(method="filter_target_types")
     created_at = filters.DateTimeFromToRangeFilter(name="created_at")
-    activated_at = filters.DateTimeFromToRangeFilter(name="activated_at")
+    activation_date = filters.DateTimeFromToRangeFilter(name="activation_date")
     access = filters.CharFilter(method="filter_access_type")
 
     class Meta:  # pylint: disable=old-style-class
         """Meta class."""
         model = Tag
-        fields = ['key', 'created_at', 'activated_at', 'status', 'course_id', 'enrolled', 'enrollments', 'username']
+        fields = ['key', 'created_at', 'activation_date', 'status', 'course_id', 'enrolled', 'enrollments', 'username']
 
     def filter_by_target_object(self, queryset, name, value):
         """Filter that returns the tags associated with target."""
