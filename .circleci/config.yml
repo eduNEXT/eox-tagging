@@ -47,8 +47,6 @@ jobs:
       - restore_cache:
           keys:
           - test-tox-py<< parameters.python_version >>-<< parameters.django_version >>-{{ checksum "requirements/test.txt" }}
-          # fallback to using the latest cache if no exact match is found
-          - test-tox-py<< parameters.python_version >>-<< parameters.django_version >>-
 
       - run:
           name: activate virtualenv and install dependencies.
