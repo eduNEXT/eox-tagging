@@ -13,7 +13,18 @@ Change Log
 Unreleased
 ----------
 
+
+[0.6.0] - 2020-08-03
+--------------------
+
+Added
+_____
+
 * The user can force a value in a field using the configuration.
+
+Changed
+_______
+
 * Fixed datetime filters for activation_date and creation_date.
 
 [0.5.0] - 2020-07-14
