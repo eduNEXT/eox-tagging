@@ -1,28 +1,12 @@
 """
 Test classes for Tags router
 """
-from django.conf.urls import include, url
 from django.test import TestCase
 from django.urls import reverse
-from rest_framework.routers import DefaultRouter
-from rest_framework.test import URLPatternsTestCase
-
-from eox_tagging.api.v1.viewset import TagViewSet
 
 
-class TestRouters(URLPatternsTestCase, TestCase):
+class TestRouters(TestCase):
     """Test class for API router."""
-
-    router = DefaultRouter()
-    router.register(r"tags", TagViewSet, basename='tag')
-
-    urlpatterns = [
-        url(r"api/v1/", include(router.urls)),
-    ]
-
-    def setUp(self):
-        """Router setup."""
-        self.router = DefaultRouter()
 
     def test_get_route_for_list_tags(self):
         """Used to test correctness of list route."""
