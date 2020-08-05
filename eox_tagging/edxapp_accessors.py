@@ -64,7 +64,7 @@ def get_object(related_object_type, **kwargs):
         "courseenrollment": get_course_enrollment,
     }
     try:
-        related_object = RELATED_OBJECTS.get(related_object_type)(**kwargs)
+        related_object = RELATED_OBJECTS.get(related_object_type.lower())(**kwargs)
     except Exception:
         raise ValidationError("This field is required.")
 
