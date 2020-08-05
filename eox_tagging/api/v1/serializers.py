@@ -67,10 +67,10 @@ class TagSerializer(serializers.ModelSerializer):
         try:
             target_object = get_object(target_type, **data)
         except Exception:  # pylint: disable=broad-except
-            serializers.ValidationError({"Target": _("Error getting {} object."
-                                         .format(target_type))})
+            raise serializers.ValidationError({"Target": _("Error getting {} object."
+                                               .format(target_type))})
 
-        if owner_type == "user":
+        if owner_type and owner_type.lower() == "user":
             owner_object = self.context.get("request").user
         else:
             owner_object = get_site()
