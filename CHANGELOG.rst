@@ -14,6 +14,14 @@ Unreleased
 ----------
 
 
+[0.7.0] - 2020-08-05
+--------------------
+
+Changed
+_______
+
+* Fixed case sensitive issue in the tag serializer with the fields `target_type` and `owner_type`.
+
 [0.6.0] - 2020-08-03
 --------------------
 
