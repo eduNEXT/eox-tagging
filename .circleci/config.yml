@@ -15,16 +15,10 @@ workflows:
           matrix:
             parameters:
               python_version: ["2.7", "3.5"]
-              django_version: ["django111"]
-      - pypi:
-          requires:
-            - test
-          filters:
-            tags:
-              only: /v?[0-9]+(\.[0-9]+)*/
-            branches:
-              ignore: /.*/
-
+              django_version: ["django111", "django22"]
+            exclude:
+              - python_version: "2.7"
+                django_version: "django22"
 jobs:
   test:
     parameters:
@@ -37,7 +31,14 @@ jobs:
         default: stretch
     docker:
       # specify the version you desire here
+      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
       - image: circleci/python:<< parameters.python_version >>-<< parameters.debian_version >>
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/postgres:9.4
+
     working_directory: ~/repo<< parameters.python_version >>
 
     steps:
@@ -46,12 +47,12 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - test-tox-py<< parameters.python_version >>-<< parameters.django_version >>-{{ checksum "requirements/test.txt" }}
+          - v2-<< parameters.python_version >>-<< parameters.django_version >>-dependencies-{{ checksum "requirements/test.txt" }}
 
       - run:
-          name: activate virtualenv and install dependencies.
+          name: Install dependencies.
           command: |
-            virtualenv ./venv
+            test -d venv || virtualenv venv
             . venv/bin/activate
             pip install -r requirements/tox.txt
 
@@ -60,19 +61,13 @@ jobs:
           command: |
             . venv/bin/activate
             export TOXENV=${TOX_ENV//./}
-            make run-test
-
-      - run:
-          name: Quality tests
-          command: |
-            . venv/bin/activate
-            export TOXENV=${TOX_ENV//./}
-            make run-quality-test
-
+            make run-tests
+            
       - save_cache:
           paths:
             - ./.tox
-          key: test-tox-py<< parameters.python_version >>-<< parameters.django_version >>-{{ checksum "requirements/test.txt" }}
+            - ./node_modules
+          key: v2-<< parameters.python_version >>-<< parameters.django_version >>-dependencies-{{ checksum "requirements/test.txt" }}
 
     environment:
       - TOX_ENV: py<< parameters.python_version >>-<< parameters.django_version >>

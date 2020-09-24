@@ -8,9 +8,6 @@
 # pin when possible.  Writing an issue against the offending project and
 # linking to it here is good.
 
-# Django version 2.0.0 dropped support for python 2.7
-Django<2.0
-
 # Version used in Ironwood version of edx-platform
 edx-opaque-keys<1.0.0
 
