@@ -20,7 +20,7 @@ class TagFilter(filters.FilterSet):
     activation_date = filters.DateTimeFromToRangeFilter(name="activation_date")
     access = filters.CharFilter(method="filter_access_type")
 
-    class Meta:  # pylint: disable=old-style-class
+    class Meta:  # pylint: disable=old-style-class, useless-suppression
         """Meta class."""
         model = Tag
         fields = ['key', 'created_at', 'activation_date', 'status', 'course_id', 'enrolled', 'enrollments', 'username']

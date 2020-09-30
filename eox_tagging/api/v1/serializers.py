@@ -66,7 +66,7 @@ class TagSerializer(serializers.ModelSerializer):
 
         try:
             target_object = get_object(target_type, **data)
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             raise serializers.ValidationError({"Target": _("Error getting {} object."
                                                .format(target_type))})
 

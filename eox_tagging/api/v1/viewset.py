@@ -4,13 +4,13 @@ Viewset for Tags.
 from django_filters import rest_framework as filters
 from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication
-from rest_framework_oauth.authentication import OAuth2Authentication
 
 from eox_tagging.api.v1.filters import TagFilter
 from eox_tagging.api.v1.pagination import TagApiPagination
 from eox_tagging.api.v1.permissions import EoxTaggingAPIPermission
 from eox_tagging.api.v1.serializers import TagSerializer
 from eox_tagging.edxapp_accessors import get_site
+from eox_tagging.edxapp_wrappers.bearer_authentication import BearerAuthentication
 from eox_tagging.models import Tag
 
 
@@ -18,7 +18,7 @@ class TagViewSet(viewsets.ModelViewSet):
     """Viewset for listing and creating Tags."""
 
     serializer_class = TagSerializer
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (EoxTaggingAPIPermission,)
     pagination_class = TagApiPagination
     filter_backends = (filters.DjangoFilterBackend,)

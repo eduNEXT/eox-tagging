@@ -52,3 +52,4 @@ def plugin_settings(settings):
     settings.EOX_TAGGING_LOAD_PERMISSIONS = True
     settings.DATA_API_DEF_PAGE_SIZE = 1000
     settings.DATA_API_MAX_PAGE_SIZE = 5000
+    settings.EOX_TAGGING_BEARER_AUTHENTICATION = 'eox_tagging.edxapp_wrappers.backends.bearer_authentication_i_v1'
