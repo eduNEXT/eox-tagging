@@ -13,6 +13,13 @@ Change Log
 Unreleased
 ----------
 
+[0.8.0] - 2020-09-30
+--------------------
+
+Added
+_______
+
+* Adding bearer_authentication to support django-oauth2-provider and django-oauth-toolkit
 
 [0.7.0] - 2020-08-05
 --------------------
