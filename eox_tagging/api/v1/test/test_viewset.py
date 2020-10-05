@@ -375,6 +375,7 @@ class TestTagViewSet(TestCase):
         before a specific datetime.
         """
         query_params = {
+            "activation_date_after": "2020-10-10 10:20:30",
             "activation_date_0": "2020-10-10 10:20:30",
         }
         datetime_value = datetime.datetime(2020, 10, 10, 10, 20, 30)
@@ -394,6 +395,7 @@ class TestTagViewSet(TestCase):
         after a specific datetime.
         """
         query_params = {
+            "activation_date_before": "2020-10-10 10:20:30",
             "activation_date_1": "2020-10-10 10:20:30",
         }
         datetime_value = datetime.datetime(2020, 10, 10, 10, 20, 30)

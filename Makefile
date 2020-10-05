@@ -47,13 +47,12 @@ upgrade: ## update the requirements/*.txt files with the latest packages satisfy
 	sed '/^[dD]jango==/d;/^django-filter==/d' requirements/test.txt > requirements/test.tmp
 	mv requirements/test.tmp requirements/test.txt
 
-
-
-run-test: clean ## Run test suite.
-	$(TOX) coverage run --source="." manage.py test
+test-python: clean ## Run test suite.
+	$(TOX) pip install -r requirements/test.txt --exists-action w
+	$(TOX) coverage run --source ./eox_tagging manage.py test
 	$(TOX) coverage report -m --fail-under=71
 
-run-quality-test: clean ## Run quality test.
+quality: clean ## Run quality test.
 	$(TOX) pycodestyle ./eox_tagging
 	$(TOX) pylint ./eox_tagging --rcfile=./setup.cfg
 	$(TOX) isort --check-only --recursive --diff ./eox_tagging
@@ -62,3 +61,5 @@ build-docs:
 	make docs_requirements
 	cd docs/ && make clean
 	cd docs/ && make html
+
+run-tests: test-python quality 

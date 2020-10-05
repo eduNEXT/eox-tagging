@@ -11,13 +11,13 @@ PROXY_MODEL_NAME = "opaquekeyproxymodel"
 class TagFilter(filters.FilterSet):
     """Filter class for tags."""
 
-    course_id = filters.CharFilter(name="course_id", method="filter_by_target_object")
-    username = filters.CharFilter(name="username", method="filter_by_target_object")
-    enrolled = filters.CharFilter(name="enrollment", method="filter_by_target_object")
+    course_id = filters.CharFilter(field_name="course_id", method="filter_by_target_object")
+    username = filters.CharFilter(field_name="username", method="filter_by_target_object")
+    enrolled = filters.CharFilter(field_name="enrollment", method="filter_by_target_object")
     enrollments = filters.CharFilter(method="filter_enrollments")
     target_type = filters.CharFilter(method="filter_target_types")
-    created_at = filters.DateTimeFromToRangeFilter(name="created_at")
-    activation_date = filters.DateTimeFromToRangeFilter(name="activation_date")
+    created_at = filters.DateTimeFromToRangeFilter(field_name="created_at")
+    activation_date = filters.DateTimeFromToRangeFilter(field_name="activation_date")
     access = filters.CharFilter(method="filter_access_type")
 
     class Meta:  # pylint: disable=old-style-class, useless-suppression

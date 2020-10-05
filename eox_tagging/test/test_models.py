@@ -12,7 +12,6 @@ from opaque_keys.edx.keys import CourseKey
 
 from eox_tagging.constants import AccessLevel
 from eox_tagging.models import Tag
-from eox_tagging.test.test_utils import CourseEnrollment, CourseOverview
 
 
 @override_settings(
@@ -33,7 +32,7 @@ from eox_tagging.test.test_utils import CourseEnrollment, CourseOverview
         {
             "tag_type": "example_tag_3",
             "validate_tag_value": {"regex": r".*eduNEXT$"},
-            "validate_target_object": "CourseEnrollment",
+            "validate_target_object": "User",
             "validate_expiration_date": {"exist": True},
         },
         {
@@ -42,8 +41,6 @@ from eox_tagging.test.test_utils import CourseEnrollment, CourseOverview
             "validate_target_object": "User",
         }
     ])
-@CourseOverview.fake_me
-@CourseEnrollment.fake_me
 class TestTag(TestCase):
     """Class for testing the Tag model."""
 
@@ -281,47 +278,43 @@ class TestTag(TestCase):
         Used to confirm that tags can't be created if the target_object does not match
         the definition.
         """
-        fake_object_target_enroll = CourseEnrollment.objects.create()  # pylint: disable=no-member
         with self.assertRaises(ValidationError):
             Tag.objects.create_tag(
                 tag_value="course-v1:demo-courses+DM101+2017",
                 tag_type="example_tag_2",
-                target_object=fake_object_target_enroll,
+                target_object=self.fake_owner_object,  # Is site not user as defined
                 owner_object=self.fake_owner_object,
             )
 
     def test_tag_validation_regex_accepts_pattern(self):
         """ Used to confirm that tags can accept a pattern if defined in settings."""
-        fake_object_target_enroll = CourseEnrollment.objects.create()  # pylint: disable=no-member
         Tag.objects.create_tag(
             tag_value="example by eduNEXT",
             tag_type="example_tag_3",
-            target_object=fake_object_target_enroll,
+            target_object=self.target_object,
             owner_object=self.fake_owner_object,
             expiration_date=datetime.date(2020, 10, 19),
         )
 
     def test_tag_validation_regex_accepts_pattern_fail(self):
         """ Used to confirm that saving fails if tag does not match pattern defined in settings."""
-        fake_object_target_enroll = CourseEnrollment.objects.create()  # pylint: disable=no-member
         with self.assertRaises(ValidationError):
             Tag.objects.create_tag(
                 tag_value="example by edx",
                 tag_type="example_tag_3",
-                target_object=fake_object_target_enroll,
+                target_object=self.target_object,
                 owner_object=self.owner_object,
                 expiration_date=datetime.date(2020, 10, 19),
             )
 
     def test_tag_validation_owner_must_be_site(self):
         """ Used to confirm that a tag must have a site as owner."""
-        fake_object_target_enroll = CourseEnrollment.objects.create()  # pylint: disable=no-member
         with self.assertRaises(ValidationError):
             Tag.objects.create_tag(
                 tag_value="example by eduNEXT",
                 tag_type="example_tag_3",
-                target_object=fake_object_target_enroll,
-                owner_object=fake_object_target_enroll,
+                target_object=self.target_object,
+                owner_object=self.target_object,  # Is user and not site as specified
                 expiration_date=datetime.date(2020, 10, 19),
             )
 
@@ -408,7 +401,7 @@ class TestTag(TestCase):
             {
                 "tag_type": "example_tag_3",
                 "validate_tag_value": {"regex": r".*eduNEXT$"},
-                "validate_target_object": "CourseEnrollment",
+                "validate_target_object": "User",
                 "validate_expiration_date": {"exist": True, "between": ["2020-10-19 10:20:30", "2020-12-04 10:20:30"]},
                 "validate_activation_date": "2020-06-16 10:20:30",
             }]
@@ -419,12 +412,10 @@ class TestTag(TestCase):
         This means that expiration_date must be grater or equal than "2020-10-19 10:20:30",
         or less or equal than "2020-12-04 10:20:30".
         """
-        fake_object_target_enroll = CourseEnrollment.objects.create()  # pylint: disable=no-member
-
         tag = Tag.objects.create_tag(
             tag_value="example by eduNEXT",
             tag_type="example_tag_3",
-            target_object=fake_object_target_enroll,
+            target_object=self.target_object,
             owner_object=self.fake_owner_object,
             expiration_date=datetime.datetime(2020, 10, 19, 10, 20, 30),
             activation_date=datetime.datetime(2020, 6, 16, 10, 20, 30),
@@ -437,7 +428,7 @@ class TestTag(TestCase):
             {
                 "tag_type": "example_tag_3",
                 "validate_tag_value": {"regex": r".*eduNEXT$"},
-                "validate_target_object": "CourseEnrollment",
+                "validate_target_object": "User",
                 "validate_expiration_date": {"exist": True, "between": ["2020-10-19 10:20:30", "2020-12-04 10:20:30"]},
                 "validate_activation_date": "2020-06-16 10:20:30",
             }]
@@ -447,13 +438,11 @@ class TestTag(TestCase):
         Used to test date validations using BETWEEN validator. In this case, the validator must
         raise a validation error because the date is not in between the two dates defined.
         """
-        fake_object_target_enroll = CourseEnrollment.objects.create()  # pylint: disable=no-member
-
         with self.assertRaises(ValidationError):
             Tag.objects.create_tag(
                 tag_value="example by eduNEXT",
                 tag_type="example_tag_3",
-                target_object=fake_object_target_enroll,
+                target_object=self.target_object,
                 owner_object=self.fake_owner_object,
                 expiration_date=datetime.datetime(2020, 5, 19, 10, 20, 30),
                 activation_date=datetime.datetime(2020, 6, 16, 10, 20, 30),
@@ -464,7 +453,7 @@ class TestTag(TestCase):
             {
                 "tag_type": "example_tag_3",
                 "validate_tag_value": {"regex": r".*eduNEXT$"},
-                "validate_target_object": "CourseEnrollment",
+                "validate_target_object": "User",
                 "validate_expiration_date": {"in": ["2020-12-04 10:20:30", "2020-10-19 10:20:30"]},
                 "validate_activation_date": "2020-06-16 10:20:30",
             }]
@@ -474,12 +463,10 @@ class TestTag(TestCase):
         Used to test date validations using IN validator. This means that expiration_date bust be equal to
         "2020-12-04 10:20:30" or equal to "2020-10-19 10:20:30".
         """
-        fake_object_target_enroll = CourseEnrollment.objects.create()  # pylint: disable=no-member
-
         tag = Tag.objects.create_tag(
             tag_value="example by eduNEXT",
             tag_type="example_tag_3",
-            target_object=fake_object_target_enroll,
+            target_object=self.target_object,
             owner_object=self.fake_owner_object,
             expiration_date=datetime.datetime(2020, 10, 19, 10, 20, 30),
             activation_date=datetime.datetime(2020, 6, 16, 10, 20, 30),
@@ -492,7 +479,7 @@ class TestTag(TestCase):
             {
                 "tag_type": "example_tag_3",
                 "validate_tag_value": {"regex": r".*eduNEXT$"},
-                "validate_target_object": "CourseEnrollment",
+                "validate_target_object": "User",
                 "validate_expiration_date": {"in": ["2020-12-04 10:20:30", "2020-10-19 10:20:30"]},
                 "validate_activation_date": "2020-06-16 10:20:30",
             }]
@@ -502,13 +489,11 @@ class TestTag(TestCase):
         Used to test date validations using IN validator. In this case, the validator must raise
         a validation error because the date is different two those defined inside the array.
         """
-        fake_object_target_enroll = CourseEnrollment.objects.create()  # pylint: disable=no-member
-
         with self.assertRaises(ValidationError):
             Tag.objects.create_tag(
                 tag_value="example by eduNEXT",
                 tag_type="example_tag_3",
-                target_object=fake_object_target_enroll,
+                target_object=self.target_object,
                 owner_object=self.fake_owner_object,
                 expiration_date=datetime.datetime(2020, 4, 19, 10, 20, 30),
                 activation_date=datetime.datetime(2020, 6, 16, 10, 20, 30),
