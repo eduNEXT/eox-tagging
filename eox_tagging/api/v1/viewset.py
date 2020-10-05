@@ -2,8 +2,10 @@
 Viewset for Tags.
 """
 from django_filters import rest_framework as filters
-from rest_framework import viewsets
+from eox_audit_model.decorators import audit_method
+from rest_framework import status, viewsets
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.response import Response
 
 from eox_tagging.api.v1.filters import TagFilter
 from eox_tagging.api.v1.pagination import TagApiPagination
@@ -95,3 +97,55 @@ class TagViewSet(viewsets.ModelViewSet):
             "owner_id": {"username": user.username},
             "owner_type": "user",
         }
+
+    def create(self, request, *args, **kwargs):
+        """Creates a tag.
+
+        Args:
+            request: Django request.
+
+        Returns:
+            Django Response.
+        """
+        @audit_method(action="create-tag-api-v1")
+        def create_tag(request_data):
+            """Inner method in order to audit the request data as input parameter.
+
+            Args:
+                request_data: dict
+
+            Returns:
+                Django Response.
+            """
+            serializer = self.get_serializer(data=request_data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return create_tag(request.data)
+
+    def destroy(self, request, *args, **kwargs):
+        """Soft deletes a tag.
+
+        Args:
+            request: Django request.
+
+        Returns:
+            Django Response.
+        """
+        @audit_method(action="delete-tag-api-v1")
+        def soft_delete_tag(key):  # pylint: disable=unused-argument
+            """Inner method in order to audit the Public identifier
+            as input parameter.
+
+            Args:
+                Key: string
+
+            Returns:
+                Django Response.
+            """
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return soft_delete_tag(self.lookup_field)

@@ -28,6 +28,8 @@ INSTALLED_APPS = [
 
 ROOT_URLCONF = 'eox_tagging.urls'
 
+EOX_AUDIT_MODEL_APP = 'eox_audit_model.apps.EoxAuditModelConfig'
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
@@ -38,6 +40,8 @@ TIME_ZONE = 'UTC'
 USE_TZ = True
 
 ALLOWED_HOSTS = ['*']
+
+ALLOW_EOX_AUDIT_MODEL = True
 
 
 def plugin_settings(settings):
@@ -53,3 +57,6 @@ def plugin_settings(settings):
     settings.DATA_API_DEF_PAGE_SIZE = 1000
     settings.DATA_API_MAX_PAGE_SIZE = 5000
     settings.EOX_TAGGING_BEARER_AUTHENTICATION = 'eox_tagging.edxapp_wrappers.backends.bearer_authentication_i_v1'
+
+    if EOX_AUDIT_MODEL_APP not in settings.INSTALLED_APPS:
+        settings.INSTALLED_APPS.append(EOX_AUDIT_MODEL_APP)
