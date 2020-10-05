@@ -24,3 +24,4 @@ six==1.15.0               # via edx-opaque-keys, pathlib2, stevedore
 stevedore==1.32.0         # via edx-opaque-keys
 vine==1.3.0               # via amqp, celery
 zipp==1.2.0               # via importlib-metadata
+-e git+https://github.com/eduNEXT/eox-audit-model.git@mjh/add-support-juniper#egg=eox-audit-model
