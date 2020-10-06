@@ -18,12 +18,7 @@ SECRET_KEY = 'secret-key'
 
 # Application definition
 
-INSTALLED_APPS = [
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'rest_framework',
-    'eox_tagging',
-]
+INSTALLED_APPS = []
 
 
 ROOT_URLCONF = 'eox_tagging.urls'
