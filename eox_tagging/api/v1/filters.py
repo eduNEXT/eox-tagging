@@ -1,5 +1,4 @@
 """Filter module for tags."""
-from django.contrib.contenttypes.models import ContentType
 from django_filters import rest_framework as filters
 
 from eox_tagging.constants import AccessLevel
@@ -13,8 +12,7 @@ class TagFilter(filters.FilterSet):
 
     course_id = filters.CharFilter(method="filter_by_target_object")
     username = filters.CharFilter(method="filter_by_target_object")
-    enrollment = filters.CharFilter(method="filter_by_target_object")
-    enrollments = filters.CharFilter(method="filter_enrollments")
+    enrollments = filters.CharFilter(method="filter_by_target_object")
     target_type = filters.CharFilter(method="filter_target_types")
     created_at = filters.DateTimeFromToRangeFilter()
     activation_date = filters.DateTimeFromToRangeFilter()
@@ -48,26 +46,6 @@ class TagFilter(filters.FilterSet):
                     "target_id": TARGET_IDENTIFICATION.get(name, DEFAULT),
                 }
                 queryset = queryset.find_all_tags_for(**filter_params)
-            except Exception:  # pylint: disable=broad-except
-                return queryset.none()
-
-        return queryset
-
-    def filter_enrollments(self, queryset, name, value):  # pylint: disable=unused-argument
-        """Filter that returns the tags associated with the enrollments owned by the request user."""
-        if value:
-            try:
-                ctype = ContentType.objects.get(model="courseenrollment")
-                enrollments_queryset = queryset.find_all_tags_by_type("courseenrollment")
-
-                query_enrollments = []
-                for tag_enrollment in enrollments_queryset:
-                    target_id = tag_enrollment.target_object_id
-                    enrollment = ctype.get_object_for_this_type(id=target_id)
-                    if str(enrollment.course_id) == str(value):
-                        query_enrollments.append(tag_enrollment)
-
-                return query_enrollments
             except Exception:  # pylint: disable=broad-except
                 return queryset.none()
 
