@@ -13,6 +13,14 @@ Change Log
 Unreleased
 ----------
 
+[0.10.0] - 2020-10-13
+--------------------
+
+Added
+_______
+
+* Added support for filters in django2.2
+
 [0.9.0] - 2020-10-05
 --------------------
 
