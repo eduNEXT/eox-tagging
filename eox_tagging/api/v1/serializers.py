@@ -57,7 +57,7 @@ class TagSerializer(serializers.ModelSerializer):
         owner_type = validated_data.pop("owner_object_type", None)
         target = validated_data.pop("target_object", None)
 
-        if target_type in MODELS_WITH_COMPOUND_KEYS:
+        if target_type and target_type.lower() in MODELS_WITH_COMPOUND_KEYS:
             data = self.__convert_compound_keys(target, target_type)
         else:
             data = {
