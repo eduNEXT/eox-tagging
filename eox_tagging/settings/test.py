@@ -45,16 +45,20 @@ USE_TZ = True
 
 ALLOWED_HOSTS = ['*']
 
-EOX_TAGGING_SKIP_VALIDATIONS = True
-EOX_TAGGING_LOAD_PERMISSIONS = False
-EOX_TAGGING_BEARER_AUTHENTICATION = 'eox_tagging.edxapp_wrappers.backends.bearer_authentication_i_v1_test'
-DATA_API_DEF_PAGE_SIZE = 1000
-DATA_API_MAX_PAGE_SIZE = 5000
-TEST_SITE = 1
 
-
-def plugin_settings(settings):  # pylint: disable=function-redefined, unused-argument
+def plugin_settings(settings):  # pylint: disable=function-redefined
     """
     Set of plugin settings used by the Open Edx platform.
     More info: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
     """
+    settings.EOX_TAGGING_SKIP_VALIDATIONS = True
+    settings.EOX_TAGGING_LOAD_PERMISSIONS = False
+    settings.EOX_TAGGING_BEARER_AUTHENTICATION = 'eox_tagging.edxapp_wrappers.backends.bearer_authentication_i_v1_test'
+    settings.DATA_API_DEF_PAGE_SIZE = 1000
+    settings.DATA_API_MAX_PAGE_SIZE = 5000
+    settings.TEST_SITE = 1
+
+
+SETTINGS = SettingsClass()
+plugin_settings(SETTINGS)
+vars().update(SETTINGS.__dict__)
