@@ -22,6 +22,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='tag',
             name='status',
-            field=models.PositiveIntegerField(choices=[(0, b'INACTIVE'), (1, b'ACTIVE')], default=eox_tagging.constants.Status(1), editable=False),
+            field=models.PositiveIntegerField(choices=[(1, 'ACTIVE'), (0, 'INACTIVE')], default=eox_tagging.constants.Status(1), editable=False),
         ),
     ]
