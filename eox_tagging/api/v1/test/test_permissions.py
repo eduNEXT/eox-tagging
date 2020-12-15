@@ -53,6 +53,7 @@ class TestAPIPermissions(TestCase):
         self.mock_request.get_host.return_value = "test_.com"
         self.mock_request.user = self.user_authorized
         self.mock_request.auth.client.url = "test.com"
+        self.mock_request.auth.application.redirect_uri_allowed.return_value = False
 
         with self.assertRaises(exceptions.NotAuthenticated):
             self.has_permission(self.mock_request, self.view)
@@ -62,6 +63,7 @@ class TestAPIPermissions(TestCase):
         self.mock_request.get_host.return_value = None
         self.mock_request.user = self.user_authorized
         self.mock_request.auth.client.url = "test.com"
+        self.mock_request.auth.application.redirect_uri_allowed.return_value = False
 
         with self.assertRaises(exceptions.NotAuthenticated):
             self.has_permission(self.mock_request, self.view)
@@ -71,6 +73,7 @@ class TestAPIPermissions(TestCase):
         self.mock_request.get_host.return_value = "test_.com"
         self.mock_request.user = self.user_authorized
         self.mock_request.auth.client.url = None
+        self.mock_request.auth.application.redirect_uri_allowed.return_value = False
 
         with self.assertRaises(exceptions.NotAuthenticated):
             self.has_permission(self.mock_request, self.view)
