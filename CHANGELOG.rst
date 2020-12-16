@@ -13,6 +13,32 @@ Change Log
 Unreleased
 ----------
 
+[1.1.0] - 2020-12-16
+--------------------
+
+Added
+_______
+
+* Permissions compatibility with DOT.
+
+
+[1.0.0] - 2020-11-13
+--------------------
+
+Added
+_______
+
+* Migration compatibility with PY35.
+
+
+[0.10.1] - 2020-11-12
+--------------------
+
+Changed
+_______
+
+* Fixed not loading correct settings when testing.
+
 [0.10.0] - 2020-10-13
 --------------------
 
