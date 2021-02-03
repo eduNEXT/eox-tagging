@@ -53,9 +53,22 @@ class TagFilter(filters.FilterSet):
 
     def filter_target_types(self, queryset, name, value):  # pylint: disable=unused-argument
         """Filter that returns targets by their type."""
+        target_id = {}
+
+        if value == "courseenrollment":
+            course_id = self.request.query_params.get("enrollment_course_id")
+            username = self.request.query_params.get("enrollment_username")
+            target_id.update({"username": username, "course_id": course_id})
+
+        if any(object_id for _, object_id in target_id.items()):
+            try:
+                return queryset.find_all_tags_for(target_type=value, target_id=target_id)
+            except Exception:  # pylint: disable=broad-except
+                return queryset.none()
+
         if value:
             try:
-                queryset = queryset.find_all_tags_by_type(str(value))
+                queryset = queryset.find_all_tags_by_type(value)
             except Exception:  # pylint: disable=broad-except
                 return queryset.none()
 
