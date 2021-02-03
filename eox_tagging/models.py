@@ -90,7 +90,10 @@ class TagQuerySet(QuerySet):
         return super(TagQuerySet, self).delete()
 
     def __get_object_for_this_type(self, object_type, object_id):
-        """Function that returns the correct content type given a type."""
+        """
+        Function that given an object type returns the correct content type and a list of objects
+        associated.
+        """
         ctype = ContentType.objects.get(model=object_type)
 
         if object_type == PROXY_MODEL_NAME:
@@ -100,15 +103,16 @@ class TagQuerySet(QuerySet):
             }
 
         if object_type == COURSE_ENROLLMENT_MODEL_NAME:
+
             course_id = object_id.get("course_id")
-            object_id = {
-                name: value for name, value in
-                (
-                    ("course_id", CourseKey.from_string(course_id) if course_id else None),
-                    ("user__username", object_id.get("username")),
-                )
-                if value is not None
-            }
+            username = object_id.get("username")
+            object_id = {}
+
+            if course_id:
+                object_id["course_id"] = CourseKey.from_string(course_id)
+
+            if username:
+                object_id["user__username"] = username
 
         object_instances = ctype.get_all_objects_for_this_type(**object_id)
 
