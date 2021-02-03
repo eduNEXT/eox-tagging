@@ -38,7 +38,7 @@ class TagQuerySet(QuerySet):
         """Method used to create tags."""
         target = kwargs.pop("target_object", None)
         if target and target.__class__.__name__ in OPAQUE_KEY_PROXY_MODEL_TARGETS:
-            kwargs['target_object'], _ = OpaqueKeyProxyModel.objects.get_or_create(opaque_key=target.id)
+            kwargs["target_object"], _ = OpaqueKeyProxyModel.objects.get_or_create(opaque_key=target.id)
         else:
             kwargs["target_object"] = target
         instance = self.create(**kwargs)
