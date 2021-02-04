@@ -8,21 +8,12 @@
 # pin when possible.  Writing an issue against the offending project and
 # linking to it here is good.
 
-# Version used in Ironwood version of edx-platform
-edx-opaque-keys<1.0.0
+# Pinned to the same version as eox-core to keep consistency
+pylint==2.5.0
 
-# Already in python3 standard library
-futures; python_version == "2.7"
-
-# pylint version 2.0.0 dropped support for python 2.7
-# See: https://github.com/PyCQA/pylint/blob/master/doc/whatsnew/2.0.rst
-pylint<2.0
-
-# django-filter 2.0 release isn't compatible with python 2
-django-filter<2.0
-
-# mock 4.0.0 release isn't compatible with python 2
-mock<4.0.0
-
-# Version used in Ironwood version of edx-platform
-djangorestframework==3.6.3
+# Version used in Juniper version of edx-platform
+django-ipware==2.1.0
+djangorestframework==3.9.4
+drf-yasg==1.17.0
+edx-opaque-keys==2.1.0
+newrelic<=6.0

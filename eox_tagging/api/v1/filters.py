@@ -18,7 +18,7 @@ class TagFilter(filters.FilterSet):
     expiration_date = filters.DateTimeFromToRangeFilter()
     access = filters.CharFilter(method="filter_access_type")
 
-    class Meta:  # pylint: disable=old-style-class, useless-suppression
+    class Meta:
         """Meta class."""
         model = Tag
         fields = ["key", "status", "tag_type", "tag_value"]

@@ -29,7 +29,7 @@ class TagSerializer(serializers.ModelSerializer):
     access = fields.EnumField(enum=AccessLevel, required=False)
     status = fields.EnumField(enum=Status, required=False)
 
-    class Meta:  # pylint: disable=old-style-class, useless-suppression
+    class Meta:
         """Meta class."""
         model = Tag
         fields = ('meta', 'key', 'tag_value', 'tag_type', 'access', 'activation_date', 'expiration_date',

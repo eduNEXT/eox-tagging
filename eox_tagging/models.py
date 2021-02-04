@@ -201,14 +201,14 @@ class Tag(models.Model):
 
     objects = TagQuerySet().as_manager()
 
-    class Meta:  # pylint: disable=old-style-class, useless-suppression
+    class Meta:
         """Meta class. """
         verbose_name = "tag"
         verbose_name_plural = "tags"
         app_label = "eox_tagging"
 
     def __str__(self):
-        return self.tag_value
+        return str(self.tag_value)
 
     @property
     def target_object_type(self):
@@ -308,15 +308,15 @@ class Tag(models.Model):
         self.clean()
         self.clean_fields()
 
-    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
+    def save(self, *args, **kwargs):  # pylint: disable=signature-differs
         self.full_clean()
-        super(Tag, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def delete(self):  # pylint: disable=arguments-differ
         self.inactivated_at = timezone.now()
         self.status = Status.INACTIVE
-        super(Tag, self).save()
+        super().save()
 
     def hard_delete(self):
         """Deletes object from database."""
-        super(Tag, self).delete()
+        super().delete()

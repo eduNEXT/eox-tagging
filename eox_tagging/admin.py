@@ -41,7 +41,7 @@ class TagAdmin(admin.ModelAdmin):
         """
         Custom search to support searching on the tagged objects
         """
-        queryset, use_distinct = super(TagAdmin, self).get_search_results(
+        queryset, use_distinct = super().get_search_results(
             request,
             queryset,
             search_term
@@ -71,7 +71,7 @@ class TagAdmin(admin.ModelAdmin):
         except Exception as error:
             return str(error)
 
-    def add_view(self, request, *args, **kwargs):  # pylint: disable=arguments-differ
+    def add_view(self, request, form_url='', extra_context=None):
         """
         Custom method to handle the specific case of tagging course_keys
 
@@ -106,7 +106,7 @@ class TagAdmin(admin.ModelAdmin):
             request.POST['target_type'] = ContentType.objects.get(model='OpaqueKeyProxyModel').id
             request.POST['target_object_id'] = opaque_key_proxy.id
 
-        return super(TagAdmin, self).add_view(request, *args, **kwargs)
+        return super().add_view(request, form_url='', extra_context=None)
 
 
 admin.site.register(Tag, TagAdmin)

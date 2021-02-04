@@ -2,6 +2,7 @@
 Viewset for Tags.
 """
 from django_filters import rest_framework as filters
+from eox_audit_model.decorators import audit_method
 from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication
 
@@ -35,6 +36,32 @@ class TagViewSet(viewsets.ModelViewSet):
         queryset = self.__get_objects_by_owner(queryset)
 
         return queryset
+
+    def create(self, request, *args, **kwargs):
+        """"Hijack the create method and use a wrapper function to perform the
+        audit process. The original parameters of create are not very useful in
+        raw form, this way we pass more useful information to our wrapper
+        function to be audited
+        """
+
+        @audit_method(action="eox_tagging-api-v1-viewset:tagviewset-create")
+        def audited_create(headers, body):  # pylint: disable=unused-argument
+            return super(TagViewSet, self).create(request, *args, **kwargs)
+
+        return audited_create(headers=request.headers, body=request.data)
+
+    def destroy(self, request, *args, **kwargs):
+        """"Hijack the destroy method and use a wrapper function to perform the
+        audit process. The original parameters of destroy are not very useful in
+        raw form, this way we pass more useful information to our wrapper
+        function to be audited
+        """
+
+        @audit_method(action="eox_tagging-api-v1-viewset:tagviewset-destroy")
+        def audited_destroy(headers, path):  # pylint: disable=unused-argument
+            return super(TagViewSet, self).destroy(request, *args, **kwargs)
+
+        return audited_destroy(headers=request.headers, path=request.path)
 
     def __get_objects_by_status(self, queryset):
         """Method that returns queryset filtered by tag status."""

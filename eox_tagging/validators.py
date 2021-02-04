@@ -29,7 +29,7 @@ except NameError:
 DATETIME_FORMAT_VALIDATION = "%Y-%m-%d %H:%M:%S"
 
 
-class TagValidators(object):
+class TagValidators:
     """ Defines all validator methods.
     """
 
@@ -352,7 +352,7 @@ class TagValidators(object):
         if not field_value:
             raise ValidationError("EOX_TAGGING | The field '{}' is required and must be equal to '{}'."
                                   .format(field, value))
-        elif field_value.lower() != value.lower():
+        if field_value.lower() != value.lower():
             raise ValidationError("EOX_TAGGING | The field '{}' must be equal to '{}'.".format(field, value))
 
     def validate_between(self, field, value):
