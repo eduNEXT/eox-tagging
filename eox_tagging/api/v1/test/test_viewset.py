@@ -147,6 +147,7 @@ class TestTagViewSet(TestCase):
         }
 
         response = self.client.post(self.URL, data, format='json')
+
         owner_type = response.data.get("meta").get("owner_type")
         self.assertEqual(owner_type, "Site")
 
@@ -190,7 +191,6 @@ class TestTagViewSet(TestCase):
     @patch_permissions
     def test_create_tag_with_owner_site(self, _):
         """"Used to test creating a tag with site as owner."""
-
         data = {
             "tag_type": "example_tag_2",
             "tag_value": "example_tag_value",
@@ -202,6 +202,7 @@ class TestTagViewSet(TestCase):
         }
 
         response = self.client.post(self.URL, data, format='json')
+
         owner_type = response.data.get("meta").get("owner_type").lower()
         self.assertEqual(owner_type, "site")
 
@@ -389,9 +390,9 @@ class TestTagViewSet(TestCase):
         self.assertTrue(all(datetimes))
 
     @patch_permissions
-    def test_filter_using_before_datetime(self, _):
+    def test_activation_using_before_filter(self, _):
         """
-        Used to test filtering tags using a range datetime filter. In this case, the filter is
+        Used to test filtering tags using a range datetime filter on activation date. In this case, the filter is
         after a specific datetime.
         """
         query_params = {
@@ -404,9 +405,29 @@ class TestTagViewSet(TestCase):
         response = self.client.get(self.URL, query_params)
 
         results = response.json().get("results")
-        datetimes = [datetime.datetime.strptime(tag.get("activation_date"), datetime_format) < datetime_value
-                     for tag in results]
-        self.assertTrue(all(datetimes))
+        activation_date = [datetime.datetime.strptime(tag.get("activation_date"), datetime_format) < datetime_value
+                           for tag in results]
+        self.assertTrue(all(activation_date))
+
+    @patch_permissions
+    def test_expiration_using_before_filter(self, _):
+        """
+        Used to test filtering tags using a range datetime filter on expiration date. In this case, the filter is
+        after a specific datetime.
+        """
+        query_params = {
+            "expiration_date_before": "2020-10-10 10:20:30",
+            "expiration_date_1": "2020-10-10 10:20:30",
+        }
+        datetime_value = datetime.datetime(2020, 10, 10, 10, 20, 30)
+        datetime_format = "%Y-%m-%dT%H:%M:%SZ"
+
+        response = self.client.get(self.URL, query_params)
+
+        results = response.json().get("results")
+        expiration_date = [datetime.datetime.strptime(tag.get("expiration_date"), datetime_format) < datetime_value
+                           for tag in results]
+        self.assertTrue(all(expiration_date))
 
     @patch_permissions
     def test_soft_delete(self, _):

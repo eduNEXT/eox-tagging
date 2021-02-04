@@ -26,7 +26,7 @@ class TagSerializer(serializers.ModelSerializer):
     owner_type = serializers.CharField(source='owner_object_type', write_only=True, required=False)
     target_type = serializers.CharField(source='target_object_type', write_only=True)
     meta = serializers.SerializerMethodField()
-    access = fields.EnumField(enum=AccessLevel)
+    access = fields.EnumField(enum=AccessLevel, required=False)
     status = fields.EnumField(enum=Status, required=False)
 
     class Meta:  # pylint: disable=old-style-class, useless-suppression

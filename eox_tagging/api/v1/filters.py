@@ -12,38 +12,31 @@ class TagFilter(filters.FilterSet):
 
     course_id = filters.CharFilter(method="filter_by_target_object")
     username = filters.CharFilter(method="filter_by_target_object")
-    enrollments = filters.CharFilter(method="filter_by_target_object")
     target_type = filters.CharFilter(method="filter_target_types")
     created_at = filters.DateTimeFromToRangeFilter()
     activation_date = filters.DateTimeFromToRangeFilter()
+    expiration_date = filters.DateTimeFromToRangeFilter()
     access = filters.CharFilter(method="filter_access_type")
 
     class Meta:  # pylint: disable=old-style-class, useless-suppression
         """Meta class."""
         model = Tag
-        fields = ['key', 'status']
+        fields = ["key", "status", "tag_type", "tag_value"]
 
     def filter_by_target_object(self, queryset, name, value):
         """Filter that returns the tags associated with target."""
         TARGET_TYPES = {
             "course_id": "courseoverview",
             "username": "user",
-            "enrollment": "courseenrollment",
         }
         if value:
-            TARGET_IDENTIFICATION = {
-                "enrollment": {
-                    "username": self.request.user.username,
-                    "course_id": str(value),
-                },
-            }
             DEFAULT = {
-                name: str(value),
+                name: value,
             }
             try:
                 filter_params = {
                     "target_type": TARGET_TYPES.get(name),
-                    "target_id": TARGET_IDENTIFICATION.get(name, DEFAULT),
+                    "target_id": DEFAULT,
                 }
                 queryset = queryset.find_all_tags_for(**filter_params)
             except Exception:  # pylint: disable=broad-except
@@ -52,12 +45,33 @@ class TagFilter(filters.FilterSet):
         return queryset
 
     def filter_target_types(self, queryset, name, value):  # pylint: disable=unused-argument
-        """Filter that returns targets by their type."""
-        if value:
-            try:
-                queryset = queryset.find_all_tags_by_type(str(value))
-            except Exception:  # pylint: disable=broad-except
-                return queryset.none()
+        """
+        Filter that returns targets using their type.
+
+        **SPECIAL CASE**: course enrollments.
+
+        If the user wants to filter by target_type courseenrollment and wants to add filters on
+        user or course, it must pass the following:
+
+            - target_type: if the other arguments are passed this is used to differentiate between
+            course_id from courseoverview and username from user object.
+            - enrollment_course_id (optional)
+            - enrollment_username (optional)
+        """
+        target_id = {}
+
+        if value == "courseenrollment":
+            course_id = self.request.query_params.get("enrollment_course_id")
+            username = self.request.query_params.get("enrollment_username")
+            target_id.update({"username": username, "course_id": course_id})
+
+        try:
+            if any(object_id for object_id in target_id.values()):
+                queryset = queryset.find_all_tags_for(target_type=value, target_id=target_id)
+            elif value:
+                queryset = queryset.find_all_tags_by_type(value)
+        except Exception:  # pylint: disable=broad-except
+            return queryset.none()
 
         return queryset
 

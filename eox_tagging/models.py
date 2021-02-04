@@ -38,7 +38,7 @@ class TagQuerySet(QuerySet):
         """Method used to create tags."""
         target = kwargs.pop("target_object", None)
         if target and target.__class__.__name__ in OPAQUE_KEY_PROXY_MODEL_TARGETS:
-            kwargs['target_object'], _ = OpaqueKeyProxyModel.objects.get_or_create(opaque_key=target.id)
+            kwargs["target_object"], _ = OpaqueKeyProxyModel.objects.get_or_create(opaque_key=target.id)
         else:
             kwargs["target_object"] = target
         instance = self.create(**kwargs)
@@ -59,13 +59,14 @@ class TagQuerySet(QuerySet):
 
     def find_by_owner(self, owner_type, owner_id):
         """Returns all tags owned by owner_id."""
-
         try:
             owner, ctype = self.__get_object_for_this_type(owner_type, owner_id)
         except ObjectDoesNotExist:
             return self.none()
 
-        return self.filter(owner_type=ctype, owner_object_id=owner.id,)
+        owner_ids = list(owner.values_list("id", flat=True))
+
+        return self.filter(owner_type=ctype, owner_object_id__in=owner_ids)
 
     def find_all_tags_for(self, target_type, target_id):
         """Returns all tags defined on an object."""
@@ -76,7 +77,9 @@ class TagQuerySet(QuerySet):
         except ObjectDoesNotExist:
             return self.none()
 
-        return self.filter(target_type=ctype, target_object_id=target.id,)
+        target_ids = list(target.values_list("id", flat=True))
+
+        return self.filter(target_type=ctype, target_object_id__in=target_ids)
 
     def find_all_tags_by_type(self, object_type):
         """Returns all tags with target_type equals to object_type."""
@@ -87,7 +90,10 @@ class TagQuerySet(QuerySet):
         return super(TagQuerySet, self).delete()
 
     def __get_object_for_this_type(self, object_type, object_id):
-        """Function that returns the correct content type given a type."""
+        """
+        Function that given an object type returns the correct content type and a list of objects
+        associated.
+        """
         ctype = ContentType.objects.get(model=object_type)
 
         if object_type == PROXY_MODEL_NAME:
@@ -97,14 +103,20 @@ class TagQuerySet(QuerySet):
             }
 
         if object_type == COURSE_ENROLLMENT_MODEL_NAME:
-            object_id = {
-                "course_id": CourseKey.from_string(object_id.get("course_id")),
-                "user__username": object_id.get("username"),
-            }
 
-        object_instance = ctype.get_object_for_this_type(**object_id)
+            course_id = object_id.get("course_id")
+            username = object_id.get("username")
+            object_id = {}
 
-        return object_instance, ctype
+            if course_id:
+                object_id["course_id"] = CourseKey.from_string(course_id)
+
+            if username:
+                object_id["user__username"] = username
+
+        object_instances = ctype.get_all_objects_for_this_type(**object_id)
+
+        return object_instances, ctype
 
 
 @python_2_unicode_compatible
