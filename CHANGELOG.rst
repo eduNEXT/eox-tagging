@@ -13,6 +13,21 @@ Change Log
 Unreleased
 ----------
 
+[1.2.0] - 2020-02-03
+--------------------
+
+Added
+_______
+
+* Added expiration_date, tag_value and tag_type filters.
+
+Changed
+_______
+
+* Fixed courseenrollments filters and refactor the rest.
+* Removed `required` from access field in serializer.
+
+
 [1.1.0] - 2020-12-16
 --------------------
 
