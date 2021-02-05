@@ -1,4 +1,5 @@
 # Main requirements of your plugin application.
 -c constraints.txt
 
+eox-audit-model
 eox-core

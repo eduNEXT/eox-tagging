@@ -6,10 +6,8 @@ from __future__ import unicode_literals
 from .common import *  # pylint: disable=wildcard-import
 
 
-class SettingsClass(object):
+class SettingsClass:
     """ dummy settings class """
-
-    pass
 
 
 SETTINGS = SettingsClass()

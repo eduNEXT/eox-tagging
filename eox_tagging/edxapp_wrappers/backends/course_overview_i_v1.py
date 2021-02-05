@@ -7,7 +7,7 @@ openedx.core.djangoapps.content.course_overviews.
 def get_course_overview():
     """Backend to get course overview."""
     try:
-        from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+        from openedx.core.djangoapps.content.course_overviews.models import CourseOverview  # pylint: disable=import-outside-toplevel
     except ImportError:
         CourseOverview = object
     return CourseOverview
