@@ -12,8 +12,11 @@ Change Log
 
 Unreleased
 ----------
+Added
+-----
+* Swagger support alongside REST API documentation
 
-[1.2.0] - 2020-02-03
+[1.2.0] - 2021-02-03
 --------------------
 
 Added
