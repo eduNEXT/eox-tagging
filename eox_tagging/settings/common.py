@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'eox_tagging',
 ]
 
+EOX_AUDIT_MODEL_APP = 'eox_audit_model.apps.EoxAuditModelConfig'
 
 ROOT_URLCONF = 'eox_tagging.urls'
 
@@ -54,3 +55,5 @@ def plugin_settings(settings):
     settings.DATA_API_DEF_PAGE_SIZE = 1000
     settings.DATA_API_MAX_PAGE_SIZE = 5000
     settings.EOX_TAGGING_BEARER_AUTHENTICATION = 'eox_tagging.edxapp_wrappers.backends.bearer_authentication_i_v1'
+    if hasattr(settings, 'INSTALLED_APPS') and EOX_AUDIT_MODEL_APP not in settings.INSTALLED_APPS:
+        settings.INSTALLED_APPS.append(EOX_AUDIT_MODEL_APP)
