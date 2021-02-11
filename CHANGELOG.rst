@@ -13,6 +13,13 @@ Change Log
 Unreleased
 ----------
 
+[2.0.1] - 2021-02-11
+--------------------
+
+Fix
+~~~
+* Fix eox-audit-model dependency in the settings
+
 [2.0.0] - 2021-02-10
 --------------------
 
