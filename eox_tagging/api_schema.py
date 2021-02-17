@@ -40,15 +40,17 @@ api_info = make_api_info(
     version="v1",
     email=" contact@edunext.co",
     description=internal_utils.dedent("""\
-    eox tagging REST API
+    **eox tagging REST API**
 
-    eox Tagging provides the ability to apply a simple label to certain objects \
-    (courses, enrollments and users). The label or tag includes a timestamp for \
-    when the tag is should be considered active, as well as fields to include \
-    the general category of the tag (tag_type) and a value belonging to that \
-    category (tag_value).
+    eox-tagging is a small plugin that provides the ability to ‘tag’ or label\
+    certain objects of the Open edX platform (Courses, Course Enrollments,\
+    Users). The tag contains the object that is being tagged, its identifier, a\
+    ‘tag_type’ indicating the set of values the tag can have and ‘tag_value’\
+    which holds a value of type ‘tag_type’. Additionally one can provide extra\
+    info such as: Access level, or timestamps for when the tag should be considered\
+    active. \
 
-    eox tagging is meant to be a lightweight plugin with emphasis on flexibility\
+    eox tagging is meant to be a lightweight plugin with emphasis on flexibility,\
     most of the logic regarding the deactivation of tags at a given time must be\
     handled separately.
     """),
