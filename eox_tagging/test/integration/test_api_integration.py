@@ -10,26 +10,24 @@ from unittest import skipUnless
 
 import requests
 from django.test import SimpleTestCase
+from django.urls import reverse
 from rest_framework import status
 
 
 @skipUnless(environ.get("TEST_INTEGRATION"), "integration")
 class TagTestCase(SimpleTestCase):  # pragma: no cover
-    """Test suite"""
+    """Test suite."""
 
     @classmethod
     def setUpClass(cls):
-        """
-        Initialize data fixtures
-        """
-
+        """Initialize data fixtures."""
         with open("eox_tagging/test/integration/test_data.json") as file:
             cls.data = json.load(file)
 
         base_url = cls.data["base_url"]
-        endpoint = "/eox-tagging/api/v1/tags/"
+        endpoint = reverse("tag-list")
 
-        cls.url = "{}{}".format(base_url, endpoint)
+        cls.url = "{}/eox-tagging{}".format(base_url, endpoint)
         cls.session = requests.Session()
         cls.session.headers.update(
             {
@@ -71,31 +69,23 @@ class TagTestCase(SimpleTestCase):  # pragma: no cover
 
     @classmethod
     def tearDownClass(cls):
-        """
-        Deactive tags created by tests
-        """
+        """Deactive tags created by tests."""
         for tag_id in cls.tear_down_tags_ids:
             delete_tag(cls.session, cls.url, tag_id)
 
     def test_read_list_tag(self):
-        """
-        Test the tag list view
-        """
-
+        """Test the tag list view."""
         response = self.session.get(self.url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("count", response.json())
 
     def test_read_detail_tag(self):
-        """
-        Test the tag detail view
-        """
-        id_ = self.read_test_tag_id
-        url = "{}{}/".format(self.url, id_)
-
+        """Test the tag detail view."""
+        tag_id = self.read_test_tag_id
+        url = "{}{}/".format(self.url, tag_id)
         expected_response = {
-            "key": id_,
+            "key": tag_id,
             "tag_value": self.tags_data[0]["tag_value"],
             "tag_type": self.tags_data[0]["tag_type"],
             "access": "PUBLIC",
@@ -110,49 +100,44 @@ class TagTestCase(SimpleTestCase):  # pragma: no cover
         self.assertDictContainsSubset(expected_response, response.json())
 
     def test_create_tag_user(self):
-        """
-        Test tag creation for target=user
-        """
+        """Test tag creation for target=user."""
         response = self.session.post(self.url, self.tags_data[0])
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.text)
 
         self.tear_down_tags_ids.append(response.json()["key"])
 
     def test_create_tag_course(self):
-        """
-        Test tag creation for target=course
-        """
+        """Test tag creation for target=course."""
         response = self.session.post(self.url, self.tags_data[1])
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.text)
 
         self.tear_down_tags_ids.append(response.json()["key"])
 
     def test_create_tag_enrollment(self):
-        """
-        Test tag creation for target=enrollment
-        """
+        """Test tag creation for target=enrollment."""
         response = self.session.post(self.url, self.tags_data[2])
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.text)
 
         self.tear_down_tags_ids.append(response.json()["key"])
 
     def test_create_tag_fail_validation(self):
-        """
-        Test creation denial due to validation
-        """
+        """Test creation denial due to validation."""
         data = self.tags_data[0].copy()
         data["access"] = "PRIVATE"
+
         response = self.session.post(self.url, data)
+
         self.assertEqual(
             response.status_code, status.HTTP_400_BAD_REQUEST, response.text
         )
 
     def test_delete_tag(self):
-        """
-        Test tag deletion
-        """
-        id_ = self.delete_test_tag_id
-        url = "{}{}/".format(self.url, id_)
+        """Test tag deletion."""
+        tag_id = self.delete_test_tag_id
+        url = "{}{}/".format(self.url, tag_id)
 
         response = self.session.delete(url)
 
@@ -160,14 +145,14 @@ class TagTestCase(SimpleTestCase):  # pragma: no cover
 
 
 def create_tag(session, url, tag_data):
-    """Auxiliary function to create tags"""
+    """Auxiliary function to create tags."""
     response = session.post(url, data=tag_data)
     response.raise_for_status()
     return response.json()["key"]
 
 
 def delete_tag(session, url, tag_id):
-    """Auxiliary function to delete tags"""
+    """Auxiliary function to delete tags."""
     url = "{}{}/".format(url, tag_id)
     response = session.delete(url)
     response.raise_for_status()
