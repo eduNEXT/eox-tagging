@@ -11,12 +11,12 @@ Running
 
 The integration test are skipped by default due to them requiring specific
 users, courses and enrollments to be registered on the data base. Once
-properly configured the test can be run by setting an environment variable
-``TEST_INTEGRATION````
+properly configured the test can be run by setting the environment variables
+``TEST_INTEGRATION`` and ``TEST_DATA``.
 
 .. code-block:: console
 
-    $ TEST_INTEGRATION=true make python-test
+    $ TEST_INTEGRATION=true TEST_DATA='{...}'make python-test
 
 Configuration
 --------------
@@ -45,7 +45,7 @@ The site where the test are going to be run must have the following configuratio
         }
   ]
 
-The file `test_data.json` must be modified to include the following data
+The variable ``TEST_DATA`` must be contain a string with the following data.
 
 .. code-block:: json
     {

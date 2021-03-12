@@ -21,9 +21,7 @@ class TagTestCase(SimpleTestCase):  # pragma: no cover
     @classmethod
     def setUpClass(cls):
         """Initialize data fixtures."""
-        with open("eox_tagging/test/integration/test_data.json") as file:
-            cls.data = json.load(file)
-
+        cls.data = json.loads(environ.get("TEST_DATA"))
         base_url = cls.data["base_url"]
         endpoint = reverse("tag-list")
 
