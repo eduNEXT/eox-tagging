@@ -204,10 +204,10 @@ class TagViewSet(viewsets.ModelViewSet):
         """
 
         @audit_method(action="eox_tagging-api-v1-viewset:tagviewset-create")
-        def audited_create(headers, body):  # pylint: disable=unused-argument
+        def audited_create(body):  # pylint: disable=unused-argument
             return super(TagViewSet, self).create(request, *args, **kwargs)
 
-        return audited_create(headers=request.headers, body=request.data)
+        return audited_create(body=request.data)
 
     def destroy(self, request, *args, **kwargs):
         """Hijack the destroy method and use a wrapper function to perform the
