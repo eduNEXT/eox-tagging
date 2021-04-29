@@ -13,6 +13,13 @@ Change Log
 Unreleased
 ----------
 
+[2.1.0] - 2021-04-29
+--------------------
+
+Fix
+~~~
+* Removed headers in audited method.
+
 [2.0.1] - 2021-02-11
 --------------------
 
