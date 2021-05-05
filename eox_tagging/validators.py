@@ -14,24 +14,15 @@ from eox_core.edxapp_wrapper.enrollments import get_enrollment
 from eox_core.edxapp_wrapper.users import get_edxapp_user
 from opaque_keys import InvalidKeyError  # pylint: disable=ungrouped-imports, useless-suppression
 
-log = logging.getLogger(__name__)
+from eox_tagging.edxapp_wrappers.course_overview import CourseOverview
 
-try:
-    from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-except ImportError:
-    CourseOverview = object  # pylint: disable=ungrouped-imports, useless-suppression
-try:
-    # Python 2: "unicode" is built-in
-    unicode  # pylint: disable=undefined-variable, useless-suppression
-except NameError:
-    unicode = str  # pylint: disable=redefined-builtin, useless-suppression
+log = logging.getLogger(__name__)
 
 DATETIME_FORMAT_VALIDATION = "%Y-%m-%d %H:%M:%S"
 
 
 class TagValidators:
-    """ Defines all validator methods.
-    """
+    """ Defines all validator methods."""
 
     def __init__(self, instance):
         """
@@ -235,7 +226,7 @@ class TagValidators:
         object_ = self.instance.get_attribute(object_name)
         data = {
             "username": object_.username,
-            "course_id": unicode(object_.course_id),
+            "course_id": str(object_.course_id),
         }
         try:
             enrollment, _ = get_enrollment(**data)
