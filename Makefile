@@ -42,10 +42,6 @@ upgrade: ## update the requirements/*.txt files with the latest packages satisfy
 	$(PIP_COMPILE) -o requirements/test.txt requirements/test.in
 	$(PIP_COMPILE) -o requirements/tox.txt requirements/tox.in
 	$(PIP_COMPILE) -o requirements/docs.txt requirements/docs.in
-	# Let tox control the Django, and django-filter version for tests
-	grep -e "^django==" -e "^django-filter==" requirements/test.txt > requirements/django.txt
-	sed '/^[dD]jango==/d;/^django-filter==/d' requirements/test.txt > requirements/test.tmp
-	mv requirements/test.tmp requirements/test.txt
 
 test-python: clean ## Run test suite.
 	$(TOX) pip install -r requirements/test.txt --exists-action w

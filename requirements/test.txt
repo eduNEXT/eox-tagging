@@ -63,6 +63,11 @@ django-fake-model==0.1.4
     #   -r requirements/base.txt
     #   -r requirements/test.in
     #   eox-core
+django-filter==2.4.0
+    # via
+    #   -r requirements/base.txt
+    #   -r requirements/test.in
+    #   eox-core
 django-ipware==2.1.0
     # via
     #   -c requirements/constraints.txt
@@ -94,6 +99,26 @@ django-webpack-loader==0.7.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
+    # via
+    #   -r requirements/base.txt
+    #   -r requirements/test.in
+    #   django-crum
+    #   django-filter
+    #   django-model-utils
+    #   django-oauth-toolkit
+    #   drf-jwt
+    #   drf-yasg
+    #   edx-api-doc-tools
+    #   edx-django-utils
+    #   edx-drf-extensions
+    #   edx-opaque-keys
+    #   edx-proctoring
+    #   edx-when
+    #   eox-audit-model
+    #   event-tracking
+    #   jsonfield2
+    #   rest-condition
+django==2.2.21
     # via
     #   -r requirements/base.txt
     #   -r requirements/test.in
