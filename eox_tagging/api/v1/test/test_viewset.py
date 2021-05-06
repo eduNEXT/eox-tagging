@@ -1,5 +1,6 @@
 """ Test classes for Tags viewset. """
 import datetime
+from functools import wraps
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -12,6 +13,16 @@ from rest_framework.test import APIClient
 from eox_tagging.api.v1.serializers import TagSerializer
 from eox_tagging.constants import AccessLevel
 from eox_tagging.models import Tag
+
+
+def mock_decorator(action=None):  # pylint: disable=unused-argument
+    """Utility decorator that returns same function."""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
 
 
 @override_settings(
@@ -44,11 +55,14 @@ from eox_tagging.models import Tag
 class TestTagViewSet(TestCase):
     """Test class for tags viewset."""
 
-    patch_permissions = patch("eox_tagging.api.v1.permissions.EoxTaggingAPIPermission.has_permission",
-                              return_value=True)
+    patch_permissions = patch(
+        "eox_tagging.api.v1.permissions.EoxTaggingAPIPermission.has_permission",
+        return_value=True,
+    )
+    patch("eox_tagging.api.v1.viewset.audit_method", mock_decorator).start()
 
     def setUp(self):
-        """ Model setup used to create objects used in tests."""
+        """Model setup used to create objects used in tests."""
         self.target_object = User.objects.create(username="user_test")
         self.owner_site = Site.objects.get(id=settings.TEST_SITE)
 
