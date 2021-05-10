@@ -1,13 +1,12 @@
 """
-Backend CourseOverview file, here are all the methods from
-openedx.core.djangoapps.content.course_overviews.
+Backend for course enrollments valid for lilac release.
 """
 
 
 def get_enrollment_object():
-    """Backend to get course overview."""
+    """Backend to get course enrollment."""
     try:
-        from openedx.core.djangoapps.content.course_overviews.models import CourseOverview  # pylint: disable=import-outside-toplevel
+        from common.djangoapps.student.models import CourseEnrollment  # pylint: disable=import-outside-toplevel
     except ImportError:
-        CourseOverview = object
-    return CourseOverview
+        CourseEnrollment = object
+    return CourseEnrollment
