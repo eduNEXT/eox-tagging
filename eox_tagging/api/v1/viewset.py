@@ -124,6 +124,11 @@ from eox_tagging.models import Tag
             "Shortcut to filter objects of target_type `user` with id `username`.",
         ),
         query_parameter(
+            "owner_type",
+            str,
+            "Shortcut to filter objects of owner_type `user` or `site`.",
+        ),
+        query_parameter(
             "target_type",
             str,
             "The type of the object that was tagged, one of: `course`, `courseenrollment`, `user`",
