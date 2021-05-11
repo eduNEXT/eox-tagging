@@ -131,7 +131,8 @@ from eox_tagging.models import Tag
         query_parameter(
             "target_type",
             str,
-            "The type of the object that was tagged, one of: `course`, `courseenrollment`, `user`",
+            "The type of the object that was tagged, one of: `course (opaquekeyproxymodel)`"
+            ", `courseenrollment`, `user`",
         ),
         query_parameter(
             "enrollment_username",
