@@ -4,14 +4,16 @@ Test classes for Tags model
 import datetime
 
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.test import TestCase, override_settings
 from django.utils import timezone
+from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 
 from eox_tagging.constants import AccessLevel
-from eox_tagging.models import Tag
+from eox_tagging.models import OpaqueKeyProxyModel, Tag, TagQuerySet
 
 
 @override_settings(
@@ -504,3 +506,116 @@ class TestTag(TestCase):
         Tag.objects.delete()
 
         self.assertFalse(Tag.objects.active())
+
+
+class TestTagQuerysetManager(TestCase):
+    """
+    Test cases for queryset used as tag manager. This test cases are focused to
+    check how the method behaves with objects like CourseOverview and CourseEnrollment.
+    """
+
+    def setUp(self):
+        self.tagQueryset = TagQuerySet()
+        self.course_id = "course-v1:edX+DemoX+Demo_Course"
+
+    @patch.object(OpaqueKeyProxyModel, 'objects')
+    def test_create_tag_with_course(self, opaque_objects_mock):
+        """Test tagging a course using TagQueryset manager."""
+        self.tagQueryset.create = Mock()
+        course_mock = Mock()
+        opaque_mock = Mock()
+        opaque_objects_mock.get_or_create.return_value = opaque_mock, Mock()
+        course_mock.__class__.__name__ = "CourseOverview"
+        kwargs = {
+            "target_object": course_mock,
+        }
+
+        self.tagQueryset.create_tag(**kwargs)
+
+        self.tagQueryset.create.called_once_with(target_object=opaque_mock)
+
+    # pylint: disable=protected-access
+    @patch.object(TagQuerySet, '_get_object_for_this_type')
+    def test_find_all_tags_for_course(self, _get_object_for_this_type):
+        """Test getting tags with course as target."""
+        target_type, target_id = "CourseOverview", 1
+        target, target_ctype = Mock(), Mock()
+        _get_object_for_this_type.return_value = target, target_ctype
+        self.tagQueryset.filter = Mock()
+        target.values_list.return_value = [1]
+
+        self.tagQueryset.find_all_tags_for(target_type, target_id)
+
+        _get_object_for_this_type.assert_called_once_with(
+            "opaquekeyproxymodel",
+            target_id
+        )
+        self.tagQueryset.filter.assert_called_once_with(
+            target_type=target_ctype,
+            target_object_id__in=[1],
+        )
+
+    @patch.object(ContentType, 'objects')
+    def test_get_objects_for_type_user(self, content_type_mock):
+        """Test getting courses associated with tags."""
+        ctype_object = Mock()
+        content_type_mock.get.return_value = ctype_object
+        object_type, object_id = "User", {
+            "username": "username",
+        }
+
+        self.tagQueryset._get_object_for_this_type(  # pylint: disable=protected-access
+            object_type,
+            object_id,
+        )
+
+        content_type_mock.get.assert_called_once_with(model=object_type)
+        ctype_object.get_all_objects_for_this_type.assert_called_once_with(
+            username="username",
+        )
+
+    @patch.object(ContentType, 'objects')
+    def test_get_objects_for_type_course(self, content_type_mock):
+        """Test getting courses associated with tags."""
+        ctype_object = Mock()
+        content_type_mock.get.return_value = ctype_object
+        object_type, object_id = "OpaqueKeyProxyModel", {
+            "course_id": self.course_id,
+        }
+        object_id_modified = {
+            "opaque_key": CourseKey.from_string(self.course_id),
+        }
+
+        self.tagQueryset._get_object_for_this_type(  # pylint: disable=protected-access
+            object_type,
+            object_id,
+        )
+
+        content_type_mock.get.assert_called_once_with(model=object_type)
+        ctype_object.get_all_objects_for_this_type.assert_called_once_with(
+            **object_id_modified
+        )
+
+    @patch.object(ContentType, 'objects')
+    def test_get_objects_for_type_enrollment(self, content_type_mock):
+        """Test getting enrollments associated with tags."""
+        ctype_object = Mock()
+        content_type_mock.get.return_value = ctype_object
+        object_type, object_id = "CourseEnrollment", {
+            "course_id": self.course_id,
+            "username": "username",
+        }
+        object_id_modified = {
+            "course_id": CourseKey.from_string(self.course_id),
+            "user__username": "username",
+        }
+
+        self.tagQueryset._get_object_for_this_type(   # pylint: disable=protected-access
+            object_type,
+            object_id,
+        )
+
+        content_type_mock.get.assert_called_once_with(model=object_type)
+        ctype_object.get_all_objects_for_this_type.assert_called_once_with(
+            **object_id_modified
+        )
