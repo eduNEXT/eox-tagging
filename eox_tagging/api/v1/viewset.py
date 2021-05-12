@@ -217,10 +217,10 @@ class TagViewSet(viewsets.ModelViewSet):
         """
 
         @audit_method(action="eox_tagging-api-v1-viewset:tagviewset-destroy")
-        def audited_destroy(headers, path):  # pylint: disable=unused-argument
+        def audited_destroy(path):  # pylint: disable=unused-argument
             return super(TagViewSet, self).destroy(request, *args, **kwargs)
 
-        return audited_destroy(headers=request.headers, path=request.path)
+        return audited_destroy(path=request.path)
 
     def __get_objects_by_status(self, queryset):
         """Method that returns queryset filtered by tag status."""
