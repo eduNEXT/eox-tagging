@@ -23,7 +23,7 @@ from eox_tagging.validators import TagValidators
 log = logging.getLogger(__name__)
 
 OPAQUE_KEY_PROXY_MODEL_TARGETS = [
-    "CourseOverview",
+    "courseoverview",
 ]
 
 PROXY_MODEL_NAME = "opaquekeyproxymodel"
@@ -37,7 +37,7 @@ class TagQuerySet(QuerySet):
     def create_tag(self, **kwargs):
         """Method used to create tags."""
         target = kwargs.pop("target_object", None)
-        if target and target.__class__.__name__ in OPAQUE_KEY_PROXY_MODEL_TARGETS:
+        if target and target.__class__.__name__.lower() in OPAQUE_KEY_PROXY_MODEL_TARGETS:
             kwargs["target_object"], _ = OpaqueKeyProxyModel.objects.get_or_create(opaque_key=target.id)
         else:
             kwargs["target_object"] = target
@@ -60,7 +60,7 @@ class TagQuerySet(QuerySet):
     def find_by_owner(self, owner_type, owner_id):
         """Returns all tags owned by owner_id."""
         try:
-            owner, ctype = self.__get_object_for_this_type(owner_type, owner_id)
+            owner, ctype = self._get_object_for_this_type(owner_type, owner_id)
         except ObjectDoesNotExist:
             return self.none()
 
@@ -70,10 +70,10 @@ class TagQuerySet(QuerySet):
 
     def find_all_tags_for(self, target_type, target_id):
         """Returns all tags defined on an object."""
-        target_type = PROXY_MODEL_NAME if target_type in OPAQUE_KEY_PROXY_MODEL_TARGETS else target_type
+        target_type = PROXY_MODEL_NAME if target_type.lower() in OPAQUE_KEY_PROXY_MODEL_TARGETS else target_type
 
         try:
-            target, ctype = self.__get_object_for_this_type(target_type, target_id)
+            target, ctype = self._get_object_for_this_type(target_type, target_id)
         except ObjectDoesNotExist:
             return self.none()
 
@@ -89,20 +89,20 @@ class TagQuerySet(QuerySet):
         """ Method for deleting Tag objects"""
         return super(TagQuerySet, self).delete()
 
-    def __get_object_for_this_type(self, object_type, object_id):
+    def _get_object_for_this_type(self, object_type, object_id):
         """
         Function that given an object type returns the correct content type and a list of objects
         associated.
         """
         ctype = ContentType.objects.get(model=object_type)
 
-        if object_type == PROXY_MODEL_NAME:
+        if object_type.lower() == PROXY_MODEL_NAME:
             object_id = object_id.get("course_id")
             object_id = {
                 "opaque_key": CourseKey.from_string(object_id),
             }
 
-        if object_type == COURSE_ENROLLMENT_MODEL_NAME:
+        if object_type.lower() == COURSE_ENROLLMENT_MODEL_NAME:
 
             course_id = object_id.get("course_id")
             username = object_id.get("username")
