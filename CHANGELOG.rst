@@ -13,6 +13,9 @@ Change Log
 Unreleased
 ----------
 
+[2.2.0] - 2021-05-13
+--------------------
+
 Added
 ~~~~~
 * Lilac compatibility.
