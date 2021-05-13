@@ -13,6 +13,14 @@ Change Log
 Unreleased
 ----------
 
+Added
+~~~~~
+* Lilac compatibility.
+
+Fix
+~~~
+* Removed headers in audited destroy method.
+
 [2.1.0] - 2021-04-29
 --------------------
 
