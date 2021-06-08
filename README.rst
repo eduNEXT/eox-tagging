@@ -290,6 +290,11 @@ Filters example usage:
 
 ``/eox_tagging/api/v1/tags/?enrollments=COURSE_ID``
 
-##Contributing
+How to Contribute
+=================
 
-Add your contribution policy. (If required)
+Contributions are welcome! See our `CONTRIBUTING`_ file for more
+information – it also contains guidelines for how to maintain high code
+quality, which will make your contribution more likely to be accepted.
+
+.. _CONTRIBUTING: https://github.com/eduNEXT/eox-tagging/blob/master/CONTRIBUTING.rst
