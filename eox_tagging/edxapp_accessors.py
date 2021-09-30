@@ -3,12 +3,14 @@ import crum
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.core.exceptions import ValidationError
+from eox_core.edxapp_wrapper.certificates import get_generated_certificate
 from eox_core.edxapp_wrapper.users import get_edxapp_user
 from opaque_keys.edx.keys import CourseKey
 
 from eox_tagging.edxapp_wrappers.course_overview import CourseOverview
 from eox_tagging.edxapp_wrappers.enrollments import CourseEnrollment
+
+GeneratedCertificate = get_generated_certificate()
 
 
 def get_user(**kwargs):
@@ -55,17 +57,30 @@ def get_course_enrollment(**kwargs):
     return CourseEnrollment.objects.get(user_id=user.id, course_id=course_id)
 
 
-def get_object(related_object_type, **kwargs):
-    """Helper function to get objects using RELATED_FIELDS dictionary."""
-    RELATED_OBJECTS = {
+def get_certificate(**kwargs):
+    """
+    Get GeneratedCertificate for specified id, key download URL or the course_id
+    and username associated with it.
+    """
+    target_id = {}
+    verify_uuid = kwargs.get("target_id")
+    if verify_uuid:
+        target_id["verify_uuid"] = kwargs.get("target_id")
+    else:
+        target_id["user__username"] = kwargs.get("username")
+        target_id["course_id"] = CourseKey.from_string(kwargs.get("course_id"))
+
+    return GeneratedCertificate.objects.get(**target_id)
+
+
+def get_object_from_edxapp(object_type, **kwargs):
+    """Helper function to get objects from edx-platfrom given its identifiers."""
+    related_objects = {
         "user": get_user,
         "courseoverview": get_course,
         "site": get_site,
         "courseenrollment": get_course_enrollment,
+        "generatedcertificate": get_certificate,
     }
-    try:
-        related_object = RELATED_OBJECTS.get(related_object_type.lower())(**kwargs)
-    except Exception:
-        raise ValidationError("This field is required.")
-
-    return related_object
+    related_object = related_objects.get(object_type.lower())
+    return related_object(**kwargs)

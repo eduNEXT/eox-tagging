@@ -10,6 +10,7 @@ import six
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from eox_core.edxapp_wrapper.certificates import get_generated_certificate
 from eox_core.edxapp_wrapper.enrollments import get_enrollment
 from eox_core.edxapp_wrapper.users import get_edxapp_user
 from opaque_keys import InvalidKeyError  # pylint: disable=ungrouped-imports, useless-suppression
@@ -19,6 +20,7 @@ from eox_tagging.edxapp_wrappers.course_overview import CourseOverview
 log = logging.getLogger(__name__)
 
 DATETIME_FORMAT_VALIDATION = "%Y-%m-%d %H:%M:%S"
+GeneratedCertificate = get_generated_certificate()
 
 
 class TagValidators:
@@ -36,6 +38,7 @@ class TagValidators:
             'OpaqueKeyProxyModel': self.__validate_proxy_model,
             'CourseEnrollment': self.__validate_enrollment_integrity,
             'Site': self.__validate_site_integrity,
+            'GeneratedCertificate': self.__validate_certificate_integrity,
         }
         self.__configuration_types = {
             "in": list,
@@ -250,6 +253,20 @@ class TagValidators:
             Site.objects.get(id=site_id)
         except ObjectDoesNotExist:
             raise ValidationError("EOX_TAGGING | Site '{}' does not exist".format(site_id))
+
+    def __validate_certificate_integrity(self, object_name):
+        """
+        Function that validates existence of the certificate object.
+
+        Arguments:
+            - object_name: name of the object to validate.
+        """
+        certificate_id = self.instance.get_attribute(object_name).id
+
+        try:
+            GeneratedCertificate.objects.get(id=certificate_id)
+        except ObjectDoesNotExist:
+            raise ValidationError("EOX_TAGGING | Certificate '{}' does not exist".format(certificate_id))
 
     # Other validations
     def validate_no_updating(self):

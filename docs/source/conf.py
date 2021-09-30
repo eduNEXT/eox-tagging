@@ -14,9 +14,11 @@
 #
 import os
 import sys
+
+import eox_tagging
+
 sys.path.insert(0, os.path.abspath('../..'))
 oath = sys.path
-import eox_tagging
 
 # -- Project information -----------------------------------------------------
 

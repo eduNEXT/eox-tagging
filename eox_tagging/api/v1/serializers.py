@@ -1,20 +1,18 @@
 """
 Serializers for tags and related objects.
 """
-import re
-
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from eox_tagging.api.v1 import fields
 from eox_tagging.constants import AccessLevel, Status
-from eox_tagging.edxapp_accessors import get_object, get_site
+from eox_tagging.edxapp_accessors import get_object_from_edxapp, get_site
 from eox_tagging.models import Tag
 
-PROXY_MODEL_NAME = "opaquekeyproxymodel"
 MODELS_WITH_COMPOUND_KEYS = {
-    "courseenrollment": ["username", "course_id"],  # Compound keys
+    "courseenrollment": ["username", "course_id"],
+    "generatedcertificate": ["username", "course_id"],
 }
 
 
@@ -46,11 +44,8 @@ class TagSerializer(serializers.ModelSerializer):
             "inactivated_at": instance.inactivated_at,
         }
 
-    # Validation and creation of tags
     def create(self, validated_data):
         """Function that creates a Tag instance."""
-
-        # Finding target and owner objects
         target_object = None
         owner_object = None
         target_type = validated_data.pop("target_object_type")
@@ -58,14 +53,14 @@ class TagSerializer(serializers.ModelSerializer):
         target = validated_data.pop("target_object", None)
 
         if target_type and target_type.lower() in MODELS_WITH_COMPOUND_KEYS:
-            data = self.__convert_compound_keys(target, target_type)
+            data = self._convert_compound_keys(target, target_type.lower())
         else:
             data = {
                 "target_id": target,
             }
 
         try:
-            target_object = get_object(target_type, **data)
+            target_object = get_object_from_edxapp(target_type, **data)
         except Exception:
             raise serializers.ValidationError({"Target": _("Error getting {} object."
                                                .format(target_type))})
@@ -75,7 +70,6 @@ class TagSerializer(serializers.ModelSerializer):
         else:
             owner_object = get_site()
 
-        # Set objects
         tag_object = {
             "target_object": target_object,
             "owner_object": owner_object,
@@ -87,11 +81,16 @@ class TagSerializer(serializers.ModelSerializer):
         except ValidationError as e:
             raise serializers.ValidationError({"Tag": _("{}".format(e.message))})
 
-    def __convert_compound_keys(self, ids, object_type):
+    @staticmethod
+    def _convert_compound_keys(ids, object_type):
         """
         Function that converts strings with format: `key1: key2` into a dictionary.
         """
-        target_id = re.split(r':\s', ids)
+        target_id = ids.replace(" ", "").split(":", 1)
+        if len(target_id) == 1:
+            return {
+                "target_id": ids,
+            }
         target_labels = MODELS_WITH_COMPOUND_KEYS.get(object_type)
         target_pairs = zip(target_labels, target_id)
         return dict(target_pairs)

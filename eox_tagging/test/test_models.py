@@ -534,7 +534,6 @@ class TestTagQuerysetManager(TestCase):
 
         self.tagQueryset.create.called_once_with(target_object=opaque_mock)
 
-    # pylint: disable=protected-access
     @patch.object(TagQuerySet, '_get_object_for_this_type')
     def test_find_all_tags_for_course(self, _get_object_for_this_type):
         """Test getting tags with course as target."""
