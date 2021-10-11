@@ -13,6 +13,9 @@ Change Log
 Unreleased
 ----------
 
+[2.3.0] - 2021-10-11
+--------------------
+
 Added
 ~~~~~
 * Support for tagging Certificate objects.
