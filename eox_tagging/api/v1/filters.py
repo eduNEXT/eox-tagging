@@ -7,7 +7,18 @@ from django_filters import rest_framework as filters
 from eox_tagging.constants import AccessLevel
 from eox_tagging.models import Tag
 
-PROXY_MODEL_NAME = "opaquekeyproxymodel"
+FILTER_TARGET_MAPPING = {
+    "course_id": {
+        "object": "courseoverview",
+    },
+    "username": {
+        "object": "user",
+    },
+    "certificate_verify_uuid": {
+        "object": "generatedcertificate",
+        "target_id": "verify_uuid",
+    }
+}
 
 
 class TagFilter(filters.FilterSet):
@@ -15,6 +26,7 @@ class TagFilter(filters.FilterSet):
 
     course_id = filters.CharFilter(method="filter_by_target_object")
     username = filters.CharFilter(method="filter_by_target_object")
+    certificate_verify_uuid = filters.CharFilter(method="filter_by_target_object")
     target_type = filters.CharFilter(method="filter_target_types")
     created_at = filters.DateTimeFromToRangeFilter()
     activation_date = filters.DateTimeFromToRangeFilter()
@@ -28,20 +40,23 @@ class TagFilter(filters.FilterSet):
 
     def filter_by_target_object(self, queryset, name, value):
         """Filter that returns the tags associated with target."""
-        TARGET_TYPES = {
-            "course_id": "courseoverview",
-            "username": "user",
-        }
         if value:
-            DEFAULT = {
-                name: value,
+
+            filter_target = FILTER_TARGET_MAPPING.get(name)
+            target_id_name = filter_target.get("target_id")
+            name = target_id_name if target_id_name else name
+
+            filter_params = {
+                "target_type": filter_target.get("object"),
+                "target_id": {
+                    name: value,
+                },
             }
+
             try:
-                filter_params = {
-                    "target_type": TARGET_TYPES.get(name),
-                    "target_id": DEFAULT,
-                }
-                queryset = queryset.find_all_tags_for(**filter_params)
+                queryset = queryset.find_all_tags_for(
+                    **filter_params
+                )
             except Exception:  # pylint: disable=broad-except
                 return queryset.none()
 
@@ -51,22 +66,33 @@ class TagFilter(filters.FilterSet):
         """
         Filter that returns targets using their type.
 
-        **SPECIAL CASE**: course enrollments.
+        **SPECIAL CASE**: course enrollments/generated certificate.
 
-        If the user wants to filter by target_type courseenrollment and wants to add filters on
+        If the user wants to filter by target_type courseenrollment/generatedcertificate and wants to add filters on
         user or course, it must pass the following:
 
             - target_type: if the other arguments are passed this is used to differentiate between
             course_id from courseoverview and username from user object.
+            Case Course Enrollment
             - enrollment_course_id (optional)
             - enrollment_username (optional)
+            Case Generated Certificate
+            - certificate_course_id (optional)
+            - certificate_username (optional)
         """
         target_id = {}
+        username = None
+        course_id = None
 
         if value == "courseenrollment":
             course_id = self.request.query_params.get("enrollment_course_id")
             username = self.request.query_params.get("enrollment_username")
-            target_id.update({"username": username, "course_id": course_id})
+
+        elif value == "generatedcertificate":
+            course_id = self.request.query_params.get("certificate_course_id")
+            username = self.request.query_params.get("certificate_username")
+
+        target_id.update({"username": username, "course_id": course_id})
 
         try:
             if any(object_id for object_id in target_id.values()):

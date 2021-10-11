@@ -28,8 +28,6 @@ OPAQUE_KEY_PROXY_MODEL_TARGETS = [
 
 PROXY_MODEL_NAME = "opaquekeyproxymodel"
 
-COURSE_ENROLLMENT_MODEL_NAME = "courseenrollment"
-
 
 class TagQuerySet(QuerySet):
     """ Tag queryset used as manager."""
@@ -102,10 +100,11 @@ class TagQuerySet(QuerySet):
                 "opaque_key": CourseKey.from_string(object_id),
             }
 
-        if object_type.lower() == COURSE_ENROLLMENT_MODEL_NAME:
+        if object_type.lower() in ["courseenrollment", "generatedcertificate"]:
 
             course_id = object_id.get("course_id")
             username = object_id.get("username")
+            verify_uuid = object_id.get("verify_uuid")
             object_id = {}
 
             if course_id:
@@ -113,6 +112,9 @@ class TagQuerySet(QuerySet):
 
             if username:
                 object_id["user__username"] = username
+
+            if verify_uuid:
+                object_id["verify_uuid"] = verify_uuid
 
         object_instances = ctype.get_all_objects_for_this_type(**object_id)
 

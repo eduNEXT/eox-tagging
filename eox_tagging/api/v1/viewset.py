@@ -47,12 +47,12 @@ from eox_tagging.models import Tag
     site configuration it can take any string.
 
     - `target_type` (**required**, string, _body_):
-    One of courseoverview, user, courseenrollment
+    One of courseoverview, user, courseenrollment, generatedcertificate
 
     - `target_id` (**required**, string, _body_): Identifier of the target\
       object. For users, username; for courseoverview, course_id and for\
-      courseenrollments a string with the following format: "`username:\
-      course_id`"
+      courseenrollments/generatedcertificates a string with the following format: "`username:\
+      course_id`. For generatedcertificates it can also be its verify_uuid"
 
     - `activation_date` (**optional**, string, _body_):
     DateTime format `YYYY-MM-DD HH:MM:SS`.
@@ -124,6 +124,11 @@ from eox_tagging.models import Tag
             "Shortcut to filter objects of target_type `user` with id `username`.",
         ),
         query_parameter(
+            "certificate_verify_uuid",
+            str,
+            "Shortcut to filter objects of target_type `generatedcertificate` with id `verify_uuid`.",
+        ),
+        query_parameter(
             "owner_type",
             str,
             "Shortcut to filter objects of owner_type `user` or `site`.",
@@ -132,7 +137,7 @@ from eox_tagging.models import Tag
             "target_type",
             str,
             "The type of the object that was tagged, one of: `course (use opaquekeyproxymodel for`"
-            "course overview types), `courseenrollment`, `user`",
+            "course overview types), `courseenrollment`, `user`, `generatedcertificate`",
         ),
         query_parameter(
             "enrollment_username",
@@ -144,6 +149,18 @@ from eox_tagging.models import Tag
             "enrollment_course_id",
             str,
             "Course identifier to be used when target_type=courseenrollment."
+            "Can be omitted and is ignored for a different target_type",
+        ),
+        query_parameter(
+            "certificate_username",
+            str,
+            "User identifier (username) to be used when target_type=generatedcertificate. "
+            "Can be omitted and is ignored for a different target_type",
+        ),
+        query_parameter(
+            "certificate_course_id",
+            str,
+            "Course identifier to be used when target_type=generatedcertificate."
             "Can be omitted and is ignored for a different target_type",
         ),
         query_parameter(
