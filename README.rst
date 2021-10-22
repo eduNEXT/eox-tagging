@@ -59,6 +59,12 @@ not listed, then the accumulation of changes from previous releases is enough.
     EOX_TAGGING_GET_COURSE_OVERVIEW: "eox_tagging.edxapp_wrappers.backends.course_overview_i_v1"
     EOX_TAGGING_BEARER_AUTHENTICATION: "eox_tagging.edxapp_wrappers.backends.bearer_authentication_i_v1"
 
+**Koa (optional)**
+
+.. code-block:: yaml
+
+    EOX_TAGGING_GET_ENROLLMENT_OBJECT: "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
+
 **Lilac**
 
 .. code-block:: yaml
