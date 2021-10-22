@@ -11,7 +11,7 @@ Installation
 Open edX devstack
 ------------------
 
-- Install either a supported version of the `Open edX devstack`_. See versions for more details.
+- Install a supported version of the `Open edX devstack`_. See versions for more details.
 
 - Clone the git repo:
 
@@ -30,7 +30,7 @@ Open edX devstack
   make lms-shell  # Enter the devstack machine (or server where lms process lives)
   cd /edx/src/edxapp/eox-tagging
   pip install -e .
-    python manage.py lms migrate eox_tagging --settings=<your app settings>
+  python manage.py lms migrate eox_tagging --settings=<your app settings>
 
 
 Compatibility Notes
@@ -48,9 +48,10 @@ Compatibility Notes
 |       Lilac       |   >= 2.2 |
 +-------------------+----------+
 
-Backend settings needed for each version:
+The following changes to the plugin settings are necessary. If the release you are looking for is
+not listed, then the accumulation of changes from previous releases is enough.
 
-**Juniper**
+**Ironwood**
 
 .. code-block:: yaml
 
@@ -58,25 +59,15 @@ Backend settings needed for each version:
     EOX_TAGGING_GET_COURSE_OVERVIEW: "eox_tagging.edxapp_wrappers.backends.course_overview_i_v1"
     EOX_TAGGING_BEARER_AUTHENTICATION: "eox_tagging.edxapp_wrappers.backends.bearer_authentication_i_v1"
 
-**Koa**
-
-.. code-block:: yaml
-
-    EOX_TAGGING_GET_ENROLLMENT_OBJECT: "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
-
-Keep other settings.
-
 **Lilac**
 
 .. code-block:: yaml
 
     EOX_TAGGING_GET_ENROLLMENT_OBJECT: "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
 
-Keep other settings.
+Those settings can be changed in ``eox_tagging/settings/common.py`` or, for example, in ansible configurations.
 
-Those settings can be changed in `eox_tagging/settings/common.py` or, for example, in ansible configurations.
-
-**NOTE**: the current `common.py` works with Open edX juniper version.
+**NOTE**: the current ``common.py`` works with Open edX juniper version.
 
 Usage
 ======
