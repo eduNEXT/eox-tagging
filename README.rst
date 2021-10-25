@@ -348,7 +348,7 @@ Filters example usage:
 Auditing Django views
 =====================
 
-The majority of views in eox-core use an auditing decorator, defined in our custom library called `eox-audit-model`_,
+The majority of views in eox-tagging use an auditing decorator, defined in our custom library called `eox-audit-model`_,
 that helps saving relevant information about non-idempotent operations. By default this functionality is turned on. To
 check your auditing records go to Django sysadmin and find DJANGO EDUNEXT AUDIT MODEL.
 
