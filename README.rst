@@ -2,23 +2,78 @@
 eox_tagging
 =============
 
-Features
-=========
-
-Place your plugin features list.
+Eox-tagging (A.K.A. Edunext Open extensions) is an `openedx plugin`_, that adds the capability
+to tag `edx-platform`_ objects. These tags can be used to categorize, include extra information, and so on.
 
 Installation
 ============
 
-
 Open edX devstack
 ------------------
 
-- Clone this repo in the src folder of your devstack.
-- Open a new Lms/Devstack shell.
-- Install the plugin as follows: pip install -e /path/to/your/src/folder
-- Restart Lms/Studio services.
+- Install a supported version of the `Open edX devstack`_. See versions for more details.
 
+- Clone the git repo:
+
+.. code-block:: bash
+
+  cd ~/Documents/eoxstack/src/  # Assuming that devstack is in  ~/Documents/eoxstack/devstack/
+  sudo mkdir edxapp
+  cd edxapp
+  git clone git@github.com:eduNEXT/eox-tagging.git
+
+- Install plugin from your server (in this case the devstack docker lms shell):
+
+.. code-block:: bash
+
+  cd ~/Documents/eoxstack/devstack  # Change for your devstack path (if you are using devstack)
+  make lms-shell  # Enter the devstack machine (or server where lms process lives)
+  cd /edx/src/edxapp/eox-tagging
+  pip install -e .
+  python manage.py lms migrate eox_tagging --settings=<your app settings>
+
+
+Compatibility Notes
+--------------------
+
++-------------------+----------+
+| Open edX Release  |  Version |
++===================+==========+
+|      Ironwood     |   < 0.9  |
++-------------------+----------+
+|       Juniper     |   >= 0.9 |
++-------------------+----------+
+|        Koa        |   >= 2.2 |
++-------------------+----------+
+|       Lilac       |   >= 2.2 |
++-------------------+----------+
+
+The following changes to the plugin settings are necessary. If the release you are looking for is
+not listed, then the accumulation of changes from previous releases is enough.
+
+**Ironwood**
+
+.. code-block:: yaml
+
+    EOX_TAGGING_GET_ENROLLMENT_OBJECT: "eox_tagging.edxapp_wrappers.backends.enrollment_i_v1"
+    EOX_TAGGING_GET_COURSE_OVERVIEW: "eox_tagging.edxapp_wrappers.backends.course_overview_i_v1"
+    EOX_TAGGING_BEARER_AUTHENTICATION: "eox_tagging.edxapp_wrappers.backends.bearer_authentication_i_v1"
+
+**Koa (optional)**
+
+.. code-block:: yaml
+
+    EOX_TAGGING_GET_ENROLLMENT_OBJECT: "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
+
+**Lilac**
+
+.. code-block:: yaml
+
+    EOX_TAGGING_GET_ENROLLMENT_OBJECT: "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
+
+Those settings can be changed in ``eox_tagging/settings/common.py`` or, for example, in ansible configurations.
+
+**NOTE**: the current ``common.py`` works with Open edX juniper version.
 
 Usage
 ======
@@ -77,7 +132,7 @@ Important notes:
 +---------------+-------------------------------------------------------+----------------------------------------------------------------+
 
 
-* The available objects to tag and validate are: User, Site, CourseOverview and CourseEnrollment
+* The available objects to tag and validate are: User, Site, CourseOverview, CourseEnrollment and GeneratedCertificate.
 
 * If an owner is not defined, then it is assumed to be the site.
 
@@ -289,6 +344,21 @@ Filters example usage:
 ``/eox_tagging/api/v1/tags/?access=ACCESS_TYPE``
 
 ``/eox_tagging/api/v1/tags/?enrollments=COURSE_ID``
+
+Auditing Django views
+=====================
+
+The majority of views in eox-core use an auditing decorator, defined in our custom library called `eox-audit-model`_,
+that helps saving relevant information about non-idempotent operations. By default this functionality is turned on. To
+check your auditing records go to Django sysadmin and find DJANGO EDUNEXT AUDIT MODEL.
+
+For more information, check the eox-audit-model documentation.
+
+
+.. _Open edX Devstack: https://github.com/edx/devstack/
+.. _openedx plugin: https://github.com/edx/edx-platform/tree/master/openedx/core/djangoapps/plugins
+.. _edx-platform: https://github.com/edx/edx-platform/
+.. _eox-audit-model: https://github.com/eduNEXT/eox-audit-model/
 
 How to Contribute
 =================
