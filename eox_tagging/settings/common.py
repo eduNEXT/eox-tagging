@@ -48,7 +48,7 @@ def plugin_settings(settings):
     More info: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
     """
     # Plugin settings
-    settings.EOX_TAGGING_GET_ENROLLMENT_OBJECT = "eox_tagging.edxapp_wrappers.backends.enrollment_i_v1"
+    settings.EOX_TAGGING_GET_ENROLLMENT_OBJECT = "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
     settings.EOX_TAGGING_GET_COURSE_OVERVIEW = "eox_tagging.edxapp_wrappers.backends.course_overview_i_v1"
     settings.EOX_TAGGING_DEFINITIONS = []
     settings.EOX_TAGGING_LOAD_PERMISSIONS = True
