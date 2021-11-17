@@ -12,6 +12,10 @@ Change Log
 
 Unreleased
 ----------
+
+[3.0.0] - 2021-11-17
+--------------------
+
 * **BREAKING CHANGE**: change backends defaults from Juniper to Lilac.
 
 [2.3.0] - 2021-10-11
