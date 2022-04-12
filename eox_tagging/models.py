@@ -13,7 +13,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible
+from six import python_2_unicode_compatible
 from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
 
