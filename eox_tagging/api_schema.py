@@ -2,7 +2,7 @@
 Swagger view generator
 """
 from django.conf import settings
-from django.conf.urls import include, url
+from django.urls import include, path
 from django.urls import reverse
 from drf_yasg.generators import OpenAPISchemaGenerator
 from drf_yasg.openapi import SwaggerDict
@@ -32,7 +32,7 @@ class APISchemaGenerator(OpenAPISchemaGenerator):
 
 
 api_urls = [
-    url(r"eox-tagging/api/", include("eox_tagging.api.urls"))
+    path("eox-tagging/api/", include("eox_tagging.api.urls"))
 ]
 
 api_info = make_api_info(
