@@ -135,7 +135,7 @@ class FilterBackend(filters.DjangoFilterBackend):
         except Exception:  # pylint: disable=broad-except
             queryset = None
             warnings.warn(
-                "{} is not compatible with schema generation".format(view.__class__)
+                f"{view.__class__} is not compatible with schema generation"
             )
 
         filterset_class = self.get_filterset_class(view, queryset)
@@ -166,6 +166,6 @@ class FilterBackend(filters.DjangoFilterBackend):
             return [field_name]
         else:
             return [field_name] if not suffixes else [
-                '{}_{}'.format(field_name, suffix)
+                f'{field_name}_{suffix}'
                 for suffix in suffixes if suffix
             ]

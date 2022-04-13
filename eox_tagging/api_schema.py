@@ -2,8 +2,7 @@
 Swagger view generator
 """
 from django.conf import settings
-from django.urls import include, re_path
-from django.urls import reverse
+from django.urls import include, re_path, reverse
 from drf_yasg.generators import OpenAPISchemaGenerator
 from drf_yasg.openapi import SwaggerDict
 from drf_yasg.views import get_schema_view
@@ -23,7 +22,7 @@ class APISchemaGenerator(OpenAPISchemaGenerator):
         security_definitions = {
             "OAuth2": {
                 "flow": "application",
-                "tokenUrl": "{}{}".format(settings.LMS_ROOT_URL, reverse('access_token')),
+                "tokenUrl": f"{settings.LMS_ROOT_URL}{reverse('access_token')}",
                 "type": "oauth2",
             },
         }

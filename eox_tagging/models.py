@@ -13,9 +13,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
-from six import python_2_unicode_compatible
 from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
+from six import python_2_unicode_compatible
 
 from eox_tagging.constants import AccessLevel, Status
 from eox_tagging.validators import TagValidators
@@ -52,8 +52,7 @@ class TagQuerySet(QuerySet):
 
     def delete(self):
         """Used to delete a set of tags."""
-        return super(TagQuerySet, self).update(inactivated_at=timezone.now(),
-                                               status=Status.INACTIVE)
+        return super().update(inactivated_at=timezone.now(), status=Status.INACTIVE)
 
     def find_by_owner(self, owner_type, owner_id):
         """Returns all tags owned by owner_id."""
@@ -85,7 +84,7 @@ class TagQuerySet(QuerySet):
 
     def hard_delete(self):
         """ Method for deleting Tag objects"""
-        return super(TagQuerySet, self).delete()
+        return super().delete()
 
     def _get_object_for_this_type(self, object_type, object_id):
         """
@@ -264,7 +263,7 @@ class Tag(models.Model):
             - name: in case we want the class and not the object
         """
 
-        field_value = getattr(self, "{}_type".format(attr))
+        field_value = getattr(self, f"{attr}_type")
         if name:
             return field_value
         else:
@@ -310,7 +309,7 @@ class Tag(models.Model):
         self.clean()
         self.clean_fields()
 
-    def save(self, *args, **kwargs):  # pylint: disable=signature-differs
+    def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
 

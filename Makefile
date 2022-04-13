@@ -55,7 +55,7 @@ test-python: clean ## Run test suite.
 quality: clean ## Run quality test.
 	$(TOX) pycodestyle ./eox_tagging
 	$(TOX) pylint ./eox_tagging --rcfile=./setup.cfg
-	$(TOX) isort --check-only --recursive --diff ./eox_tagging
+	$(TOX) isort --check-only --diff ./eox_tagging
 
 build-docs:
 	make docs_requirements

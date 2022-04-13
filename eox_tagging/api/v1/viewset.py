@@ -16,9 +16,10 @@ from eox_tagging.models import Tag
 try:
     from eox_audit_model.decorators import audit_method
 except ImportError:
-    def audit_method(*args, **kwargs):
+    def audit_method(*args, **kwargs):  # pylint: disable=unused-argument
         """Identity decorator"""
         return lambda x: x
+
 
 @schema_for(
     "create",
@@ -233,7 +234,7 @@ class TagViewSet(viewsets.ModelViewSet):
 
         @audit_method(action="eox_tagging-api-v1-viewset:tagviewset-create")
         def audited_create(body):  # pylint: disable=unused-argument
-            return super(TagViewSet, self).create(request, *args, **kwargs)
+            return super(TagViewSet, self).create(request, *args, **kwargs)  # pylint: disable=super-with-arguments
 
         return audited_create(body=request.data)
 
@@ -246,7 +247,7 @@ class TagViewSet(viewsets.ModelViewSet):
 
         @audit_method(action="eox_tagging-api-v1-viewset:tagviewset-destroy")
         def audited_destroy(path):  # pylint: disable=unused-argument
-            return super(TagViewSet, self).destroy(request, *args, **kwargs)
+            return super(TagViewSet, self).destroy(request, *args, **kwargs)  # pylint: disable=super-with-arguments
 
         return audited_destroy(path=request.path)
 
