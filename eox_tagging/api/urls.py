@@ -1,10 +1,10 @@
 """
 URL module for Tags API.
 """
-from django.conf.urls import include, url
+from django.urls import include, re_path
 
 from eox_tagging.api.v1.routers import router
 
 urlpatterns = [
-    url(r'v1/', include(router.urls)),
+    re_path(r'v1/', include(router.urls)),
 ]

@@ -8,14 +8,14 @@ class EnumField(serializers.ChoiceField):
     def __init__(self, enum, **kwargs):
         self.enum = enum
         kwargs['choices'] = [(e.value, e.name) for e in enum]
-        super(EnumField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
-    def to_representation(self, obj):  # pylint: disable=arguments-differ
+    def to_representation(self, value):
         """Function that helps with choice serialization."""
         try:
-            return getattr(obj, 'name', self.enum(obj).name)
+            return getattr(value, 'name', self.enum(value).name)
         except AttributeError:
-            return self.enum(obj).name
+            return self.enum(value).name
 
     def to_internal_value(self, data):
         """Function that helps with choice deserialization."""

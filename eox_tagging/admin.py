@@ -55,7 +55,7 @@ class TagAdmin(admin.ModelAdmin):
         """
         # pylint: disable=broad-except
         try:
-            return u"{}: {}".format(tag.owner_object_type, tag.owner_object)
+            return f"{tag.owner_object_type}: {tag.owner_object}"
         except Exception as error:
             return str(error)
 
@@ -66,8 +66,8 @@ class TagAdmin(admin.ModelAdmin):
         # pylint: disable=broad-except
         try:
             if tag.target_object:
-                return u"{}: {}".format(tag.target_object_type, tag.target_object)
-            return u"Resource locator: {}".format(tag.resource_locator)
+                return f"{tag.target_object_type}: {tag.target_object}"
+            return f"Resource locator: {tag.resource_locator}"
         except Exception as error:
             return str(error)
 
@@ -97,8 +97,8 @@ class TagAdmin(admin.ModelAdmin):
                 course_key = CourseKey.from_string(request.POST.get('opaque_key'))
                 opaque_key_proxy, _ = OpaqueKeyProxyModel.objects.get_or_create(opaque_key=course_key)
             except InvalidKeyError:
-                message = u"EOX_TAGGING | Error: Opaque Key %s does not match with opaque_keys.edx definition." \
-                          % request.POST['opaque_key']
+                opaque_key = request.POST['opaque_key']
+                message = f"EOX_TAGGING | Error: Opaque Key {opaque_key} does not match with opaque_keys.edx definition"
                 messages.error(request, message)
                 return HttpResponseRedirect(request.path)
 

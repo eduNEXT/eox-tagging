@@ -62,8 +62,7 @@ class TagSerializer(serializers.ModelSerializer):
         try:
             target_object = get_object_from_edxapp(target_type, **data)
         except Exception:
-            raise serializers.ValidationError({"Target": _("Error getting {} object."
-                                               .format(target_type))})
+            raise serializers.ValidationError({"Target": _(f"Error getting {target_type} object.")})
 
         if owner_type and owner_type.lower() == "user":
             owner_object = self.context.get("request").user
@@ -79,7 +78,7 @@ class TagSerializer(serializers.ModelSerializer):
         try:
             return Tag.objects.create_tag(**tag_object)
         except ValidationError as e:
-            raise serializers.ValidationError({"Tag": _("{}".format(e.message))})
+            raise serializers.ValidationError({"Tag": _(f"{e.message}")})
 
     @staticmethod
     def _convert_compound_keys(ids, object_type):

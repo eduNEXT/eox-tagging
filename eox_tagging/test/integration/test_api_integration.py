@@ -25,11 +25,11 @@ class TagTestCase(SimpleTestCase):  # pragma: no cover
         base_url = cls.data["base_url"]
         endpoint = reverse("tag-list")
 
-        cls.url = "{}/eox-tagging{}".format(base_url, endpoint)
+        cls.url = f"{base_url}/eox-tagging{endpoint}"
         cls.session = requests.Session()
         cls.session.headers.update(
             {
-                "Authorization": "Bearer {}".format(cls.data["access_token"]),
+                "Authorization": f"Bearer {cls.data['access_token']}",
             }
         )
 
@@ -54,7 +54,7 @@ class TagTestCase(SimpleTestCase):  # pragma: no cover
                 "tag_type": "test_enrollment_tag",
                 "tag_value": "test_enrollment_tag",
                 "target_type": "courseenrollment",
-                "target_id": "{}: {}".format(cls.data["username"], cls.data["course_id"]),
+                "target_id": f"{cls.data['username']}: {cls.data['course_id']}",
                 "access": "PUBLIC",
                 "owner_type": "site",
             },
@@ -81,7 +81,7 @@ class TagTestCase(SimpleTestCase):  # pragma: no cover
     def test_read_detail_tag(self):
         """Test the tag detail view."""
         tag_id = self.read_test_tag_id
-        url = "{}{}/".format(self.url, tag_id)
+        url = f"{self.url}{tag_id}/"
         expected_response = {
             "key": tag_id,
             "tag_value": self.tags_data[0]["tag_value"],
@@ -135,7 +135,7 @@ class TagTestCase(SimpleTestCase):  # pragma: no cover
     def test_delete_tag(self):
         """Test tag deletion."""
         tag_id = self.delete_test_tag_id
-        url = "{}{}/".format(self.url, tag_id)
+        url = f"{self.url}{tag_id}/"
 
         response = self.session.delete(url)
 
@@ -151,6 +151,6 @@ def create_tag(session, url, tag_data):
 
 def delete_tag(session, url, tag_id):
     """Auxiliary function to delete tags."""
-    url = "{}{}/".format(url, tag_id)
+    url = f"{url}{tag_id}/"
     response = session.delete(url)
     response.raise_for_status()

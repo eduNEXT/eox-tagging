@@ -14,13 +14,9 @@ workflows:
               only: /v?[0-9]+(\.[0-9]+)*/
           matrix:
             parameters:
-              python_version: ["3.5", "3.8"]
-              debian_version: ["stretch", "buster"]
-            exclude:
-              - python_version: "3.5"
-                debian_version: "buster"
-              - python_version: "3.8"
-                debian_version: "stretch"
+              python_version: ["3.8"]
+              debian_version: ["buster"]
+              django_version: ["django22", "django32"]
       - pypi:
           requires:
             - test
@@ -35,7 +31,6 @@ jobs:
     parameters:
       django_version:
         type: string
-        default: django22
       python_version:
         type: string
       debian_version:
@@ -59,30 +54,38 @@ jobs:
       - restore_cache:
           keys:
           - v2-<< parameters.python_version >>-<< parameters.django_version >>-dependencies-{{ checksum "requirements/test.txt" }}
-
       - run:
-          name: Install dependencies.
+          name: install dependencies
           command: |
             test -d venv || virtualenv venv
             . venv/bin/activate
             pip install -r requirements/tox.txt
 
+      # run tests!
+      # this example uses Django's built-in test-runner
+      # other common Python testing frameworks include pytest and nose
+      # https://pytest.org
+      # https://nose.readthedocs.io
       - run:
-          name: Run tests
+          name: run tests
           command: |
             . venv/bin/activate
+            export TOX_ENV=$PY_ENV-$DJANGO_ENV
             export TOXENV=${TOX_ENV//./}
             make run-tests
-            
+
       - save_cache:
           paths:
             - ./.tox
-            - ./node_modules
           key: v2-<< parameters.python_version >>-<< parameters.django_version >>-dependencies-{{ checksum "requirements/test.txt" }}
 
-    environment:
-      - TOX_ENV: py<< parameters.python_version >>-<< parameters.django_version >>
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports
 
+    environment:
+      - PY_ENV: py<< parameters.python_version >>
+      - DJANGO_ENV: << parameters.django_version >>
 
   pypi:
     docker:

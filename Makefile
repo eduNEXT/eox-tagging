@@ -15,6 +15,9 @@ help: ## display this help message
 	@echo "Please use \`make <target>' where <target> is one of"
 	@grep '^[a-zA-Z]' $(MAKEFILE_LIST) | sort | awk -F ':.*?## ' 'NF==2 {printf "\033[36m  %-25s\033[0m %s\n", $$1, $$2}'
 
+install-dev-dependencies: ## install tox
+	pip install -r requirements/tox.txt
+
 clean: ## delete most git-ignored files
 	find . -name '__pycache__' -exec rm -rf {} +
 	find . -name '*.pyc' -exec rm -f {} +
@@ -43,6 +46,10 @@ upgrade: ## update the requirements/*.txt files with the latest packages satisfy
 	$(PIP_COMPILE) -o requirements/tox.txt requirements/tox.in
 	$(PIP_COMPILE) -o requirements/docs.txt requirements/docs.in
 
+	grep -e "^django==" requirements/test.txt > requirements/django.txt
+	sed '/^[dD]jango==/d;' requirements/test.txt > requirements/test.tmp
+	mv requirements/test.tmp requirements/test.txt
+
 test-python: clean ## Run test suite.
 	$(TOX) pip install -r requirements/test.txt --exists-action w
 	$(TOX) coverage run --source ./eox_tagging manage.py test
@@ -51,7 +58,7 @@ test-python: clean ## Run test suite.
 quality: clean ## Run quality test.
 	$(TOX) pycodestyle ./eox_tagging
 	$(TOX) pylint ./eox_tagging --rcfile=./setup.cfg
-	$(TOX) isort --check-only --recursive --diff ./eox_tagging
+	$(TOX) isort --check-only --diff ./eox_tagging
 
 build-docs:
 	make docs_requirements

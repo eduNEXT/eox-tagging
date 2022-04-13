@@ -9,11 +9,14 @@
 # linking to it here is good.
 
 # Pinned to the same version as eox-core to keep consistency
-pylint==2.5.0
+pylint==2.12.2
+pycodestyle==2.8.0
 
-# Version used in Juniper version of edx-platform
-django-ipware==2.1.0
-djangorestframework==3.9.4
-drf-yasg==1.17.0
-edx-opaque-keys==2.1.0
-newrelic<=6.0
+# Version used in Maple version of edx-platform
+django<=3.2.12
+django-ipware==4.0.2
+djangorestframework==3.13.1
+drf-yasg==1.20.0
+edx-opaque-keys==2.3.0
+newrelic==7.2.1.168
+wrapt==1.11.2
