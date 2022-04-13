@@ -25,7 +25,6 @@ billiard==3.6.4.0
 celery==5.2.6
     # via
     #   -r requirements/base.txt
-    #   eox-audit-model
     #   eox-core
     #   event-tracking
 certifi==2021.10.8
@@ -95,17 +94,14 @@ deprecated==1.2.13
     #   edx-drf-extensions
     #   edx-proctoring
     #   edx-when
-    #   eox-audit-model
     #   event-tracking
     #   jsonfield
-    #   jsonfield2
 django-crum==0.7.9
     # via
     #   -r requirements/base.txt
     #   -r requirements/test.in
     #   edx-django-utils
     #   edx-proctoring
-    #   eox-audit-model
 django-fake-model==0.1.4
     # via -r requirements/test.in
 django-filter==21.1
@@ -118,7 +114,6 @@ django-ipware==4.0.2
     #   -c requirements/constraints.txt
     #   -r requirements/base.txt
     #   edx-proctoring
-    #   eox-audit-model
 django-model-utils==4.2.0
     # via
     #   -r requirements/base.txt
@@ -206,8 +201,6 @@ edx-when==2.3.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
-eox-audit-model==0.6.0
-    # via -r requirements/base.txt
 eox-core==6.0.1
     # via -r requirements/base.txt
 event-tracking==2.1.0
@@ -244,10 +237,6 @@ jsonfield==3.1.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
-jsonfield2==4.0.0.post0
-    # via
-    #   -r requirements/base.txt
-    #   eox-audit-model
 jwcrypto==1.0
     # via
     #   -r requirements/base.txt

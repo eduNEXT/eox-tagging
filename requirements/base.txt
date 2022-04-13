@@ -14,7 +14,6 @@ billiard==3.6.4.0
     # via celery
 celery==5.2.6
     # via
-    #   eox-audit-model
     #   eox-core
     #   event-tracking
 certifi==2021.10.8
@@ -62,22 +61,18 @@ django==3.2.12
     #   edx-drf-extensions
     #   edx-proctoring
     #   edx-when
-    #   eox-audit-model
     #   event-tracking
     #   jsonfield
-    #   jsonfield2
 django-crum==0.7.9
     # via
     #   edx-django-utils
     #   edx-proctoring
-    #   eox-audit-model
 django-filter==21.1
     # via eox-core
 django-ipware==4.0.2
     # via
     #   -c requirements/constraints.txt
     #   edx-proctoring
-    #   eox-audit-model
 django-model-utils==4.2.0
     # via
     #   edx-proctoring
@@ -136,8 +131,6 @@ edx-rest-api-client==5.5.0
     # via edx-proctoring
 edx-when==2.3.0
     # via edx-proctoring
-eox-audit-model==0.6.0
-    # via -r requirements/base.in
 eox-core==6.0.1
     # via -r requirements/base.in
 event-tracking==2.1.0
@@ -156,8 +149,6 @@ jinja2==3.1.1
     # via coreschema
 jsonfield==3.1.0
     # via edx-proctoring
-jsonfield2==4.0.0.post0
-    # via eox-audit-model
 jwcrypto==1.0
     # via django-oauth-toolkit
 kombu==5.2.4

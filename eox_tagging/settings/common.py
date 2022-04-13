@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 from __future__ import unicode_literals
 
+from importlib.util import find_spec
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
@@ -22,7 +24,6 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'rest_framework',
-    'eox_audit_model.apps.EoxAuditModelConfig',
     'eox_tagging',
 ]
 
@@ -55,5 +56,6 @@ def plugin_settings(settings):
     settings.DATA_API_DEF_PAGE_SIZE = 1000
     settings.DATA_API_MAX_PAGE_SIZE = 5000
     settings.EOX_TAGGING_BEARER_AUTHENTICATION = 'eox_tagging.edxapp_wrappers.backends.bearer_authentication_i_v1'
-    if hasattr(settings, 'INSTALLED_APPS') and EOX_AUDIT_MODEL_APP not in settings.INSTALLED_APPS:
-        settings.INSTALLED_APPS.append(EOX_AUDIT_MODEL_APP)
+    if hasattr(settings, 'INSTALLED_APPS'):
+        if find_spec('eox_audit_model') and EOX_AUDIT_MODEL_APP not in settings.INSTALLED_APPS:
+            settings.INSTALLED_APPS.append(EOX_AUDIT_MODEL_APP)

@@ -2,7 +2,6 @@
 Viewset for Tags.
 """
 from edx_api_doc_tools import query_parameter, schema_for
-from eox_audit_model.decorators import audit_method
 from rest_framework import status, viewsets
 from rest_framework.authentication import SessionAuthentication
 
@@ -14,6 +13,12 @@ from eox_tagging.edxapp_accessors import get_site
 from eox_tagging.edxapp_wrappers.bearer_authentication import BearerAuthentication
 from eox_tagging.models import Tag
 
+try:
+    from eox_audit_model.decorators import audit_method
+except ImportError:
+    def audit_method(*args, **kwargs):
+        """Identity decorator"""
+        return lambda x: x
 
 @schema_for(
     "create",
