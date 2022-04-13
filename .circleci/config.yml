@@ -54,30 +54,37 @@ jobs:
       - restore_cache:
           keys:
           - v2-<< parameters.python_version >>-<< parameters.django_version >>-dependencies-{{ checksum "requirements/test.txt" }}
-
       - run:
-          name: Install dependencies.
+          name: install dependencies
           command: |
             test -d venv || virtualenv venv
             . venv/bin/activate
             pip install -r requirements/tox.txt
 
+      # run tests!
+      # this example uses Django's built-in test-runner
+      # other common Python testing frameworks include pytest and nose
+      # https://pytest.org
+      # https://nose.readthedocs.io
       - run:
-          name: Run tests
+          name: run tests
           command: |
             . venv/bin/activate
             export TOX_ENV=$PY_ENV-$DJANGO_ENV
             export TOXENV=${TOX_ENV//./}
             make run-tests
-            
+
       - save_cache:
           paths:
             - ./.tox
-            - ./node_modules
           key: v2-<< parameters.python_version >>-<< parameters.django_version >>-dependencies-{{ checksum "requirements/test.txt" }}
 
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports
+
     environment:
-      - TOX_ENV: py<< parameters.python_version >>-<< parameters.django_version >>
+      - PY_ENV: py<< parameters.python_version >>
       - DJANGO_ENV: << parameters.django_version >>
 
   pypi:
