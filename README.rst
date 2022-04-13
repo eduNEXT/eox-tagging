@@ -47,6 +47,8 @@ Compatibility Notes
 +-------------------+----------+
 |       Lilac       |   >= 2.2 |
 +-------------------+----------+
+|       Maple       |   >= 4.0 |
++-------------------+----------+
 
 The following changes to the plugin settings are necessary. If the release you are looking for is
 not listed, then the accumulation of changes from previous releases is enough.
@@ -66,6 +68,12 @@ not listed, then the accumulation of changes from previous releases is enough.
     EOX_TAGGING_GET_ENROLLMENT_OBJECT: "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
 
 **Lilac**
+
+.. code-block:: yaml
+
+    EOX_TAGGING_GET_ENROLLMENT_OBJECT: "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
+
+**Maple**
 
 .. code-block:: yaml
 
@@ -345,8 +353,8 @@ Filters example usage:
 
 ``/eox_tagging/api/v1/tags/?enrollments=COURSE_ID``
 
-Auditing Django views
-=====================
+Auditing Django views (Optional in Maple)
+=========================================
 
 The majority of views in eox-tagging use an auditing decorator, defined in our custom library called `eox-audit-model`_,
 that helps saving relevant information about non-idempotent operations. By default this functionality is turned on. To
