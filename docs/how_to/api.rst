@@ -88,10 +88,9 @@ When retrieving objects, the JSON object will have the following fields (the men
 Validations
 -----------
 
-Before doing the validations mentioned in :ref:`model:Validations`, it is checked that target_type exists, if not then
-the creation process is interrupted and an error will be raised. This results in returning an object describing the error ocurred. After
-checking if the target_type exists, the model validations will be performed and if an error occurs the error message will be returned in a
-response instead of valid data.
+During the creation process starts, it's checked that ``target_type`` exists, if not then the creation process is interrupted and an error
+will be raised. This results in returning an object describing the error ocurred. After checking if the target_type exists, the model validations
+will be performed and if an error occurs the error message will be returned in a response instead of valid data.
 
 
 Examples

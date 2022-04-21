@@ -23,6 +23,25 @@ Where <FIELD_NAME> can be any editable tag field, and <VALIDATION> any of the de
 
 Validations
 ^^^^^^^^^^^
+
+Here's how to create validated fields, first, add the key validate_<FIELD_VALUE> to the configuration dictionary, where:
+
+* The FIELD_VALUE must be a Tag field, if not an exception will be raised.
+
+* If this is defined in EOX_TAGGING_DEFINITIONS as one of the tag definitions ``validate_<FIELD_VALUE_1>: <VALIDATIONS>``, then:
+
+  * The application will expect that <VALIDATIONS> is a dictionary of validations or a string.
+  * This dictionary has for keys the validations you want to perform and for values, the values allowed for the field. In case it is a string, the field must be equal to that string.
+  * If a key or value is not defined then an exception will be raised. In case that is a string, the field must be equal to that string.
+
+* If this is defined ``<FIELD_VALUE>: <VALIDATIONS>``, then:
+
+  * The application will expect just a string as a validation. This is also a way to define the required fields.
+  * The settings for EOX_TAGGING_DEFINITIONS can be a combination of dictionary validations and strings.
+  * If a key in the settings dictionary has as prefix `validate` it means that the <key, value> can have a dictionary of validations as value. If not, is assume that value of that tag field is equal to that string.
+
+* force_<FIELD_VALUE> allowing to set a value to a field without running validations or directly specifying it in the tag object.
+
 +---------------+-------+-----------------------------------------------+----------------------------------------------------------------+
 | Name          | Description                                           | Example                                                        |
 +===============+=======================================================+================================================================+
@@ -50,34 +69,33 @@ Fields
 +-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
 | Name(s)                 | Description                             |  Value/Format         | Possible validators                        |
 +=========================+=========================================+=======================+============================================+
-| validate_tag_value      | Contains possible values for the field  | Not specified         | in, exists, equals, regex, opaque          |
+| tag_value               | Contains possible values for the field  | Not specified         | in, exists, equals, regex, opaque          |
 |                         |                                         |                       | any validation that can validate a string. |
 +-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
-| validate_access         | Contains possible values for the field  | Public, private,      | Any validator but must have at least one   |
+| access                  | Contains possible values for the field  | Public, private,      | Any validator but must have at least one   |
 |                         |                                         | protected.            | of the values defined.                     |
 +-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
-| validate_deactivation   | Contains possible datetime values for   | Year-month-day H:M:S  | in, exists, equals, between. If apply, the |
-| _date                   | the field.                              |                       | values must match the format specified.    |
-+-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
-| validate_activation_date| Contains possible datetime values for   | Year-month-day H:M:S  | in, exists, equals, between. If apply, the |
+| deactivation_date       | Contains possible datetime values for   | Year-month-day H:M:S  | in, exists, equals, between. If apply, the |
 |                         | the field.                              |                       | values must match the format specified.    |
 +-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
-| validate_target_object  | Contains the only possible target value | User, site,           | equals. The values must match the targets  |
+| activation_date         | Contains possible datetime values for   | Year-month-day H:M:S  | in, exists, equals, between. If apply, the |
+|                         | the field.                              |                       | values must match the format specified.    |
++-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
+| target_object           | Contains the only possible target value | User, site,           | equals. The values must match the targets  |
 |                         | of that tag.                            | CourseEnrollment,     | predefined.                                |
 |                         |                                         | OpaqueKeyProxyModel*  |                                            |
 +-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
-| validate_owner_object   | Contains the only possible owner value  | User, site,           | equals. The values must match the targets  |
+| owner_object            | Contains the only possible owner value  | User, site,           | equals. The values must match the targets  |
 |                         | of that tag.                            |                       | predefined.                                |
 +-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
 | tag_type                | Contains the only possible type         | Not specified         | equals. The tag_type must always exist and |
 |                         | of that tag.                            |                       | needs to be unique in the config array.    |
 +-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
 
-
 * In the configuration, if the user wants to create a tag on a course it must use OpaqueKeyProxyModel as the target_object.
 
-**Important note:** as mentioned above the validations can or not have ``validate_`` in front of the <FIELD_NAME>, if they don't have it,
-the program will assume that the field must be equal to the value. For example:
+**Important note:** as mentioned above the tag fields can or not have ``validate_`` in front of the <FIELD_NAME>, if they don't have it,
+the application will assume that the field must be equal to the value. For example:
 
 .. code-block:: JSON
 
@@ -85,7 +103,7 @@ the program will assume that the field must be equal to the value. For example:
             "FIELD_NAME": "VALUE"
         }
 
-This means that the FIELD with FIELD_NAME must be equal to VALUE.
+This means that the FIELD with FIELD_NAME must be equal to VALUE when creating a tag, otherwise, an error will be raised.
 
 Setting values using the configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

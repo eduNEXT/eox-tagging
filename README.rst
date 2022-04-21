@@ -86,63 +86,13 @@ Those settings can be changed in ``eox_tagging/settings/common.py`` or, for exam
 Usage
 ======
 
+See the `How to section <https://github.com/eduNEXT/eox-tagging/tree/master/docs/how_to>`_ for a detailed guidance on: Model, configurations and API usage.
+
 Important notes:
 ----------------
 
 * All the comparison with string objects are case insensitive.
-* validate_<FIELD_VALUE> meaning:
-
-  * The FIELD_VALUE must be a Tag field, if not an exception will be raised.
-  * If this is defined in EOX_TAGGING_DEFINITIONS as one of the tag definitions:
-
-    ``validate_<FIELD_VALUE_1>: <VALIDATIONS>``
-
-    * The application will expect that <VALIDATIONS> is a dictionary of validations or a string.
-
-    * This dictionary has for keys the validations you want to perform and for values, the values allowed for the field. In case it is a string, the field must be equal to that string.
-
-    * If a key or value is not defined then an exception will be raised. In case that is a string, the field must be equal to that string.
-
-  * If this is defined:
-
-    ``<FIELD_VALUE>: <VALIDATIONS>``
-
-    * The application will expect just a string as a validation. This is also a way to define the required fields.
-
-    * The settings for EOX_TAGGING_DEFINITIONS can be a combination of dictionary validations and strings.
-
-  * If a key in the settings dictionary has as prefix `validate` it means that the <key, value> can have a dictionary of validations as value. If not, is assume that
-      value is a string.
-
-* force_<FIELD_VALUE> meaning:
-
-    * This allows to set a value to a field without running validations or directly specifying it in the tag object.
-
-* The validations available are:
-
-+---------------+-------+-----------------------------------------------+----------------------------------------------------------------+
-| Name          | Description                                           | Example                                                        |
-+===============+=======================================================+================================================================+
-| ``in``        | the field must be equal to one of the strings defined | ``validate_tag_value : {"in": ["tag_value_1", "tag_value_2"]}``|
-|               | inside the array                                      |                                                                |
-+---------------+-------------------------------------------------------+----------------------------------------------------------------+
-| ``exists``    | the field must be different to None                   |  ``validate_tag_value : {"exists": true}``                     |
-+---------------+-------------------------------------------------------+----------------------------------------------------------------+
-|  ``equals``   | the field must be equal to the dictionary value       |  ``validate_tag_value : {"equals": "tag_value"}``              |
-+---------------+-------------------------------------------------------+----------------------------------------------------------------+
-|  ``regex``    | the field must match the pattern defined              |  ``validate_tag_value : {"regex": ".+eduNEXT"}``               |
-+---------------+-------------------------------------------------------+----------------------------------------------------------------+
-|``opaque_key`` | the field must be an opaque key                       |  ``validate_tag_value : {"opaque_key": "CourseKey"}``          |
-+---------------+-------------------------------------------------------+----------------------------------------------------------------+
-| ``between``   | the field must be greater than the first member of    |  ``validate_expiration_date : {"between": [DATE_1, DATE_2]}``  |
-|               | the list and less than the last member. Or can be     |                                                                |
-|               | equal to one of the two. The list must be sorted.     |                                                                |
-+---------------+-------------------------------------------------------+----------------------------------------------------------------+
-
-
-* The available objects to tag and validate are: User, Site, CourseOverview, CourseEnrollment and GeneratedCertificate.
-
-* If an owner is not defined, then it is assumed to be the site.
+* If a tag owner is not defined, then it is assumed to be the site.
 
 Examples
 --------
