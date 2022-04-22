@@ -184,7 +184,7 @@ Get list of tags
 
 **Request**
 
-``curl -H 'Accept: application/json' -H "Authorization: Bearer AUTHENTICATION_TOKEN" http://BASE_URL_SITE/eox_tagging/api/v1/tags/``
+``curl -H 'Accept: application/json' -H "Authorization: Bearer AUTHENTICATION_TOKEN" http://BASE_URL_SITE/eox-tagging/api/v1/tags/``
 
 **Response**
 
@@ -237,7 +237,7 @@ Create tag
 
 **Request**
 
-``curl -H 'Accept: application/json' -H "Authorization: Bearer AUTHENTICATION_TOKEN" --data TAG_DATA http://BASE_URL_SITE/eox_tagging/api/v1/tags/``
+``curl -H 'Accept: application/json' -H "Authorization: Bearer AUTHENTICATION_TOKEN" --data TAG_DATA http://BASE_URL_SITE/eox-tagging/api/v1/tags/``
 
 Where TAG_DATA:
 
@@ -283,7 +283,7 @@ Delete tag
 
 **Request**
 
-``curl -X DELETE  http://BASE_URL_SITE/eox_tagging/api/v1/tags/EXISTING_KEY_TAG/``
+``curl -X DELETE  http://BASE_URL_SITE/eox-tagging/api/v1/tags/EXISTING_KEY_TAG/``
 
 **Response**
 
