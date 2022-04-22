@@ -58,7 +58,7 @@ When creating a tag, this are the fields expected:
 | activation_date                  | Datetime when the tag will be activated.         | No               |
 |                                  | It can have UTC format or Year-Month-Day H:M:S   |                  |
 +----------------------------------+--------------------------------------------------+------------------+
-| deactivation_date                | Datetime when the tag will be deactivated.       | No               |
+| expiration_date                  | Datetime when the tag will be deactivated.       | No               |
 |                                  | It can have UTC format or Year-Month-Day H:M:S   |                  |
 +----------------------------------+--------------------------------------------------+------------------+
 | target_type                      | Type of the target. Must be equal to: user, site,| Yes              |
