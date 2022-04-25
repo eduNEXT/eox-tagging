@@ -12,6 +12,7 @@ Change Log
 
 Unreleased
 ----------
+* Added tutor installation instructions in README file.
 
 [3.0.0] - 2021-11-17
 --------------------
