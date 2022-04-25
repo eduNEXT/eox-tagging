@@ -32,6 +32,30 @@ Open edX devstack
   pip install -e .
   python manage.py lms migrate eox_tagging --settings=<your app settings>
 
+Open edX with Tutor (Maple)
+----------------------------
+If you are using `Tutor <https://docs.tutor.overhang.io/gettingstarted.html>`_ to deploy the Open edX instance, please follow this steps:
+
+#. Install a new fresh instance of tutor following `this steps <https://docs.tutor.overhang.io/quickstart.html#quickstart-1-click-install>`_. *If you already have a tutor instance running you can skip this step.*
+#. Add to the Tutor configuration in the file ``cat "$(tutor config printroot)/config.yml"`` this lines that install eox-tagging and eox-core lib:
+    .. code-block:: yaml
+    
+        OPENEDX_EXTRA_PIP_REQUIREMENTS:
+        - eox_core
+        - eox_tagging
+#. Create a new tutor plugin that adds this settings to openedx common settings:
+    .. code-block:: yaml
+    
+        EOX_TAGGING_GET_ENROLLMENT_OBJECT = "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
+        EOX_CORE_USERS_BACKEND = "eox_core.edxapp_wrapper.backends.users_m_v1"
+
+    .. note::
+        `Here <https://github.com/eduNEXT/eox-tagging/issues/83>`_ is an example of creating a tutor plugin with a yaml file. 
+        But there are other ways to create tutor plugins, please go to tutor docs and see how to add settings in Open edX common settings.
+#. Install the plugin doing ``tutor plugins enable eox-tagging-plugin`` and then ``tutor config save``.
+#. Build the openedx image doing ``tutor images build openedx``.
+#. Start the tutor instance with the new config doing ``tutor local quickstart``.
+#. All set to use eox-tagging lib!
 
 Compatibility Notes
 --------------------
