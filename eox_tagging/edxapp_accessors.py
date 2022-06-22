@@ -35,7 +35,7 @@ def get_course(**kwargs):
     return course
 
 
-def get_site():
+def get_site(**_kwargs):
     """Function used to get current site."""
     if getattr(settings, "EOX_TAGGING_SKIP_VALIDATIONS", False):  # Use TEST_SITE while testing
         site = Site.objects.get(id=settings.TEST_SITE)
