@@ -1,8 +1,30 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on ## [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to ## [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## v4.1.0 - 2022-09-05
+
+### [4.1.0](https://github.com/eduNEXT/eox-tagging/compare/v4.0.0...v4.1.0) (2022-09-05)
+
+#### Features
+
+- added installation docs with tutor ([ffa023c](https://github.com/eduNEXT/eox-tagging/commit/ffa023cc4ea5277e4ce6433f68601b8e877e6537))
+
+#### Bug Fixes
+
+- get_site arg ([ee27ff1](https://github.com/eduNEXT/eox-tagging/commit/ee27ff145b0f266124c1fa63a214b7d3703dc29d))
+- update API url in documentation ([eb5e0ce](https://github.com/eduNEXT/eox-tagging/commit/eb5e0ce93412c096ffb8c6cd89842da6d6c95a37))
+
+#### Continuous Integration
+
+- add ci pipelines ([c0f904d](https://github.com/eduNEXT/eox-tagging/commit/c0f904d64e44025b19fe58cc109c50b38bffedfd))
+
+#### Code Refactoring
+
+- rearrange documentation to be less overwhelming ([9ec7920](https://github.com/eduNEXT/eox-tagging/commit/9ec79204b0381f471efe8687c6e668adf2989cfe))
 
 ## [3.0.0] - 2021-11-17
 
@@ -13,11 +35,13 @@ and this project adheres to ## [Semantic Versioning](https://semver.org/spec/v2.
 ## [2.3.0] - 2021-10-11
 
 ### Added
+
 - Support for tagging Certificate objects.
 
 ## [2.2.0] - 2021-05-13
 
 ### Added
+
 - Lilac compatibility.
 
 ### Fix
@@ -39,7 +63,10 @@ and this project adheres to ## [Semantic Versioning](https://semver.org/spec/v2.
 ## [2.0.0] - 2021-02-10
 
 ### Added
------
+
+
+---
+
 - Swagger support alongside REST API documentation
 
 ## [1.2.0] - 2021-02-03
@@ -53,20 +80,17 @@ Changed
 - Fixed courseenrollments filters and refactor the rest.
 - Removed `required` from access field in serializer.
 
-
 ## [1.1.0] - 2020-12-16
 
 ### Added
 
 - Permissions compatibility with DOT.
 
-
 ## [1.0.0] - 2020-11-13
 
 ### Added
 
 - Migration compatibility with PY35.
-
 
 ## [0.10.1] - 2020-11-12
 
@@ -141,9 +165,11 @@ Changed
 ## [0.2.0] - 2020-06-26
 
 - REST API to create, get, filter and delete tags.
+- 
 - New filters in Tag queryset.
-
+- 
 - First PyPI release.
+- 
 
 ## [0.1.0] - 2020-06-23
 
