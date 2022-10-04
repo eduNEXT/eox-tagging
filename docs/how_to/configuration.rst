@@ -75,7 +75,7 @@ Fields
 | access                  | Contains possible values for the field  | Public, private,      | Any validator but must have at least one   |
 |                         |                                         | protected.            | of the values defined.                     |
 +-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
-| deactivation_date       | Contains possible datetime values for   | Year-month-day H:M:S  | in, exists, equals, between. If apply, the |
+| expiration_date         | Contains possible datetime values for   | Year-month-day H:M:S  | in, exists, equals, between. If apply, the |
 |                         | the field.                              |                       | values must match the format specified.    |
 +-------------------------+-----------------------------------------+-----------------------+--------------------------------------------+
 | activation_date         | Contains possible datetime values for   | Year-month-day H:M:S  | in, exists, equals, between. If apply, the |
