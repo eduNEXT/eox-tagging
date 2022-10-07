@@ -42,6 +42,10 @@ USE_TZ = True
 
 ALLOWED_HOSTS = ['*']
 
+# Define AutoField to generate primary keys
+# https://docs.djangoproject.com/en/3.2/releases/3.2/#customizing-type-of-auto-created-primary-keys
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 
 def plugin_settings(settings):
     """
