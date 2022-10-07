@@ -60,19 +60,21 @@ If you are using `Tutor <https://docs.tutor.overhang.io/gettingstarted.html>`_ t
 Compatibility Notes
 --------------------
 
-+-------------------+----------+
-| Open edX Release  |  Version |
-+===================+==========+
-|      Ironwood     |   < 0.9  |
-+-------------------+----------+
-|       Juniper     |   >= 0.9 |
-+-------------------+----------+
-|        Koa        |   >= 2.2 |
-+-------------------+----------+
-|       Lilac       |   >= 2.2 |
-+-------------------+----------+
-|       Maple       |   >= 4.0 |
-+-------------------+----------+
++-------------------+----------------+
+| Open edX Release  |     Version    |
++===================+================+
+|      Ironwood     |   < 0.9 < 3.0  |
++-------------------+----------------+
+|       Juniper     |   >= 0.9 < 3.0 |
++-------------------+----------------+
+|        Koa        |   >= 2.2 < 5.0 |
++-------------------+----------------+
+|       Lilac       |   >= 2.2 < 5.0 |
++-------------------+----------------+
+|       Maple       |      >= 4.0    |
++-------------------+----------------+
+|       Nutmeg      |      >= 5.0    |
++-------------------+----------------+
 
 The following changes to the plugin settings are necessary. If the release you are looking for is
 not listed, then the accumulation of changes from previous releases is enough.
@@ -85,23 +87,12 @@ not listed, then the accumulation of changes from previous releases is enough.
     EOX_TAGGING_GET_COURSE_OVERVIEW: "eox_tagging.edxapp_wrappers.backends.course_overview_i_v1"
     EOX_TAGGING_BEARER_AUTHENTICATION: "eox_tagging.edxapp_wrappers.backends.bearer_authentication_i_v1"
 
-**Koa (optional)**
+**Koa, Lilac, Maple, Nutmeg**
 
 .. code-block:: yaml
 
     EOX_TAGGING_GET_ENROLLMENT_OBJECT: "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
 
-**Lilac**
-
-.. code-block:: yaml
-
-    EOX_TAGGING_GET_ENROLLMENT_OBJECT: "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
-
-**Maple**
-
-.. code-block:: yaml
-
-    EOX_TAGGING_GET_ENROLLMENT_OBJECT: "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
 
 Those settings can be changed in ``eox_tagging/settings/common.py`` or, for example, in ansible configurations.
 
