@@ -6,8 +6,5 @@ objects.
 
 def get_enrollment_object():
     """Backend to get enrollment object."""
-    try:
-        from student.models import CourseEnrollment  # pylint: disable=import-outside-toplevel
-    except ImportError:
-        CourseEnrollment = object
+    from student.models import CourseEnrollment  # pylint: disable=C0415, E0401
     return CourseEnrollment

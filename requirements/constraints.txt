@@ -8,15 +8,7 @@
 # pin when possible.  Writing an issue against the offending project and
 # linking to it here is good.
 
-# Pinned to the same version as eox-core to keep consistency
-pylint==2.12.2
-pycodestyle==2.8.0
 
 # Version used in Maple version of edx-platform
-django<=3.2.12
-django-ipware==4.0.2
-djangorestframework==3.13.1
-drf-yasg==1.20.0
-edx-opaque-keys==2.3.0
+django<=3.3
 newrelic==7.2.1.168
-wrapt==1.11.2
