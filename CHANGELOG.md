@@ -5,20 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on ## [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to ## [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v4.2.0 - 2022-10-09
-
-### [4.2.0](https://github.com/eduNEXT/eox-tagging/compare/v4.1.0...v4.2.0) (2022-10-09)
-
-#### Features
-
-- add compatibility with nutmeg release ([#94](https://github.com/eduNEXT/eox-tagging/issues/94)) ([95e94ef](https://github.com/eduNEXT/eox-tagging/commit/95e94ef23501692c10ae45ca090d6b2f84c57b39))
-
-#### Documentation
-
-- change deactivation_date to expiration_date ([#87](https://github.com/eduNEXT/eox-tagging/issues/87)) ([e74b942](https://github.com/eduNEXT/eox-tagging/commit/e74b9428fc7fe279c78deac87429aeb0a62fa332))
-- **bumpversion:** v4.1.0 → 4.2.0 ([3df2ebc](https://github.com/eduNEXT/eox-tagging/commit/3df2ebcdf5a50f4ecd47b7014cfba0d3bc9ad702))
-- **bumpversion:** v4.1.0 → 5.0.0 ([297c81e](https://github.com/eduNEXT/eox-tagging/commit/297c81ee0ade4f1095cc3bf96b32c3e599a5d4a2))
-
 ## v5.0.0 - 2022-10-09
 
 ### [4.2.0](https://github.com/eduNEXT/eox-tagging/compare/v4.1.0...v5.0.0) (2022-10-09)
