@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on ## [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to ## [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v5.1.0 - 2023-02-10
+
+### [5.1.0](https://github.com/eduNEXT/eox-tagging/compare/v5.0.0...v5.1.0) (2023-02-10)
+
+#### Features
+
+- add compatibility with Open edX olive release ([4b985c0](https://github.com/eduNEXT/eox-tagging/commit/4b985c04a2810bdaac78b37f0af05b6ed8622d4c))
+
+#### Documentation
+
+- adds issue template ([0758024](https://github.com/eduNEXT/eox-tagging/commit/0758024f6287991c085af98d433b14ef8d4c598a))
+- update readme with olive version ([8eec015](https://github.com/eduNEXT/eox-tagging/commit/8eec0157f5e7bfcc915a66b3440d441066d0488e))
+
+#### Continuous Integration
+
+- adds mantainer group ([bd105de](https://github.com/eduNEXT/eox-tagging/commit/bd105deab7d4a9fc7b0d0a5f4de484ae0686e24d))
+- update the changelog updater step in bumpversion ([#95](https://github.com/eduNEXT/eox-tagging/issues/95)) ([35cb9e1](https://github.com/eduNEXT/eox-tagging/commit/35cb9e1538c491a4d99f79f8e06b6663c3492bdd))
+- update workflows to github actions ([7d7ac61](https://github.com/eduNEXT/eox-tagging/commit/7d7ac6119cdc955439d4fea41e77caea1c772356))
+
 ## v5.0.0 - 2022-10-09
 
 ### [4.2.0](https://github.com/eduNEXT/eox-tagging/compare/v4.1.0...v5.0.0) (2022-10-09)
