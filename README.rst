@@ -77,6 +77,8 @@ Compatibility Notes
 +-------------------+----------------+
 |       Olive       |      >= 5.0    |
 +-------------------+----------------+
+|       Palm        |      >= 5.0    |
++-------------------+----------------+
 
 The following changes to the plugin settings are necessary. If the release you are looking for is
 not listed, then the accumulation of changes from previous releases is enough.
