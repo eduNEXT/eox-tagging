@@ -211,7 +211,7 @@ class TagViewSet(viewsets.ModelViewSet):
     permission_classes = (EoxTaggingAPIPermission,)
     pagination_class = TagApiPagination
     filter_backends = (FilterBackend,)
-    filter_class = TagFilter
+    filterset_class = TagFilter
     lookup_field = "key"
     http_method_names = ["get", "post", "delete", "head"]
 
