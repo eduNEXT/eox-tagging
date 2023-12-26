@@ -266,8 +266,7 @@ class Tag(models.Model):
         field_value = getattr(self, f"{attr}_type")
         if name:
             return field_value
-        else:
-            return getattr(self, attr)
+        return getattr(self, attr)
 
     def __get_field_choice(self, attr):
         """
