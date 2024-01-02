@@ -77,8 +77,8 @@ class TagSerializer(serializers.ModelSerializer):
 
         try:
             return Tag.objects.create_tag(**tag_object)
-        except ValidationError as e:
-            raise serializers.ValidationError({"Tag": _(f"{e.message}")})
+        except ValidationError as validation_error:
+            raise serializers.ValidationError({"Tag": _(f"{validation_error.message}")})
 
     @staticmethod
     def _convert_compound_keys(ids, object_type):
