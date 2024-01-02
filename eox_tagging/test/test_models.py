@@ -106,24 +106,7 @@ class TestTag(TestCase):
     @override_settings(EOX_TAGGING_DEFINITIONS=[])
     def test_empty_setting(self):
         """
-        Used to test saving without validations defined.
-        If the definitions array is empty then the tag cannot be created.
-        """
-        with self.assertRaises(ValidationError):
-            Tag.objects.create_tag(
-                tag_value="example_tag_value",
-                tag_type="example_tag_1",
-                target_object=self.target_object,
-                owner_object=self.owner_object,
-                access=AccessLevel.PRIVATE,
-            )
-
-    @override_settings(
-        EOX_TAGGING_DEFINITIONS=[
-            {
-                "tag_type": "subscription_tier",
-                "force_access": "private",
-                "validate_tag_value": {"in": ["free", "private"]},
+        Used to test saving without validisable = C0103,  R0903, R0904, W0511, R0901lue": {"in": ["free", "private"]},
                 "validate_owner_object": "User",
                 "validate_target_object": "User",
             },
@@ -515,13 +498,13 @@ class TestTagQuerysetManager(TestCase):
     """
 
     def setUp(self):
-        self.tagQueryset = TagQuerySet()
+        self.tag_query_set = TagQuerySet()
         self.course_id = "course-v1:edX+DemoX+Demo_Course"
 
     @patch.object(OpaqueKeyProxyModel, 'objects')
     def test_create_tag_with_course(self, opaque_objects_mock):
         """Test tagging a course using TagQueryset manager."""
-        self.tagQueryset.create = Mock()
+        self.tag_query_set.create = Mock()
         course_mock = Mock()
         opaque_mock = Mock()
         opaque_objects_mock.get_or_create.return_value = opaque_mock, Mock()
@@ -530,9 +513,9 @@ class TestTagQuerysetManager(TestCase):
             "target_object": course_mock,
         }
 
-        self.tagQueryset.create_tag(**kwargs)
+        self.tag_query_set.create_tag(**kwargs)
 
-        self.tagQueryset.create.assert_called_once_with(target_object=opaque_mock)
+        self.tag_query_set.create.assert_called_once_with(target_object=opaque_mock)
 
     @patch.object(TagQuerySet, '_get_object_for_this_type')
     def test_find_all_tags_for_course(self, _get_object_for_this_type):
@@ -540,16 +523,16 @@ class TestTagQuerysetManager(TestCase):
         target_type, target_id = "CourseOverview", 1
         target, target_ctype = Mock(), Mock()
         _get_object_for_this_type.return_value = target, target_ctype
-        self.tagQueryset.filter = Mock()
+        self.tag_query_set.filter = Mock()
         target.values_list.return_value = [1]
 
-        self.tagQueryset.find_all_tags_for(target_type, target_id)
+        self.tag_query_set.find_all_tags_for(target_type, target_id)
 
         _get_object_for_this_type.assert_called_once_with(
             "opaquekeyproxymodel",
             target_id
         )
-        self.tagQueryset.filter.assert_called_once_with(
+        self.tag_query_set.filter.assert_called_once_with(
             target_type=target_ctype,
             target_object_id__in=[1],
         )
@@ -563,7 +546,7 @@ class TestTagQuerysetManager(TestCase):
             "username": "username",
         }
 
-        self.tagQueryset._get_object_for_this_type(  # pylint: disable=protected-access
+        self.tag_query_set._get_object_for_this_type(  # pylint: disable=protected-access
             object_type,
             object_id,
         )
@@ -585,7 +568,7 @@ class TestTagQuerysetManager(TestCase):
             "opaque_key": CourseKey.from_string(self.course_id),
         }
 
-        self.tagQueryset._get_object_for_this_type(  # pylint: disable=protected-access
+        self.tag_query_set._get_object_for_this_type(  # pylint: disable=protected-access
             object_type,
             object_id,
         )
@@ -609,7 +592,7 @@ class TestTagQuerysetManager(TestCase):
             "user__username": "username",
         }
 
-        self.tagQueryset._get_object_for_this_type(   # pylint: disable=protected-access
+        self.tag_query_set._get_object_for_this_type(   # pylint: disable=protected-access
             object_type,
             object_id,
         )

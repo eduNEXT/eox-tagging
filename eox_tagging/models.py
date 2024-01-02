@@ -202,7 +202,7 @@ class Tag(models.Model):
 
     objects = TagQuerySet().as_manager()
 
-    class Meta:
+    class Meta:  # pylint: disable=too-few-public-methods
         """Meta class. """
         verbose_name = "tag"
         verbose_name_plural = "tags"
