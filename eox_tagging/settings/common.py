@@ -28,7 +28,6 @@ INSTALLED_APPS = [
 ]
 
 EOX_AUDIT_MODEL_APP = 'eox_audit_model.apps.EoxAuditModelConfig'
-# pylint: disable=R0801
 ROOT_URLCONF = 'eox_tagging.urls'
 
 # Internationalization
