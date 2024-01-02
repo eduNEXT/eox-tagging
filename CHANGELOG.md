@@ -5,6 +5,65 @@ All notable changes to this project will be documented in this file.
 The format is based on ## [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to ## [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v6.0.0 - 2024-01-02
+
+### [6.0.0](https://github.com/eduNEXT/eox-tagging/compare/v5.1.0...v6.0.0) (2024-01-02)
+
+#### ⚠ BREAKING CHANGES
+
+* add compatibility with palm release
+  
+* perf: add support for palm release
+  
+* fix: remove 3.10 version test
+  
+* fix: tag pylint to avoid error and newrelic to match with edx-platform
+  
+* fix: rename functions due requirements migrations
+  
+* fix: line too long
+  
+* fix: ignore C0103
+  
+* fix: ignore W0707
+  
+* fix: ignore R0903, R0904
+  
+* fix: pylint R1705: Unnecessary "else" after "return"
+  
+* fix: too-many-ancestors
+  
+* fix: too-many-ancestors
+  
+* fix: too-many-instance-attributes
+  
+* fix: too-many-instance-attributes
+  
+* fix: unused-wildcard-import
+  
+* fix: unused-wildcard-import
+  
+* fix: similar lines in 2 files
+  
+* fix: similar lines in 2 files
+  
+* fix: similar lines in 2 files
+  
+* fix: remove disable codes
+  
+* fix: remove disable codes
+  
+* fix: remove disable codes
+  
+* fix: pylint style
+  
+* docs: update readme
+  
+
+#### Performance Improvements
+
+* add compatibility with Open edX Palm release DS-708 ([#100](https://github.com/eduNEXT/eox-tagging/issues/100)) ([9540f2a](https://github.com/eduNEXT/eox-tagging/commit/9540f2a02774d3278b44b0548afed6ac81b94615))
+
 ## v5.1.0 - 2023-02-10
 
 ### [5.1.0](https://github.com/eduNEXT/eox-tagging/compare/v5.0.0...v5.1.0) (2023-02-10)
