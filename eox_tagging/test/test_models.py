@@ -106,7 +106,24 @@ class TestTag(TestCase):
     @override_settings(EOX_TAGGING_DEFINITIONS=[])
     def test_empty_setting(self):
         """
-        Used to test saving without validisable = C0103,  R0903, R0904, W0511, R0901lue": {"in": ["free", "private"]},
+        Used to test saving without validations defined.
+        If the definitions array is empty then the tag cannot be created.
+        """
+        with self.assertRaises(ValidationError):
+            Tag.objects.create_tag(
+                tag_value="example_tag_value",
+                tag_type="example_tag_1",
+                target_object=self.target_object,
+                owner_object=self.owner_object,
+                access=AccessLevel.PRIVATE,
+            )
+
+    @override_settings(
+        EOX_TAGGING_DEFINITIONS=[
+            {
+                "tag_type": "subscription_tier",
+                "force_access": "private",
+                "validate_tag_value": {"in": ["free", "private"]},
                 "validate_owner_object": "User",
                 "validate_target_object": "User",
             },
