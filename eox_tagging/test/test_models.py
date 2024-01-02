@@ -515,13 +515,13 @@ class TestTagQuerysetManager(TestCase):
     """
 
     def setUp(self):
-        self.tagQueryset = TagQuerySet()
+        self.tag_query_set = TagQuerySet()
         self.course_id = "course-v1:edX+DemoX+Demo_Course"
 
     @patch.object(OpaqueKeyProxyModel, 'objects')
     def test_create_tag_with_course(self, opaque_objects_mock):
         """Test tagging a course using TagQueryset manager."""
-        self.tagQueryset.create = Mock()
+        self.tag_query_set.create = Mock()
         course_mock = Mock()
         opaque_mock = Mock()
         opaque_objects_mock.get_or_create.return_value = opaque_mock, Mock()
@@ -530,9 +530,9 @@ class TestTagQuerysetManager(TestCase):
             "target_object": course_mock,
         }
 
-        self.tagQueryset.create_tag(**kwargs)
+        self.tag_query_set.create_tag(**kwargs)
 
-        self.tagQueryset.create.called_once_with(target_object=opaque_mock)
+        self.tag_query_set.create.assert_called_once_with(target_object=opaque_mock)
 
     @patch.object(TagQuerySet, '_get_object_for_this_type')
     def test_find_all_tags_for_course(self, _get_object_for_this_type):
@@ -540,16 +540,16 @@ class TestTagQuerysetManager(TestCase):
         target_type, target_id = "CourseOverview", 1
         target, target_ctype = Mock(), Mock()
         _get_object_for_this_type.return_value = target, target_ctype
-        self.tagQueryset.filter = Mock()
+        self.tag_query_set.filter = Mock()
         target.values_list.return_value = [1]
 
-        self.tagQueryset.find_all_tags_for(target_type, target_id)
+        self.tag_query_set.find_all_tags_for(target_type, target_id)
 
         _get_object_for_this_type.assert_called_once_with(
             "opaquekeyproxymodel",
             target_id
         )
-        self.tagQueryset.filter.assert_called_once_with(
+        self.tag_query_set.filter.assert_called_once_with(
             target_type=target_ctype,
             target_object_id__in=[1],
         )
@@ -563,7 +563,7 @@ class TestTagQuerysetManager(TestCase):
             "username": "username",
         }
 
-        self.tagQueryset._get_object_for_this_type(  # pylint: disable=protected-access
+        self.tag_query_set._get_object_for_this_type(  # pylint: disable=protected-access
             object_type,
             object_id,
         )
@@ -585,7 +585,7 @@ class TestTagQuerysetManager(TestCase):
             "opaque_key": CourseKey.from_string(self.course_id),
         }
 
-        self.tagQueryset._get_object_for_this_type(  # pylint: disable=protected-access
+        self.tag_query_set._get_object_for_this_type(  # pylint: disable=protected-access
             object_type,
             object_id,
         )
@@ -609,7 +609,7 @@ class TestTagQuerysetManager(TestCase):
             "user__username": "username",
         }
 
-        self.tagQueryset._get_object_for_this_type(   # pylint: disable=protected-access
+        self.tag_query_set._get_object_for_this_type(   # pylint: disable=protected-access
             object_type,
             object_id,
         )

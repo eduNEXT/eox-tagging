@@ -28,7 +28,7 @@ class TestAPIPermissions(TestCase):
         self.mock_request = Mock()
         self.view = Mock()
 
-    def test_API_access_success(self):
+    def test_api_access_success(self):
         """Used to test that an authorized user can access to the Tag API."""
         self.mock_request.get_host.return_value = "test.com"
         self.mock_request.user = self.user_authorized
@@ -38,7 +38,7 @@ class TestAPIPermissions(TestCase):
 
         self.assertTrue(has_permission)
 
-    def test_API_access_denied(self):
+    def test_api_access_denied(self):
         """Used to test that a unauthorized user can't access to the Tag API."""
         self.mock_request.get_host.return_value = "test.com"
         self.mock_request.user = self.common_user
@@ -48,7 +48,7 @@ class TestAPIPermissions(TestCase):
 
         self.assertFalse(has_permission)
 
-    def test_API_access_with_bad_host(self):
+    def test_api_access_with_bad_host(self):
         """Used to test that an authorized user without a matching host with client can't access the API."""
         self.mock_request.get_host.return_value = "test_.com"
         self.mock_request.user = self.user_authorized
@@ -58,7 +58,7 @@ class TestAPIPermissions(TestCase):
         with self.assertRaises(exceptions.NotAuthenticated):
             self.has_permission(self.mock_request, self.view)
 
-    def test_API_access_without_valid_host(self):
+    def test_api_access_without_valid_host(self):
         """Used to test that an authorized user without a valid host can't access the API."""
         self.mock_request.get_host.return_value = None
         self.mock_request.user = self.user_authorized
@@ -68,7 +68,7 @@ class TestAPIPermissions(TestCase):
         with self.assertRaises(exceptions.NotAuthenticated):
             self.has_permission(self.mock_request, self.view)
 
-    def test_API_access_without_valid_client(self):
+    def test_api_access_without_valid_client(self):
         """Used to test that an authorized user without a valid client can't access the API."""
         self.mock_request.get_host.return_value = "test_.com"
         self.mock_request.user = self.user_authorized

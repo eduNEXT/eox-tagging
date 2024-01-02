@@ -17,10 +17,10 @@ from eox_tagging.models import Tag
 
 def mock_decorator(action=None):  # pylint: disable=unused-argument
     """Utility decorator that returns same function."""
-    def decorator(f):
-        @wraps(f)
+    def decorator(func):
+        @wraps(func)
         def decorated_function(*args, **kwargs):
-            return f(*args, **kwargs)
+            return func(*args, **kwargs)
         return decorated_function
     return decorator
 
@@ -52,7 +52,7 @@ def mock_decorator(action=None):  # pylint: disable=unused-argument
             "validate_expiration_date": {"exist": True},
         },
     ])
-class TestTagViewSet(TestCase):
+class TestTagViewSet(TestCase):  # pylint: disable=too-many-instance-attributes
     """Test class for tags viewset."""
 
     patch_permissions = patch(
@@ -108,22 +108,22 @@ class TestTagViewSet(TestCase):
             access=AccessLevel.PUBLIC,
             expiration_date=datetime.datetime(2020, 7, 19, 10, 30, 40),
         )
-        self.KEY = self.example_tag.key.hex
+        self.key = self.example_tag.key.hex
         # Test URLs
-        self.URL = reverse("tag-list")
-        self.URL_DETAILS = reverse("tag-detail", args=[self.KEY])
+        self.url = reverse("tag-list")
+        self.url_details = reverse("tag-detail", args=[self.key])
 
     @patch_permissions
     def test_get_all_tags(self, _):
         """Used to test getting all tags."""
-        response = self.client.get(self.URL)
+        response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
 
     @patch_permissions
     def test_retreive_tag(self, _):
         """Used to test getting a tag given its key."""
-        response = self.client.get(self.URL_DETAILS)
+        response = self.client.get(self.url_details)
 
         self.assertEqual(response.status_code, 200)
 
@@ -141,7 +141,7 @@ class TestTagViewSet(TestCase):
             "expiration_date": "2020-12-04 10:20:30",
         }
 
-        response = self.client.post(self.URL, data, format='json')
+        response = self.client.post(self.url, data, format='json')
 
         self.assertEqual(response.status_code, 201)
 
@@ -160,7 +160,7 @@ class TestTagViewSet(TestCase):
             "expiration_date": "2020-12-04 10:20:30",
         }
 
-        response = self.client.post(self.URL, data, format='json')
+        response = self.client.post(self.url, data, format='json')
 
         owner_type = response.data.get("meta").get("owner_type")
         self.assertEqual(owner_type, "Site")
@@ -178,7 +178,7 @@ class TestTagViewSet(TestCase):
             "expiration_date": "2020-12-04T10:20:30.15785",
         }
 
-        response = self.client.post(self.URL, data, format='json')
+        response = self.client.post(self.url, data, format='json')
 
         self.assertEqual(response.status_code, 201)
 
@@ -198,7 +198,7 @@ class TestTagViewSet(TestCase):
             "expiration_date": "12-04-2020 10:20:30",
         }
 
-        response = self.client.post(self.URL, data, format='json')
+        response = self.client.post(self.url, data, format='json')
 
         self.assertEqual(response.status_code, 400)
 
@@ -215,7 +215,7 @@ class TestTagViewSet(TestCase):
             "expiration_date": "2020-12-04 10:30:40",
         }
 
-        response = self.client.post(self.URL, data, format='json')
+        response = self.client.post(self.url, data, format='json')
 
         owner_type = response.data.get("meta").get("owner_type").lower()
         self.assertEqual(owner_type, "site")
@@ -233,21 +233,21 @@ class TestTagViewSet(TestCase):
             "expiration_date": "2020-12-04 10:30:40 ",
         }
 
-        response = self.client.post(self.URL, data, format='json')
+        response = self.client.post(self.url, data, format='json')
 
         self.assertEqual(response.status_code, 400)
 
     @patch_permissions
     def test_patch_tag(self, _):
         """Used to test that a tag can't be updated."""
-        response = self.client.patch(self.URL_DETAILS)
+        response = self.client.patch(self.url_details)
 
         self.assertEqual(response.status_code, 405)
 
     @patch_permissions
     def test_put_tag(self, _):
         """Used to test that a tag can't be updated."""
-        response = self.client.put(self.URL_DETAILS)
+        response = self.client.put(self.url_details)
 
         self.assertEqual(response.status_code, 405)
 
@@ -258,10 +258,10 @@ class TestTagViewSet(TestCase):
             "key": self.example_tag.key.hex,
         }
 
-        response = self.client.get(self.URL, query_params)
+        response = self.client.get(self.url, query_params)
 
         data = response.json().get("results")[0]
-        self.assertEqual(data.get("key").replace("-", ""), self.KEY)
+        self.assertEqual(data.get("key").replace("-", ""), self.key)
 
     @patch_permissions
     def test_filter_by_username(self, _):
@@ -270,7 +270,7 @@ class TestTagViewSet(TestCase):
             "username": "user_test",
         }
 
-        response = self.client.get(self.URL, query_params)
+        response = self.client.get(self.url, query_params)
 
         data = response.json().get("results")[0].get("meta")
         self.assertEqual(data.get("target_id"), "user_test")
@@ -282,7 +282,7 @@ class TestTagViewSet(TestCase):
             "owner_type": "user",
         }
 
-        response = self.client.get(self.URL, query_params)
+        response = self.client.get(self.url, query_params)
 
         results = response.json().get("results")
         owner_is_user = [tag.get("meta").get("owner_type") == "User" for tag in results]
@@ -296,7 +296,7 @@ class TestTagViewSet(TestCase):
             "target_type": "user",
         }
 
-        response = self.client.get(self.URL, query_params)
+        response = self.client.get(self.url, query_params)
 
         results = response.json().get("results")
         owner_is_user = [tag.get("meta").get("owner_type") == "User" for tag in results]
@@ -312,7 +312,7 @@ class TestTagViewSet(TestCase):
             "username": "user_test",
         }
 
-        response = self.client.get(self.URL, query_params)
+        response = self.client.get(self.url, query_params)
 
         results = response.json().get("results")
         owner_type = results[0].get("meta").get("owner_type")
@@ -327,7 +327,7 @@ class TestTagViewSet(TestCase):
             "owner_type": "site",
         }
 
-        response = self.client.get(self.URL, query_params)
+        response = self.client.get(self.url, query_params)
 
         data = response.json().get("results")[0]
         owner_type = data.get("meta").get("owner_type").lower()
@@ -343,7 +343,7 @@ class TestTagViewSet(TestCase):
             "owner_type": "course",
         }
 
-        response = self.client.get(self.URL, query_params)
+        response = self.client.get(self.url, query_params)
 
         data = response.json().get("results")
         self.assertFalse(data)
@@ -355,7 +355,7 @@ class TestTagViewSet(TestCase):
             "target_type": "user",
         }
 
-        response = self.client.get(self.URL, query_params)
+        response = self.client.get(self.url, query_params)
 
         self.assertEqual(response.status_code, 200)
 
@@ -366,7 +366,7 @@ class TestTagViewSet(TestCase):
             "access": "public",
         }
 
-        response = self.client.get(self.URL, query_params)
+        response = self.client.get(self.url, query_params)
 
         data = response.json().get("results")[0]
         self.assertEqual(data.get("key").replace("-", ""), self.example_tag_3.key.hex)
@@ -378,7 +378,7 @@ class TestTagViewSet(TestCase):
             "access": "pub",
         }
 
-        response = self.client.get(self.URL, query_params)
+        response = self.client.get(self.url, query_params)
 
         data = response.json().get("results")
         self.assertFalse(data)
@@ -396,7 +396,7 @@ class TestTagViewSet(TestCase):
         datetime_value = datetime.datetime(2020, 10, 10, 10, 20, 30)
         datetime_format = "%Y-%m-%dT%H:%M:%SZ"
 
-        response = self.client.get(self.URL, query_params)
+        response = self.client.get(self.url, query_params)
 
         results = response.json().get("results")
         datetimes = [datetime.datetime.strptime(tag.get("activation_date"), datetime_format) > datetime_value
@@ -416,7 +416,7 @@ class TestTagViewSet(TestCase):
         datetime_value = datetime.datetime(2020, 10, 10, 10, 20, 30)
         datetime_format = "%Y-%m-%dT%H:%M:%SZ"
 
-        response = self.client.get(self.URL, query_params)
+        response = self.client.get(self.url, query_params)
 
         results = response.json().get("results")
         activation_date = [datetime.datetime.strptime(tag.get("activation_date"), datetime_format) < datetime_value
@@ -436,7 +436,7 @@ class TestTagViewSet(TestCase):
         datetime_value = datetime.datetime(2020, 10, 10, 10, 20, 30)
         datetime_format = "%Y-%m-%dT%H:%M:%SZ"
 
-        response = self.client.get(self.URL, query_params)
+        response = self.client.get(self.url, query_params)
 
         results = response.json().get("results")
         expiration_date = [datetime.datetime.strptime(tag.get("expiration_date"), datetime_format) < datetime_value
@@ -446,14 +446,14 @@ class TestTagViewSet(TestCase):
     @patch_permissions
     def test_soft_delete(self, _):
         """Used to test a tag soft deletion."""
-        response = self.client.delete(self.URL_DETAILS)
+        response = self.client.delete(self.url_details)
 
         self.assertEqual(response.status_code, 204)
 
     @patch_permissions
     def test_getting_meta_field(self, _):
         """Used to test getting tag most important technical information."""
-        response = self.client.get(self.URL_DETAILS)
+        response = self.client.get(self.url_details)
 
         data = response.json().get("meta")
         self.assertIsNotNone(data)
@@ -465,25 +465,25 @@ class TestTagViewSet(TestCase):
     @patch_permissions
     def test_retreive_inactive_tag(self, _):
         """Used to test getting a tag given its key."""
-        self.client.delete(self.URL_DETAILS)
-        response = self.client.get(self.URL_DETAILS)
+        self.client.delete(self.url_details)
+        response = self.client.get(self.url_details)
 
-        self.assertEqual(response.data.get("key").replace("-", ""), self.KEY)
+        self.assertEqual(response.data.get("key").replace("-", ""), self.key)
         self.assertEqual(response.data.get("status"), "INACTIVE")
 
     @patch_permissions
     def test_get_inactive_tag_with_filter(self, _):
         """Used to test getting a tag given its key."""
         query_params = {
-            "key": self.KEY,
+            "key": self.key,
         }
 
-        self.client.delete(self.URL_DETAILS)
-        response = self.client.get(self.URL, query_params)
+        self.client.delete(self.url_details)
+        response = self.client.get(self.url, query_params)
 
         data = response.json().get("results")[0]
         self.assertEqual(data.get("status"), "INACTIVE")
-        self.assertEqual(data.get("key").replace("-", ""), self.KEY)
+        self.assertEqual(data.get("key").replace("-", ""), self.key)
 
     @patch_permissions
     def test_listing_inactive_tags(self, _):
@@ -492,8 +492,8 @@ class TestTagViewSet(TestCase):
             "include_inactive": "true"
         }
 
-        self.client.delete(self.URL_DETAILS)  # To deactivate the tag
-        response_include_inactive = self.client.get(self.URL, query_params)
+        self.client.delete(self.url_details)  # To deactivate the tag
+        response_include_inactive = self.client.get(self.url, query_params)
 
         include_inactive = [tag.get("key") for tag in response_include_inactive.json().get("results")]
         serialized_tag = TagSerializer(self.example_tag).data
@@ -501,9 +501,9 @@ class TestTagViewSet(TestCase):
 
     @patch_permissions
     def test_listing_just_active_tags(self, _):
-        """Used to test getting just active tags using as the only inactive tag the tag in URL_DETAILS."""
-        self.client.delete(self.URL_DETAILS)  # To deactivate the tag
-        response_exclude_inactive = self.client.get(self.URL)
+        """Used to test getting just active tags using as the only inactive tag the tag in url_details."""
+        self.client.delete(self.url_details)  # To deactivate the tag
+        response_exclude_inactive = self.client.get(self.url)
 
         exclude_inactive = [tag.get("key") for tag in response_exclude_inactive.json().get("results")]
         serialized_tag = TagSerializer(self.example_tag).data

@@ -3,7 +3,8 @@
 
 Django
 edx-opaque-keys[django]
-pylint
+# Use palm version for pylint to avoid errors
+pylint==2.15.10
 pycodestyle
 coverage
 django-fake-model

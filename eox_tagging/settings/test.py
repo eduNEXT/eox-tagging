@@ -3,7 +3,7 @@ Test Django settings for eox_tagging project.
 """
 from __future__ import unicode_literals
 
-from .common import *  # pylint: disable=wildcard-import
+from .common import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 
 class SettingsClass:
@@ -29,19 +29,6 @@ DATABASES = {
         'NAME': 'db.sqlite3',
     },
 }
-
-ROOT_URLCONF = 'eox_tagging.urls'
-
-# Internationalization
-# https://docs.djangoproject.com/en/1.11/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_TZ = True
-
-ALLOWED_HOSTS = ['*']
 
 
 def plugin_settings(settings):  # pylint: disable=function-redefined

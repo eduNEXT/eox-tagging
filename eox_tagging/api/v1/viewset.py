@@ -203,7 +203,7 @@ except ImportError:
     ],
     responses={status.HTTP_404_NOT_FOUND: "Not found"},
 )
-class TagViewSet(viewsets.ModelViewSet):
+class TagViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
     """Viewset for listing and creating Tags."""
 
     serializer_class = TagSerializer
@@ -211,7 +211,7 @@ class TagViewSet(viewsets.ModelViewSet):
     permission_classes = (EoxTaggingAPIPermission,)
     pagination_class = TagApiPagination
     filter_backends = (FilterBackend,)
-    filter_class = TagFilter
+    filterset_class = TagFilter
     lookup_field = "key"
     http_method_names = ["get", "post", "delete", "head"]
 
