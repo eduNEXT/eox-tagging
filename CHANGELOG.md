@@ -17,45 +17,7 @@ and this project adheres to ## [Semantic Versioning](https://semver.org/spec/v2.
   
 * fix: remove 3.10 version test
   
-* fix: tag pylint to avoid error and newrelic to match with edx-platform
-  
-* fix: rename functions due requirements migrations
-  
-* fix: line too long
-  
-* fix: ignore C0103
-  
-* fix: ignore W0707
-  
-* fix: ignore R0903, R0904
-  
-* fix: pylint R1705: Unnecessary "else" after "return"
-  
-* fix: too-many-ancestors
-  
-* fix: too-many-ancestors
-  
-* fix: too-many-instance-attributes
-  
-* fix: too-many-instance-attributes
-  
-* fix: unused-wildcard-import
-  
-* fix: unused-wildcard-import
-  
-* fix: similar lines in 2 files
-  
-* fix: similar lines in 2 files
-  
-* fix: similar lines in 2 files
-  
-* fix: remove disable codes
-  
-* fix: remove disable codes
-  
-* fix: remove disable codes
-  
-* fix: pylint style
+* fix: pylint issues
   
 * docs: update readme
   
