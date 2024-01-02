@@ -30,19 +30,6 @@ DATABASES = {
     },
 }
 
-ROOT_URLCONF = 'eox_tagging.urls'
-
-# Internationalization
-# https://docs.djangoproject.com/en/1.11/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_TZ = True
-
-ALLOWED_HOSTS = ['*']
-
 
 def plugin_settings(settings):  # pylint: disable=function-redefined
     """

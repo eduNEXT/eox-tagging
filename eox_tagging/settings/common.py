@@ -28,6 +28,7 @@ INSTALLED_APPS = [
 ]
 
 EOX_AUDIT_MODEL_APP = 'eox_audit_model.apps.EoxAuditModelConfig'
+
 ROOT_URLCONF = 'eox_tagging.urls'
 
 # Internationalization
