@@ -202,7 +202,7 @@ class Tag(models.Model):
 
     objects = TagQuerySet().as_manager()
 
-    class Meta:  # pylint: disable=too-few-public-methods
+    class Meta:
         """Meta class. """
         verbose_name = "tag"
         verbose_name_plural = "tags"
@@ -299,7 +299,7 @@ class Tag(models.Model):
             return
         self.validator.validate_fields_integrity()
 
-    def full_clean(self, exclude=None, validate_unique=False):
+    def full_clean(self, exclude=None, validate_unique=False):  # pylint: disable=arguments-differ
         """
         Call clean_fields(), clean(), and validate_unique() -not implemented- on the model.
         Raise a ValidationError for any errors that occur.

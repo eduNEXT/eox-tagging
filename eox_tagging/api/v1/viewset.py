@@ -203,7 +203,7 @@ except ImportError:
     ],
     responses={status.HTTP_404_NOT_FOUND: "Not found"},
 )
-class TagViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
+class TagViewSet(viewsets.ModelViewSet):
     """Viewset for listing and creating Tags."""
 
     serializer_class = TagSerializer

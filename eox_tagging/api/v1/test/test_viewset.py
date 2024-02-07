@@ -52,7 +52,7 @@ def mock_decorator(action=None):  # pylint: disable=unused-argument
             "validate_expiration_date": {"exist": True},
         },
     ])
-class TestTagViewSet(TestCase):  # pylint: disable=too-many-instance-attributes
+class TestTagViewSet(TestCase):
     """Test class for tags viewset."""
 
     patch_permissions = patch(

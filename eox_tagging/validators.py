@@ -85,8 +85,10 @@ class TagValidators:
             if key.startswith(pattern):
                 try:
                     self.instance.set_attribute(key.replace(pattern, ""), value)
-                except Exception:
-                    raise ValidationError(f"EOX_TAGGING | The field {key} with value `{value}` is wrongly configured")
+                except Exception as exc:
+                    raise ValidationError(
+                        f"EOX_TAGGING | The field {key} with value `{value}` is wrongly configured"
+                    ) from exc
                 del self.current_tag_definitions[key]
 
     def __validate_required(self):
@@ -126,16 +128,18 @@ class TagValidators:
                 for _key in value:  # Validations must exist as a class method
                     try:
                         getattr(self, f"validate_{_key}")
-                    except AttributeError:
+                    except AttributeError as exc:
                         raise ValidationError(
                             f"EOX_TAGGING | The field {key} with value `{_key}` is wrongly configured."
-                        )
+                        ) from exc
             # Validate key existence
             clean_key = re.sub(regex, "", key)
             try:
                 self.instance.get_attribute(clean_key)
-            except AttributeError:
-                raise ValidationError(f"EOX_TAGGING | The field `{key}` is wrongly configured.")
+            except AttributeError as exc:
+                raise ValidationError(
+                    f"EOX_TAGGING | The field `{key}` is wrongly configured."
+                ) from exc
 
     def __validate_configuration_types(self):
         """Function that validate the correct type for pairs <key, value> in configuration."""
@@ -170,13 +174,17 @@ class TagValidators:
         """Function that validates the instances in GFK fields calling the integrity validators."""
         try:
             model_name = self.instance.get_attribute(field_name, name=True)
-        except AttributeError:
-            raise ValidationError(f"EOX_TAGGING | The field '{field_name}' is wrongly configured.")
+        except AttributeError as exc:
+            raise ValidationError(
+                f"EOX_TAGGING | The field '{field_name}' is wrongly configured."
+            ) from exc
         try:
             if model_name:
                 self.model_validations[model_name](field_name)
-        except KeyError:
-            raise ValidationError(f"EOX_TAGGING | Could not find integrity validation for field '{field_name}'")
+        except KeyError as exc:
+            raise ValidationError(
+                f"EOX_TAGGING | Could not find integrity validation for field '{field_name}'"
+            ) from exc
 
     # Integrity validators
     def __validate_proxy_model(self, object_name):
@@ -189,10 +197,10 @@ class TagValidators:
         opaque_key = self.instance.get_attribute(object_name).opaque_key
         try:
             CourseOverview.get_from_id(opaque_key)
-        except Exception:
+        except Exception as exc:
             raise ValidationError(
                 f"EOX_TAGGING | Could not find opaque key: '{opaque_key}' for relation '{object_name}'"
-            )
+            ) from exc
 
     def __validate_user_integrity(self, object_name):
         """
@@ -209,9 +217,11 @@ class TagValidators:
         try:
             get_edxapp_user(**data)
 
-        except Exception:
-            raise ValidationError(f"EOX_TAGGING | Could not find ID: {self.instance.get_attribute(object_name).id} \
-                for relation '{object_name}'")
+        except Exception as exc:
+            raise ValidationError(
+                f"EOX_TAGGING | Could not find ID: {self.instance.get_attribute(object_name).id} \
+                for relation '{object_name}'"
+            ) from exc
 
     def __validate_enrollment_integrity(self, object_name):
         """
@@ -232,11 +242,11 @@ class TagValidators:
                     f"EOX_TAGGING | Enrollment for user '{data['username']}' and courseID '{data['course_id']}' \
                         does not exist"
                 )
-        except Exception:
+        except Exception as exc:
             raise ValidationError(
                 f"EOX_TAGGING | Error getting enrollment for user '{data['username']}' \
                     and courseID '{data['course_id']}'"
-            )
+            ) from exc
 
     def __validate_site_integrity(self, object_name):
         """
@@ -249,8 +259,10 @@ class TagValidators:
 
         try:
             Site.objects.get(id=site_id)
-        except ObjectDoesNotExist:
-            raise ValidationError(f"EOX_TAGGING | Site '{site_id}' does not exist")
+        except ObjectDoesNotExist as exc:
+            raise ValidationError(
+                f"EOX_TAGGING | Site '{site_id}' does not exist"
+            ) from exc
 
     def __validate_certificate_integrity(self, object_name):
         """
@@ -263,8 +275,10 @@ class TagValidators:
 
         try:
             GeneratedCertificate.objects.get(id=certificate_id)
-        except ObjectDoesNotExist:
-            raise ValidationError(f"EOX_TAGGING | Certificate '{certificate_id}' does not exist")
+        except ObjectDoesNotExist as exc:
+            raise ValidationError(
+                f"EOX_TAGGING | Certificate '{certificate_id}' does not exist"
+            ) from exc
 
     # Other validations
     def validate_no_updating(self):
@@ -303,9 +317,11 @@ class TagValidators:
             opaque_key_to_validate = getattr(all_opaque_keys, value)
             # Validation method for OpaqueKey: opaque_key_to_validate
             getattr(opaque_key_to_validate, "from_string")(field_value)
-        except InvalidKeyError:
+        except InvalidKeyError as exc:
             # We don't recognize this key
-            raise ValidationError(f"The key '{field_value}' for '{field}' is not an opaque key")
+            raise ValidationError(
+                f"The key '{field_value}' for '{field}' is not an opaque key"
+            ) from exc
 
     def validate_in(self, field, values):
         """
@@ -374,11 +390,11 @@ class TagValidators:
         for datetime_str in value:
             try:
                 datetime_obj.append(datetime.datetime.strptime(datetime_str, DATETIME_FORMAT_VALIDATION))
-            except TypeError:
+            except TypeError as exc:
                 raise ValidationError(
                     f"EOX_TAGGING | The DateTime field '{datetime_str}' \
                         must follow the format '{DATETIME_FORMAT_VALIDATION}'."
-                )
+                ) from exc
 
         if field_value < datetime_obj[0] or field_value > datetime_obj[-1]:
             raise ValidationError(
@@ -396,10 +412,10 @@ class TagValidators:
         """
         try:
             datetime_str = datetime.datetime.strptime(value, DATETIME_FORMAT_VALIDATION)
-        except TypeError:
+        except TypeError as exc:
             raise ValidationError(
                 f"EOX_TAGGING | The DateTime field '{value}' must follow the format '{DATETIME_FORMAT_VALIDATION}'."
-            )
+            ) from exc
 
         if field_value != datetime_str:
             raise ValidationError(f"EOX_TAGGING | The DateTime field '{field_value}' must be equal to '{str(value)}'.")
