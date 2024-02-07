@@ -79,7 +79,8 @@ Compatibility Notes
 +-------------------+----------------+
 |       Palm        |      >= 6.0    |
 +-------------------+----------------+
-
+|      Quince       |      >= 7.0    |
++-------------------+----------------+
 The following changes to the plugin settings are necessary. If the release you are looking for is
 not listed, then the accumulation of changes from previous releases is enough.
 
@@ -91,7 +92,7 @@ not listed, then the accumulation of changes from previous releases is enough.
     EOX_TAGGING_GET_COURSE_OVERVIEW: "eox_tagging.edxapp_wrappers.backends.course_overview_i_v1"
     EOX_TAGGING_BEARER_AUTHENTICATION: "eox_tagging.edxapp_wrappers.backends.bearer_authentication_i_v1"
 
-**Koa, Lilac, Maple, Nutmeg, Olive**
+**Koa, Lilac, Maple, Nutmeg, Olive, Palm and Quince**
 
 .. code-block:: yaml
 
