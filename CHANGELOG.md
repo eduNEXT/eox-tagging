@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on ## [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to ## [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v7.0.0 - 2024-02-13
+
+### [7.0.0](https://github.com/eduNEXT/eox-tagging/compare/v6.0.0...v7.0.0) (2024-02-13)
+
+#### ⚠ BREAKING CHANGES
+
+* add compatibility with Quince release
+  
+* chore: update main requirements & add django 4.2 support
+  
+* chore: support django 42 & solve issues in testing
+  
+* fix: delete deprecated pylint rules
+  
+* fix: use pylint messages control
+  
+* fix: ignore migrations from quality tests
+  
+* fix: solve deprecated methods & apply linter corrections
+  
+* chore: update github-actions requirements
+  
+* docs: update compatibility notes
+  
+* fix: add required blank line after table
+  
+
+#### Performance Improvements
+
+* add compatibility with Quince release ([#102](https://github.com/eduNEXT/eox-tagging/issues/102)) ([cff9359](https://github.com/eduNEXT/eox-tagging/commit/cff93597d26b93d5a403f2bc89f821f4bff77caa))
+
+#### Documentation
+
+* improve changelog ([ba004ef](https://github.com/eduNEXT/eox-tagging/commit/ba004efbc96f8d44f0c1f59b9853e790054882ac))
+
 ## v6.0.0 - 2024-01-02
 
 ### [6.0.0](https://github.com/eduNEXT/eox-tagging/compare/v5.1.0...v6.0.0) (2024-01-02)
