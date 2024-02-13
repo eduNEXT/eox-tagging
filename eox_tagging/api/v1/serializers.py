@@ -1,8 +1,9 @@
 """
 Serializers for tags and related objects.
 """
+
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from eox_tagging.api.v1 import fields
@@ -19,19 +20,36 @@ MODELS_WITH_COMPOUND_KEYS = {
 class TagSerializer(serializers.ModelSerializer):
     """Serializer for tag objects."""
 
-    target_id = serializers.CharField(source='target_object', write_only=True)
-    owner_id = serializers.CharField(source='owner_object', required=False, write_only=True)
-    owner_type = serializers.CharField(source='owner_object_type', write_only=True, required=False)
-    target_type = serializers.CharField(source='target_object_type', write_only=True)
+    target_id = serializers.CharField(source="target_object", write_only=True)
+    owner_id = serializers.CharField(
+        source="owner_object", required=False, write_only=True
+    )
+    owner_type = serializers.CharField(
+        source="owner_object_type", write_only=True, required=False
+    )
+    target_type = serializers.CharField(source="target_object_type", write_only=True)
     meta = serializers.SerializerMethodField()
     access = fields.EnumField(enum=AccessLevel, required=False)
     status = fields.EnumField(enum=Status, required=False)
 
     class Meta:
         """Meta class."""
+
         model = Tag
-        fields = ('meta', 'key', 'tag_value', 'tag_type', 'access', 'activation_date', 'expiration_date',
-                  'target_id', 'owner_id', 'owner_type', 'target_type', 'status')
+        fields = (
+            "meta",
+            "key",
+            "tag_value",
+            "tag_type",
+            "access",
+            "activation_date",
+            "expiration_date",
+            "target_id",
+            "owner_id",
+            "owner_type",
+            "target_type",
+            "status",
+        )
 
     def get_meta(self, instance):
         """Getter of read-only field that returns technical information."""
@@ -61,8 +79,10 @@ class TagSerializer(serializers.ModelSerializer):
 
         try:
             target_object = get_object_from_edxapp(target_type, **data)
-        except Exception:
-            raise serializers.ValidationError({"Target": _(f"Error getting {target_type} object.")})
+        except Exception as exc:
+            raise serializers.ValidationError(
+                {"Target": _(f"Error getting {target_type} object.")}
+            ) from exc
 
         if owner_type and owner_type.lower() == "user":
             owner_object = self.context.get("request").user

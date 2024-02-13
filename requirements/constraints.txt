@@ -10,5 +10,4 @@
 
 
 # Version used in Palm version of edx-platform
-django<=3.3
-newrelic==8.8.0
+django<5.0
