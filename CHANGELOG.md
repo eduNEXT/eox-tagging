@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on ## [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to ## [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v7.1.0 - 2024-03-19
+
+### [7.1.0](https://github.com/eduNEXT/eox-tagging/compare/v7.0.0...v7.1.0) (2024-03-19)
+
+#### Features
+
+* add workflow to add items to the Dedalo project DS-831 ([#103](https://github.com/eduNEXT/eox-tagging/issues/103)) ([0c93d84](https://github.com/eduNEXT/eox-tagging/commit/0c93d845dd3c1f29c8e5ac517c167094bb61e2ba))
+
 ## v7.0.0 - 2024-02-13
 
 ### [7.0.0](https://github.com/eduNEXT/eox-tagging/compare/v6.0.0...v7.0.0) (2024-02-13)
