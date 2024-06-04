@@ -1,12 +1,12 @@
 """
 Test Django settings for eox_tagging project.
 """
+from __future__ import unicode_literals
+
 import codecs
 import os
 
 import yaml
-
-from __future__ import unicode_literals
 
 from .common import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
