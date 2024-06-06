@@ -5,7 +5,7 @@ echo "Install eox-core(requirement)"
 pip install eox-core
 
 echo "Install package"
-pip install -e ../eox-tagging
+pip install -e /openedx/eox-tagging
 
 echo "Install test-requirements"
 make test-requirements
