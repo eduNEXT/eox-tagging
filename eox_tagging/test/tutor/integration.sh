@@ -10,5 +10,8 @@ make test-requirements
 echo "Install eox-core(requirement)"
 pip install eox-core
 
+python manage.py lms makemigrations
+python manage.py lms migrate
+
 echo "Run tests"
 pytest -s --ds=lms.envs.tutor.test /openedx/eox-tagging/eox_tagging/test/tutor
