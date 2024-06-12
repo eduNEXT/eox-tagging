@@ -1,61 +1,24 @@
-=============
-eox_tagging
-=============
+===========
+EOX Tagging
+===========
 
-Eox-tagging (A.K.A. Edunext Open extensions) is an `openedx plugin`_, that adds the capability
+Eox-tagging is an `openedx plugin`_, part of the Edunext Open Extensions (aka EOX), that adds the capability
 to tag `edx-platform`_ objects. These tags can be used to categorize, include extra information, and so on.
 
 Installation
 ============
 
-Open edX devstack
-------------------
+#. Install a new fresh instance of tutor following `this steps <https://docs.tutor.overhang.io/quickstart.html#quickstart-1-click-install>`_. *If your instance is running, you can skip this step.*
+#. Add to the Tutor configuration in the file ``cat "$(tutor config printroot)/config.yml"`` these lines that install eox-tagging and eox-core lib:
 
-- Install a supported version of the `Open edX devstack`_. See versions for more details.
-
-- Clone the git repo:
-
-.. code-block:: bash
-
-  cd ~/Documents/eoxstack/src/  # Assuming that devstack is in  ~/Documents/eoxstack/devstack/
-  sudo mkdir edxapp
-  cd edxapp
-  git clone git@github.com:eduNEXT/eox-tagging.git
-
-- Install plugin from your server (in this case the devstack docker lms shell):
-
-.. code-block:: bash
-
-  cd ~/Documents/eoxstack/devstack  # Change for your devstack path (if you are using devstack)
-  make lms-shell  # Enter the devstack machine (or server where lms process lives)
-  cd /edx/src/edxapp/eox-tagging
-  pip install -e .
-  python manage.py lms migrate eox_tagging --settings=<your app settings>
-
-Open edX with Tutor (Maple)
-----------------------------
-If you are using `Tutor <https://docs.tutor.overhang.io/gettingstarted.html>`_ to deploy the Open edX instance, please follow this steps:
-
-#. Install a new fresh instance of tutor following `this steps <https://docs.tutor.overhang.io/quickstart.html#quickstart-1-click-install>`_. *If you already have a tutor instance running you can skip this step.*
-#. Add to the Tutor configuration in the file ``cat "$(tutor config printroot)/config.yml"`` this lines that install eox-tagging and eox-core lib:
     .. code-block:: yaml
     
         OPENEDX_EXTRA_PIP_REQUIREMENTS:
         - eox_core
         - eox_tagging
-#. Create a new tutor plugin that adds this settings to openedx common settings:
-    .. code-block:: yaml
-    
-        EOX_TAGGING_GET_ENROLLMENT_OBJECT = "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
-        EOX_CORE_USERS_BACKEND = "eox_core.edxapp_wrapper.backends.users_m_v1"
 
-    .. note::
-        `Here <https://github.com/eduNEXT/eox-tagging/issues/83>`_ is an example of creating a tutor plugin with a yaml file. 
-        But there are other ways to create tutor plugins, please go to tutor docs and see how to add settings in Open edX common settings.
-#. Install the plugin doing ``tutor plugins enable eox-tagging-plugin`` and then ``tutor config save``.
-#. Build the openedx image doing ``tutor images build openedx``.
-#. Start the tutor instance with the new config doing ``tutor local quickstart``.
-#. All set to use eox-tagging lib!
+#. Build the openedx image by doing ``tutor images build openedx``.
+#. Start the tutor instance with ``tutor local launch``.
 
 Compatibility Notes
 --------------------
@@ -107,12 +70,12 @@ Those settings can be changed in ``eox_tagging/settings/common.py`` or, for exam
 Usage
 ======
 
-See the `How to section <https://github.com/eduNEXT/eox-tagging/tree/master/docs/how_to>`_ for a detailed guidance on: Model, configurations and API usage.
+See the `How to section <https://github.com/eduNEXT/eox-tagging/tree/master/docs/how_to>`_ for detailed guidance on Model, configurations and API usage.
 
 Important notes:
 ----------------
 
-* All the comparison with string objects are case insensitive.
+* All the comparisons with string objects are case insensitive.
 * If a tag owner is not defined, then it is assumed to be the site.
 
 Examples
@@ -151,11 +114,11 @@ This means that:
 
         {
             "validate_tag_value":{
-                "exist":true
+                "exist": true
             },
-            "validate_access":"Public",
-            "validate_target_object":"User",
-            "tag_type":"tag_by_edunext"
+            "validate_access": "Public",
+            "validate_target_object": "User",
+            "tag_type": "tag_by_edunext"
         }
 
 This means that:
@@ -170,17 +133,17 @@ This means that:
 .. code-block:: JSON
 
         {
-            "validate_tag_value":"tag_value",
-            "validate_access":{
-                "in":[
+            "validate_tag_value": "tag_value",
+            "validate_access": {
+                "in": [
                     "Private",
                     "Public"
                 ]
             },
-            "validate_target_object":"CourseEnrollment",
+            "validate_target_object": "CourseEnrollment",
             "tag_type":"tag_by_edunext",
             "validate_activation_date":{
-                "exist":true,
+                "exist": true,
                 "in":[
                     "Dec 04 2020 10:30:40",
                     "Oct 19 2020 10:30:40"
@@ -328,15 +291,14 @@ Auditing Django views (Optional in Maple)
 =========================================
 
 The majority of views in eox-tagging use an auditing decorator, defined in our custom library called `eox-audit-model`_,
-that helps saving relevant information about non-idempotent operations. By default this functionality is turned on. To
+that helps save relevant information about non-idempotent operations. By default, this functionality is turned on. To
 check your auditing records go to Django sysadmin and find DJANGO EDUNEXT AUDIT MODEL.
 
 For more information, check the eox-audit-model documentation.
 
 
-.. _Open edX Devstack: https://github.com/edx/devstack/
-.. _openedx plugin: https://github.com/edx/edx-platform/tree/master/openedx/core/djangoapps/plugins
-.. _edx-platform: https://github.com/edx/edx-platform/
+.. _openedx plugin: https://github.com/openedx/edx-platform/tree/master/openedx/core/djangoapps/plugins
+.. _edx-platform: https://github.com/openedx/edx-platform/
 .. _eox-audit-model: https://github.com/eduNEXT/eox-audit-model/
 
 How to Contribute
