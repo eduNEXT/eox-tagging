@@ -1,6 +1,14 @@
 ===========
 EOX Tagging
 ===========
+|Maintainance Badge| |Test Badge| |PyPI Badge|
+
+.. |Maintainance Badge| image:: https://img.shields.io/badge/Status-Maintained-brightgreen
+   :alt: Maintainance Status
+.. |Test Badge| image:: https://img.shields.io/github/actions/workflow/status/edunext/eox-tagging/.github%2Fworkflows%2Ftests.yml?label=Test
+   :alt: GitHub Actions Workflow Test Status
+.. |PyPI Badge| image:: https://img.shields.io/pypi/v/eox-tagging?label=PyPI
+   :alt: PyPI - Version
 
 Eox-tagging is an `openedx plugin`_, part of the Edunext Open Extensions (aka EOX), that adds the capability
 to tag `edx-platform`_ objects. These tags can be used to categorize, include extra information, and so on.
@@ -23,27 +31,27 @@ Installation
 Compatibility Notes
 --------------------
 
-+-------------------+----------------+
-| Open edX Release  |     Version    |
-+===================+================+
-|      Ironwood     |   < 0.9 < 3.0  |
-+-------------------+----------------+
-|       Juniper     |   >= 0.9 < 3.0 |
-+-------------------+----------------+
-|        Koa        |   >= 2.2 < 5.0 |
-+-------------------+----------------+
-|       Lilac       |   >= 2.2 < 5.0 |
-+-------------------+----------------+
-|       Maple       | >= 4.0 < 6.0   |
-+-------------------+----------------+
-|       Nutmeg      |  >= 5.0 < 6.0  |
-+-------------------+----------------+
-|       Olive       |  >= 5.0 < 6.0  |
-+-------------------+----------------+
-|       Palm        |      >= 6.0    |
-+-------------------+----------------+
-|      Quince       |      >= 7.0    |
-+-------------------+----------------+
++------------------+--------------+
+| Open edX Release | Version      |
++==================+==============+
+| Ironwood         | < 0.9 < 3.0  |
++------------------+--------------+
+| Juniper          | >= 0.9 < 3.0 |
++------------------+--------------+
+| Koa              | >= 2.2 < 5.0 |
++------------------+--------------+
+| Lilac            | >= 2.2 < 5.0 |
++------------------+--------------+
+| Maple            | >= 4.0 < 6.0 |
++------------------+--------------+
+| Nutmeg           | >= 5.0 < 6.0 |
++------------------+--------------+
+| Olive            | >= 5.0 < 6.0 |
++------------------+--------------+
+| Palm             | >= 6.0       |
++------------------+--------------+
+| Quince           | >= 7.0       |
++------------------+--------------+
 
 The following changes to the plugin settings are necessary. If the release you are looking for is
 not listed, then the accumulation of changes from previous releases is enough.
@@ -56,21 +64,21 @@ not listed, then the accumulation of changes from previous releases is enough.
     EOX_TAGGING_GET_COURSE_OVERVIEW: "eox_tagging.edxapp_wrappers.backends.course_overview_i_v1"
     EOX_TAGGING_BEARER_AUTHENTICATION: "eox_tagging.edxapp_wrappers.backends.bearer_authentication_i_v1"
 
-**Koa, Lilac, Maple, Nutmeg, Olive, Palm and Quince**
+**Koa, Lilac, Maple, Nutmeg, Olive**
 
 .. code-block:: yaml
 
     EOX_TAGGING_GET_ENROLLMENT_OBJECT: "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
 
 
-Those settings can be changed in ``eox_tagging/settings/common.py`` or, for example, in ansible configurations.
+Those settings can be changed in ``eox_tagging/settings/common.py`` or the instance settings.
 
-**NOTE**: the current ``common.py`` works with Open edX Lilac version.
+**NOTE**: the current ``common.py`` works with Open edX Quince and Palm versions.
 
 Usage
 ======
 
-See the `How to section <https://github.com/eduNEXT/eox-tagging/tree/master/docs/how_to>`_ for detailed guidance on Model, configurations and API usage.
+See the `How to section <https://github.com/eduNEXT/eox-tagging/tree/master/docs/how_to>`_ for detailed guidance on model, configurations and API usage.
 
 Important notes:
 ----------------
@@ -86,18 +94,18 @@ Examples
 .. code-block:: JSON
 
         {
-            "validate_tag_value":{
-                "in":[
+            "validate_tag_value": {
+                "in": [
                     "example_tag_value",
                     "example_tag_value_1"
                 ]
             },
-            "validate_access":{
-                "equals":"PRIVATE"
+            "validate_access": {
+                "equals": "PRIVATE"
             },
-            "validate_target_object":"OpaqueKeyProxyModel",
-            "owner_object":"User",
-            "tag_type":"tag_by_example"
+            "validate_target_object": "OpaqueKeyProxyModel",
+            "owner_object": "User",
+            "tag_type": "tag_by_example"
         }
 
 This means that:
@@ -113,7 +121,7 @@ This means that:
 .. code-block:: JSON
 
         {
-            "validate_tag_value":{
+            "validate_tag_value": {
                 "exist": true
             },
             "validate_access": "Public",
@@ -141,10 +149,10 @@ This means that:
                 ]
             },
             "validate_target_object": "CourseEnrollment",
-            "tag_type":"tag_by_edunext",
-            "validate_activation_date":{
+            "tag_type": "tag_by_edunext",
+            "validate_activation_date": {
                 "exist": true,
-                "in":[
+                "in": [
                     "Dec 04 2020 10:30:40",
                     "Oct 19 2020 10:30:40"
                 ]
@@ -157,14 +165,14 @@ This means that:
 * The field access can be `private` or `public`.
 * The target type must be equal to `CourseEnrollment`
 * Tag type must be equal to tag_by_edunext.
-* The tag activation date must exist and be between the values defined in the array. This means: value_1 <= activation_date <= value_2.
+* The tag activation date must exist between the values defined in the array. This means, value_1 <= activation_date <= value_2.
   The array must be sorted or a validation error will be raised.
 
 Tagging REST API
 ================
 
-Get list of tags
-----------------
+Get a list of tags
+------------------
 
 **Request**
 
@@ -287,12 +295,13 @@ Filters example usage:
 
 ``/eox_tagging/api/v1/tags/?enrollments=COURSE_ID``
 
-Auditing Django views (Optional in Maple)
-=========================================
+Auditing Django views
+=====================
 
 The majority of views in eox-tagging use an auditing decorator, defined in our custom library called `eox-audit-model`_,
-that helps save relevant information about non-idempotent operations. By default, this functionality is turned on. To
-check your auditing records go to Django sysadmin and find DJANGO EDUNEXT AUDIT MODEL.
+that helps save relevant information about non-idempotent operations. By default, this functionality is turned off, to enable it, install eox-audit-model. 
+
+Check your auditing records in *Django sysadmin > DJANGO EDUNEXT AUDIT MODEL*.
 
 For more information, check the eox-audit-model documentation.
 
@@ -309,3 +318,9 @@ information – it also contains guidelines for how to maintain high code
 quality, which will make your contribution more likely to be accepted.
 
 .. _CONTRIBUTING: https://github.com/eduNEXT/eox-tagging/blob/master/CONTRIBUTING.rst
+
+
+License
+=======
+
+This project is licensed under the AGPL-3.0 License. See the LICENSE file for details.

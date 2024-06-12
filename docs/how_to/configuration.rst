@@ -24,7 +24,7 @@ Where <FIELD_NAME> can be any editable tag field, and <VALIDATION> any of the de
 Validations
 ^^^^^^^^^^^
 
-Here's how to create validated fields, first, add the key validate_<FIELD_VALUE> to the configuration dictionary, where:
+Here's how to create validated fields, first, add the key ``validate_<FIELD_VALUE>`` to the configuration dictionary, where:
 
 * The FIELD_VALUE must be a Tag field, if not an exception will be raised.
 
@@ -133,18 +133,18 @@ Examples
 .. code-block:: JSON
 
         {
-            "validate_tag_value":{
-                "in":[
+            "validate_tag_value": {
+                "in": [
                     "example_tag_value",
                     "example_tag_value_1"
                 ]
             },
-            "validate_access":{
-                "equals":"PRIVATE"
+            "validate_access": {
+                "equals": "PRIVATE"
             },
-            "validate_target_object":"OpaqueKeyProxyModel",
-            "owner_object":"User",
-            "tag_type":"tag_by_example"
+            "validate_target_object": "OpaqueKeyProxyModel",
+            "owner_object": "User",
+            "tag_type": "tag_by_example"
         }
 
 This means that:
@@ -160,12 +160,12 @@ This means that:
 .. code-block:: JSON
 
         {
-            "validate_tag_value":{
-                "exist":true
+            "validate_tag_value": {
+                "exist": true
             },
-            "validate_access":"Public",
-            "validate_target_object":"User",
-            "tag_type":"tag_by_edunext"
+            "validate_access": "Public",
+            "validate_target_object": "User",
+            "tag_type": "tag_by_edunext"
         }
 
 This means that:
@@ -180,18 +180,18 @@ This means that:
 .. code-block:: JSON
 
         {
-            "validate_tag_value":"tag_value",
-            "validate_access":{
-                "in":[
+            "validate_tag_value": "tag_value",
+            "validate_access": {
+                "in": [
                     "Private",
                     "Public"
                 ]
             },
-            "validate_target_object":"CourseEnrollment",
-            "tag_type":"tag_by_edunext",
-            "validate_activation_date":{
-                "exist":true,
-                "in":[
+            "validate_target_object": "CourseEnrollment",
+            "tag_type": "tag_by_edunext",
+            "validate_activation_date": {
+                "exist": true,
+                "in": [
                     "Dec 04 2020 10:30:40",
                     "Oct 19 2020 10:30:40"
                 ]
