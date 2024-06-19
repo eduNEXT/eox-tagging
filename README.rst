@@ -17,12 +17,11 @@ Installation
 ============
 
 #. Install a new fresh instance of tutor following `this steps <https://docs.tutor.overhang.io/quickstart.html#quickstart-1-click-install>`_. *If your instance is running, you can skip this step.*
-#. Add to the Tutor configuration in the file ``cat "$(tutor config printroot)/config.yml"`` these lines that install eox-tagging and eox-core lib:
+#. Add to the Tutor configuration in the file ``cat "$(tutor config printroot)/config.yml"`` these lines that install eox-tagging lib:
 
     .. code-block:: yaml
     
         OPENEDX_EXTRA_PIP_REQUIREMENTS:
-        - eox_core
         - eox_tagging
 
 #. Build the openedx image by doing ``tutor images build openedx``.
@@ -53,27 +52,12 @@ Compatibility Notes
 | Quince           | >= 7.0       |
 +------------------+--------------+
 
-The following changes to the plugin settings are necessary. If the release you are looking for is
-not listed, then the accumulation of changes from previous releases is enough.
+The plugin is configured for the latest release (Quince). 
 
-**Ironwood**
+We will list here the changes in the plugin settings that should be applied to be used for previous releases. If the release you are looking for is not listed, 
+the actual configuration is sufficient or incompatible with the current eox-tagging version.
 
-.. code-block:: yaml
-
-    EOX_TAGGING_GET_ENROLLMENT_OBJECT: "eox_tagging.edxapp_wrappers.backends.enrollment_i_v1"
-    EOX_TAGGING_GET_COURSE_OVERVIEW: "eox_tagging.edxapp_wrappers.backends.course_overview_i_v1"
-    EOX_TAGGING_BEARER_AUTHENTICATION: "eox_tagging.edxapp_wrappers.backends.bearer_authentication_i_v1"
-
-**Koa, Lilac, Maple, Nutmeg, Olive**
-
-.. code-block:: yaml
-
-    EOX_TAGGING_GET_ENROLLMENT_OBJECT: "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
-
-
-Those settings can be changed in ``eox_tagging/settings/common.py`` or the instance settings.
-
-**NOTE**: the current ``common.py`` works with Open edX Quince and Palm versions.
+If you are installing a previous version, please refer to the tag to verify the configuration that should be applied.
 
 Usage
 ======
