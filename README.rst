@@ -24,8 +24,7 @@ Installation
         OPENEDX_EXTRA_PIP_REQUIREMENTS:
         - eox_tagging
 
-#. Build the openedx image by doing ``tutor images build openedx``.
-#. Start the tutor instance with ``tutor local launch``.
+#. Build the docker image and start the tutor instance with ``tutor local launch``.
 
 Compatibility Notes
 --------------------
