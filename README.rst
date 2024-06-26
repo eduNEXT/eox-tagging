@@ -16,15 +16,15 @@ to tag `edx-platform`_ objects. These tags can be used to categorize, include ex
 Installation
 ============
 
-#. Install a new fresh instance of tutor following `this steps <https://docs.tutor.overhang.io/quickstart.html#quickstart-1-click-install>`_. *If your instance is running, you can skip this step.*
-#. Add to the Tutor configuration in the file ``cat "$(tutor config printroot)/config.yml"`` these lines that install eox-tagging lib:
+#. Add this plugin in your Tutor ``config.yml`` with the ``OPENEDX_EXTRA_PIP_REQUIREMENTS`` setting.
 
-    .. code-block:: yaml
-    
-        OPENEDX_EXTRA_PIP_REQUIREMENTS:
-        - eox_tagging
-
-#. Build the docker image and start the tutor instance with ``tutor local launch``.
+   .. code-block:: yaml
+      
+      OPENEDX_EXTRA_PIP_REQUIREMENTS:
+         - eox-tagging=={{version}}
+         
+#. Save the configuration with ``tutor config save``.
+#. Build the image and launch your platform with ``tutor local launch``.
 
 Compatibility Notes
 --------------------
@@ -51,10 +51,8 @@ Compatibility Notes
 | Quince           | >= 7.0       |
 +------------------+--------------+
 
-The plugin is configured for the latest release (Quince). 
-
-We will list here the changes in the plugin settings that should be applied to be used for previous releases. If the release you are looking for is not listed, 
-the actual configuration is sufficient or incompatible with the current eox-tagging version.
+The plugin is configured for the latest release (Quince). The following changes in the plugin settings should be applied to be used for previous releases.
+If the release you are looking for is not listed, the actual configuration is sufficient or it is incompatible with the current eox-tagging version.
 
 If you are installing a previous version, please refer to the tag to verify the configuration that should be applied.
 
@@ -287,7 +285,6 @@ that helps save relevant information about non-idempotent operations. By default
 Check your auditing records in *Django sysadmin > DJANGO EDUNEXT AUDIT MODEL*.
 
 For more information, check the eox-audit-model documentation.
-
 
 .. _openedx plugin: https://github.com/openedx/edx-platform/tree/master/openedx/core/djangoapps/plugins
 .. _edx-platform: https://github.com/openedx/edx-platform/
