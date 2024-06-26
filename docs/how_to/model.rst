@@ -9,32 +9,32 @@ A tag is an object created over a specified target by an entity called owner. Th
 Attributes
 -----------
 
-+--------------------------+----------------------------------------------------------------------------+
-| Name                     |  Description                                                               |
-+==========================+============================================================================+
-| tag_type                 | This attribute works as a category, it can be for example:                 |
-|                          | `subscription_tier`.                                                       |
-+--------------------------+----------------------------------------------------------------------------+
-| tag_value                | Contains the value of the tag. This would be for `subscription_tier`       |
-|                          | the value `free`.                                                          |
-+--------------------------+----------------------------------------------------------------------------+
-| access                   | The access level for the tag, it can be public, private and protected. This|
-|                          | this defines the visibility of the tag to the users. The default is public.|
-+--------------------------+----------------------------------------------------------------------------+
-| activation_date          | Datetime when the tag will be activated.                                   |
-+--------------------------+----------------------------------------------------------------------------+
-| expiration_date          | Datetime when the tag will be deactivated.                                 |
-+--------------------------+----------------------------------------------------------------------------+
-| created_at               | Creation date.                                                             |
-+--------------------------+----------------------------------------------------------------------------+
-| status                   | Current tag status, when created is ACTIVE, and when is deleted becomes    |
-|                          | an inactive tag.                                                           |
-+--------------------------+----------------------------------------------------------------------------+
-| target_object            | Represents the tag target, this can be a user, courseenrollment, site or   |
-|                          | course.                                                                    |
-+--------------------------+----------------------------------------------------------------------------+
-| owner_object             | Represents the tag owner. This can be a user or site.                      |
-+--------------------------+----------------------------------------------------------------------------+
++-----------------+----------------------------------------------------------------------------+
+| Name            |  Description                                                               |
++=================+============================================================================+
+| tag_type        | This attribute works as a category, it can be for example:                 |
+|                 | `subscription_tier`.                                                       |
++-----------------+----------------------------------------------------------------------------+
+| tag_value       | Contains the value of the tag. This would be for `subscription_tier`       |
+|                 | the value `free`.                                                          |
++-----------------+----------------------------------------------------------------------------+
+| access          | The access level for the tag, it can be public, private and protected. This|
+|                 | this defines the visibility of the tag to the users. The default is public.|
++-----------------+----------------------------------------------------------------------------+
+| activation_date | Datetime when the tag will be activated.                                   |
++-----------------+----------------------------------------------------------------------------+
+| expiration_date | Datetime when the tag will be deactivated.                                 |
++-----------------+----------------------------------------------------------------------------+
+| created_at      | Creation date.                                                             |
++-----------------+----------------------------------------------------------------------------+
+| status          | Current tag status, when created is ACTIVE, and when is deleted becomes    |
+|                 | an inactive tag.                                                           |
++-----------------+----------------------------------------------------------------------------+
+| target_object   | Represents the tag target, this can be a user, courseenrollment, site or   |
+|                 | course.                                                                    |
++-----------------+----------------------------------------------------------------------------+
+| owner_object    | Represents the tag owner. This can be a user or site.                      |
++-----------------+----------------------------------------------------------------------------+
 
 
 Validations

@@ -10,13 +10,13 @@ Currently, to be able to use the API, the user must be authenticated. One of the
 any request to the tagging API. In the future, public -limited- access will be provided.
 
 As mentioned above, an authorization token can be provided as an Authorization HTTP header when calling the API.
-If not, then the session authentication will be use. If any of this authentications work then the user won't be able to make any
+If not, then the session authentication will be used. If any of these authentications work then the user won't be able to make any
 successful API call.
 
 API permission
 ^^^^^^^^^^^^^^^
-If a user wants to make API calls, in addition to being authenticated must have the custom eox-tagging permission so can make any write/read operations.
-This permission iscalled `can_call_eox_tagging`.
+If a user wants to make API calls, in addition to being authenticated, must have the custom eox-tagging permission so can make any write/read operations.
+This permission is called `can_call_eox_tagging`.
 
 
 Possible API calls
@@ -24,80 +24,80 @@ Possible API calls
 
 The tags are `immutable` by definition, so after creating a tag the only calls allowed are to list, get details and delete tags.
 
-+---------------------------------+---------------------------------------------------+
-| Name                            | Description                                       |
-+=================================+===================================================+
-| list                            | Used to list all tags owned by the user making the|
-|                                 | API call. If the owner does not have any tags     |
-|                                 | created yet, an empty set will be returned.       |
-+---------------------------------+---------------------------------------------------+
-| details                         | Used to get the information of a single tag. If   |
-|                                 | the tag does not exist it returns Not Found.      |
-+---------------------------------+---------------------------------------------------+
-| delete                          | Used to deactivate an active tag. This implements |
-|                                 | a soft delete operation.                          |
-+---------------------------------+---------------------------------------------------+
-| create                          | Used to create a tag.                             |
-+---------------------------------+---------------------------------------------------+
++---------+----------------------------------------------------+
+| Name    | Description                                        |
++=========+====================================================+
+| list    | Used to list all tags owned by the user making the |
+|         | API call. If the owner does not have any tags      |
+|         | created yet, an empty set will be returned.        |
++---------+----------------------------------------------------+
+| details | Used to get the information of a single tag. If    |
+|         | the tag does not exist it returns Not Found.       |
++---------+----------------------------------------------------+
+| delete  | Used to deactivate an active tag. This implements  |
+|         | a soft delete operation.                           |
++---------+----------------------------------------------------+
+| create  | Used to create a tag.                              |
++---------+----------------------------------------------------+
 
 
 Serializer fields
 ------------------
 
-When creating a tag, this are the fields expected:
+When creating a tag, these are the fields expected:
 
-+----------------------------------+--------------------------------------------------+------------------+
-| Field Name                       | Description                                      | Required         |
-+==================================+==================================================+==================+
-| tag_type                         | Works as the class of the tag.                   | Yes              |
-+----------------------------------+--------------------------------------------------+------------------+
-| tag_value                        | It can be thought as the class instance.         | Yes              |
-+----------------------------------+--------------------------------------------------+------------------+
-| access                           | Access level of the tag.                         | Yes              |
-+----------------------------------+--------------------------------------------------+------------------+
-| activation_date                  | Datetime when the tag will be activated.         | No               |
-|                                  | It can have UTC format or Year-Month-Day H:M:S   |                  |
-+----------------------------------+--------------------------------------------------+------------------+
-| expiration_date                  | Datetime when the tag will be deactivated.       | No               |
-|                                  | It can have UTC format or Year-Month-Day H:M:S   |                  |
-+----------------------------------+--------------------------------------------------+------------------+
-| target_type                      | Type of the target. Must be equal to: user, site,| Yes              |
-|                                  | courseoverview or courseenrollment.              |                  |
-+----------------------------------+--------------------------------------------------+------------------+
-| target_id                        | ID of the target with type target_type.          | Yes              |
-+----------------------------------+--------------------------------------------------+------------------+
-| owner_type                       | Type of the tag owner. If omitted, site will be  | No               |
-|                                  | as the owner                                     |                  |
-+----------------------------------+--------------------------------------------------+------------------+
++-----------------+--------------------------------------------------+----------+
+| Field Name      | Description                                      | Required |
++=================+==================================================+==========+
+| tag_type        | Works as the class of the tag.                   | Yes      |
++-----------------+--------------------------------------------------+----------+
+| tag_value       | It can be thought as the class instance.         | Yes      |
++-----------------+--------------------------------------------------+----------+
+| access          | Access level of the tag.                         | Yes      |
++-----------------+--------------------------------------------------+----------+
+| activation_date | Datetime when the tag will be activated.         | No       |
+|                 | It can have UTC format or Year-Month-Day H:M:S   |          |
++-----------------+--------------------------------------------------+----------+
+| expiration_date | Datetime when the tag will be deactivated.       | No       |
+|                 | It can have UTC format or Year-Month-Day H:M:S   |          |
++-----------------+--------------------------------------------------+----------+
+| target_type     | Type of the target. Must be equal to: user, site,| Yes      |
+|                 | courseoverview or courseenrollment.              |          |
++-----------------+--------------------------------------------------+----------+
+| target_id       | ID of the target with type target_type.          | Yes      |
++-----------------+--------------------------------------------------+----------+
+| owner_type      | Type of the tag owner. If omitted, site will be  | No       |
+|                 | as the owner                                     |          |
++-----------------+--------------------------------------------------+----------+
 
-When retrieving objects, the JSON object will have the following fields (the mentioned above and):
+When retrieving objects, the JSON object will have the following fields (and the mentioned above):
 
-+----------------------------------+---------------------------------------------------+
-| Field Name                       | Description                                       |
-+==================================+===================================================+
-| meta                             | Field with technical information, like dates and  |
-|                                  | information about the target and the owner.       |
-+----------------------------------+---------------------------------------------------+
-| status                           | Status of the tag. This could be active or        |
-|                                  | inactive.                                         |
-+----------------------------------+---------------------------------------------------+
-| key                              | UUID Public identifier.                           |
-+----------------------------------+---------------------------------------------------+
++------------+---------------------------------------------------+
+| Field Name | Description                                       |
++============+===================================================+
+| meta       | Field with technical information, like dates and  |
+|            | information about the target and the owner.       |
++------------+---------------------------------------------------+
+| status     | Status of the tag. This could be active or        |
+|            | inactive.                                         |
++------------+---------------------------------------------------+
+| key        | UUID Public identifier.                           |
++------------+---------------------------------------------------+
 
 
 Validations
 -----------
 
-During the creation process starts, it's checked that ``target_type`` exists, if not then the creation process is interrupted and an error
-will be raised. This results in returning an object describing the error ocurred. After checking if the target_type exists, the model validations
+The creation process check that ``target_type`` exists, if not this is interrupted and an error
+will be raised, returning an object describing the error that occurred. After checking if the target_type exists, the model validations
 will be performed and if an error occurs the error message will be returned in a response instead of valid data.
 
 
 Examples
 --------
 
-Get list of tags
-^^^^^^^^^^^^^^^^
+Get a list of tags
+^^^^^^^^^^^^^^^^^^
 
 **Request**
 
@@ -129,7 +129,7 @@ Get list of tags
         }
 
 Create tag
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^
 
 **Request**
 
@@ -170,7 +170,7 @@ Where TAG_DATA:
         }
 
 Delete tag
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^
 
 **Request**
 
