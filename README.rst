@@ -10,7 +10,7 @@ EOX Tagging
 .. |PyPI Badge| image:: https://img.shields.io/pypi/v/eox-tagging?label=PyPI
    :alt: PyPI - Version
 
-Eox-tagging is an `openedx plugin`_, part of the Edunext Open Extensions (aka EOX), that adds the capability
+Eox-tagging is an `openedx plugin`_, part of the Edunext Open edX Extensions (aka EOX), that adds the capability
 to tag `edx-platform`_ objects. These tags can be used to categorize, include extra information, and so on.
 
 Installation
@@ -52,9 +52,13 @@ Compatibility Notes
 +------------------+--------------+
 
 The plugin is configured for the latest release (Quince). The following changes in the plugin settings should be applied to be used for previous releases.
-If the release you are looking for is not listed, the actual configuration is sufficient or it is incompatible with the current eox-tagging version.
+Those settings can be changed in `eox_tagging/settings/common.py`` or, for example, in the instance configurations.
 
-If you are installing a previous version, please refer to the tag to verify the configuration that should be applied.
+
+🚨 If the release you are looking for is not listed, please note:
+
+- If the Open edX release is compatible with the current eox-tagging version (see `Compatibility Notes <https://github.com/eduNEXT/eox-tagging?tab=readme-ov-file#compatibility-notes>`_), the default configuration is sufficient.
+- If incompatible, you can refer to the README from the relevant version tag for configuration details (e.g., `v5.1.0 README <https://github.com/eduNEXT/eox-tagging/blob/v5.1.0/README.rst>`_).
 
 Usage
 ======
