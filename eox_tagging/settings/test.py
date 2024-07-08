@@ -34,7 +34,7 @@ DATABASES = {
 def plugin_settings(settings):  # pylint: disable=function-redefined
     """
     Set of plugin settings used by the Open Edx platform.
-    More info: https://github.com/eopenedx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
+    More info: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
     """
     settings.EOX_TAGGING_SKIP_VALIDATIONS = True
     settings.EOX_TAGGING_LOAD_PERMISSIONS = False
