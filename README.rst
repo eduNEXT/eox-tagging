@@ -1,118 +1,74 @@
-=============
-eox_tagging
-=============
+===========
+EOX Tagging
+===========
+|Maintainance Badge| |Test Badge| |PyPI Badge|
 
-Eox-tagging (A.K.A. Edunext Open extensions) is an `openedx plugin`_, that adds the capability
+.. |Maintainance Badge| image:: https://img.shields.io/badge/Status-Maintained-brightgreen
+   :alt: Maintainance Status
+.. |Test Badge| image:: https://img.shields.io/github/actions/workflow/status/edunext/eox-tagging/.github%2Fworkflows%2Ftests.yml?label=Test
+   :alt: GitHub Actions Workflow Test Status
+.. |PyPI Badge| image:: https://img.shields.io/pypi/v/eox-tagging?label=PyPI
+   :alt: PyPI - Version
+
+Eox-tagging is an `openedx plugin`_, part of the Edunext Open edX Extensions (aka EOX), that adds the capability
 to tag `edx-platform`_ objects. These tags can be used to categorize, include extra information, and so on.
 
 Installation
 ============
 
-Open edX devstack
-------------------
+#. Add this plugin in your Tutor ``config.yml`` with the ``OPENEDX_EXTRA_PIP_REQUIREMENTS`` setting.
 
-- Install a supported version of the `Open edX devstack`_. See versions for more details.
-
-- Clone the git repo:
-
-.. code-block:: bash
-
-  cd ~/Documents/eoxstack/src/  # Assuming that devstack is in  ~/Documents/eoxstack/devstack/
-  sudo mkdir edxapp
-  cd edxapp
-  git clone git@github.com:eduNEXT/eox-tagging.git
-
-- Install plugin from your server (in this case the devstack docker lms shell):
-
-.. code-block:: bash
-
-  cd ~/Documents/eoxstack/devstack  # Change for your devstack path (if you are using devstack)
-  make lms-shell  # Enter the devstack machine (or server where lms process lives)
-  cd /edx/src/edxapp/eox-tagging
-  pip install -e .
-  python manage.py lms migrate eox_tagging --settings=<your app settings>
-
-Open edX with Tutor (Maple)
-----------------------------
-If you are using `Tutor <https://docs.tutor.overhang.io/gettingstarted.html>`_ to deploy the Open edX instance, please follow this steps:
-
-#. Install a new fresh instance of tutor following `this steps <https://docs.tutor.overhang.io/quickstart.html#quickstart-1-click-install>`_. *If you already have a tutor instance running you can skip this step.*
-#. Add to the Tutor configuration in the file ``cat "$(tutor config printroot)/config.yml"`` this lines that install eox-tagging and eox-core lib:
-    .. code-block:: yaml
-    
-        OPENEDX_EXTRA_PIP_REQUIREMENTS:
-        - eox_core
-        - eox_tagging
-#. Create a new tutor plugin that adds this settings to openedx common settings:
-    .. code-block:: yaml
-    
-        EOX_TAGGING_GET_ENROLLMENT_OBJECT = "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
-        EOX_CORE_USERS_BACKEND = "eox_core.edxapp_wrapper.backends.users_m_v1"
-
-    .. note::
-        `Here <https://github.com/eduNEXT/eox-tagging/issues/83>`_ is an example of creating a tutor plugin with a yaml file. 
-        But there are other ways to create tutor plugins, please go to tutor docs and see how to add settings in Open edX common settings.
-#. Install the plugin doing ``tutor plugins enable eox-tagging-plugin`` and then ``tutor config save``.
-#. Build the openedx image doing ``tutor images build openedx``.
-#. Start the tutor instance with the new config doing ``tutor local quickstart``.
-#. All set to use eox-tagging lib!
+   .. code-block:: yaml
+      
+      OPENEDX_EXTRA_PIP_REQUIREMENTS:
+         - eox-tagging=={{version}}
+         
+#. Save the configuration with ``tutor config save``.
+#. Build the image and launch your platform with ``tutor local launch``.
 
 Compatibility Notes
 --------------------
 
-+-------------------+----------------+
-| Open edX Release  |     Version    |
-+===================+================+
-|      Ironwood     |   < 0.9 < 3.0  |
-+-------------------+----------------+
-|       Juniper     |   >= 0.9 < 3.0 |
-+-------------------+----------------+
-|        Koa        |   >= 2.2 < 5.0 |
-+-------------------+----------------+
-|       Lilac       |   >= 2.2 < 5.0 |
-+-------------------+----------------+
-|       Maple       | >= 4.0 < 6.0   |
-+-------------------+----------------+
-|       Nutmeg      |  >= 5.0 < 6.0  |
-+-------------------+----------------+
-|       Olive       |  >= 5.0 < 6.0  |
-+-------------------+----------------+
-|       Palm        |      >= 6.0    |
-+-------------------+----------------+
-|      Quince       |      >= 7.0    |
-+-------------------+----------------+
++------------------+--------------+
+| Open edX Release | Version      |
++==================+==============+
+| Ironwood         | < 0.9 < 3.0  |
++------------------+--------------+
+| Juniper          | >= 0.9 < 3.0 |
++------------------+--------------+
+| Koa              | >= 2.2 < 5.0 |
++------------------+--------------+
+| Lilac            | >= 2.2 < 5.0 |
++------------------+--------------+
+| Maple            | >= 4.0 < 6.0 |
++------------------+--------------+
+| Nutmeg           | >= 5.0 < 6.0 |
++------------------+--------------+
+| Olive            | >= 5.0 < 6.0 |
++------------------+--------------+
+| Palm             | >= 6.0       |
++------------------+--------------+
+| Quince           | >= 7.0       |
++------------------+--------------+
 
-The following changes to the plugin settings are necessary. If the release you are looking for is
-not listed, then the accumulation of changes from previous releases is enough.
-
-**Ironwood**
-
-.. code-block:: yaml
-
-    EOX_TAGGING_GET_ENROLLMENT_OBJECT: "eox_tagging.edxapp_wrappers.backends.enrollment_i_v1"
-    EOX_TAGGING_GET_COURSE_OVERVIEW: "eox_tagging.edxapp_wrappers.backends.course_overview_i_v1"
-    EOX_TAGGING_BEARER_AUTHENTICATION: "eox_tagging.edxapp_wrappers.backends.bearer_authentication_i_v1"
-
-**Koa, Lilac, Maple, Nutmeg, Olive, Palm and Quince**
-
-.. code-block:: yaml
-
-    EOX_TAGGING_GET_ENROLLMENT_OBJECT: "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
+The plugin is configured for the latest release (Quince). The following changes in the plugin settings should be applied to be used for previous releases.
+Those settings can be changed in `eox_tagging/settings/common.py`` or, for example, in the instance configurations.
 
 
-Those settings can be changed in ``eox_tagging/settings/common.py`` or, for example, in ansible configurations.
+🚨 If the release you are looking for is not listed, please note:
 
-**NOTE**: the current ``common.py`` works with Open edX Lilac version.
+- If the Open edX release is compatible with the current eox-tagging version (see `Compatibility Notes <https://github.com/eduNEXT/eox-tagging?tab=readme-ov-file#compatibility-notes>`_), the default configuration is sufficient.
+- If incompatible, you can refer to the README from the relevant version tag for configuration details (e.g., `v5.1.0 README <https://github.com/eduNEXT/eox-tagging/blob/v5.1.0/README.rst>`_).
 
 Usage
 ======
 
-See the `How to section <https://github.com/eduNEXT/eox-tagging/tree/master/docs/how_to>`_ for a detailed guidance on: Model, configurations and API usage.
+See the `How to section <https://github.com/eduNEXT/eox-tagging/tree/master/docs/how_to>`_ for detailed guidance on model, configurations and API usage.
 
 Important notes:
 ----------------
 
-* All the comparison with string objects are case insensitive.
+* All the comparisons with string objects are case insensitive.
 * If a tag owner is not defined, then it is assumed to be the site.
 
 Examples
@@ -123,18 +79,18 @@ Examples
 .. code-block:: JSON
 
         {
-            "validate_tag_value":{
-                "in":[
+            "validate_tag_value": {
+                "in": [
                     "example_tag_value",
                     "example_tag_value_1"
                 ]
             },
-            "validate_access":{
-                "equals":"PRIVATE"
+            "validate_access": {
+                "equals": "PRIVATE"
             },
-            "validate_target_object":"OpaqueKeyProxyModel",
-            "owner_object":"User",
-            "tag_type":"tag_by_example"
+            "validate_target_object": "OpaqueKeyProxyModel",
+            "owner_object": "User",
+            "tag_type": "tag_by_example"
         }
 
 This means that:
@@ -150,12 +106,12 @@ This means that:
 .. code-block:: JSON
 
         {
-            "validate_tag_value":{
-                "exist":true
+            "validate_tag_value": {
+                "exist": true
             },
-            "validate_access":"Public",
-            "validate_target_object":"User",
-            "tag_type":"tag_by_edunext"
+            "validate_access": "Public",
+            "validate_target_object": "User",
+            "tag_type": "tag_by_edunext"
         }
 
 This means that:
@@ -170,18 +126,18 @@ This means that:
 .. code-block:: JSON
 
         {
-            "validate_tag_value":"tag_value",
-            "validate_access":{
-                "in":[
+            "validate_tag_value": "tag_value",
+            "validate_access": {
+                "in": [
                     "Private",
                     "Public"
                 ]
             },
-            "validate_target_object":"CourseEnrollment",
-            "tag_type":"tag_by_edunext",
-            "validate_activation_date":{
-                "exist":true,
-                "in":[
+            "validate_target_object": "CourseEnrollment",
+            "tag_type": "tag_by_edunext",
+            "validate_activation_date": {
+                "exist": true,
+                "in": [
                     "Dec 04 2020 10:30:40",
                     "Oct 19 2020 10:30:40"
                 ]
@@ -194,14 +150,14 @@ This means that:
 * The field access can be `private` or `public`.
 * The target type must be equal to `CourseEnrollment`
 * Tag type must be equal to tag_by_edunext.
-* The tag activation date must exist and be between the values defined in the array. This means: value_1 <= activation_date <= value_2.
+* The tag activation date must exist between the values defined in the array. This means, value_1 <= activation_date <= value_2.
   The array must be sorted or a validation error will be raised.
 
 Tagging REST API
 ================
 
-Get list of tags
-----------------
+Get a list of tags
+------------------
 
 **Request**
 
@@ -324,19 +280,18 @@ Filters example usage:
 
 ``/eox_tagging/api/v1/tags/?enrollments=COURSE_ID``
 
-Auditing Django views (Optional in Maple)
-=========================================
+Auditing Django views
+=====================
 
 The majority of views in eox-tagging use an auditing decorator, defined in our custom library called `eox-audit-model`_,
-that helps saving relevant information about non-idempotent operations. By default this functionality is turned on. To
-check your auditing records go to Django sysadmin and find DJANGO EDUNEXT AUDIT MODEL.
+that helps save relevant information about non-idempotent operations. By default, this functionality is turned off, to enable it, install eox-audit-model. 
+
+Check your auditing records in *Django sysadmin > DJANGO EDUNEXT AUDIT MODEL*.
 
 For more information, check the eox-audit-model documentation.
 
-
-.. _Open edX Devstack: https://github.com/edx/devstack/
-.. _openedx plugin: https://github.com/edx/edx-platform/tree/master/openedx/core/djangoapps/plugins
-.. _edx-platform: https://github.com/edx/edx-platform/
+.. _openedx plugin: https://github.com/openedx/edx-platform/tree/master/openedx/core/djangoapps/plugins
+.. _edx-platform: https://github.com/openedx/edx-platform/
 .. _eox-audit-model: https://github.com/eduNEXT/eox-audit-model/
 
 How to Contribute
@@ -347,3 +302,9 @@ information – it also contains guidelines for how to maintain high code
 quality, which will make your contribution more likely to be accepted.
 
 .. _CONTRIBUTING: https://github.com/eduNEXT/eox-tagging/blob/master/CONTRIBUTING.rst
+
+
+License
+=======
+
+This project is licensed under the AGPL-3.0 License. See the LICENSE file for details.

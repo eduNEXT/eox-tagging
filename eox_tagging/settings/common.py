@@ -50,7 +50,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 def plugin_settings(settings):
     """
     Set of plugin settings used by the Open Edx platform.
-    More info: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
+    More info: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
     """
     # Plugin settings
     settings.EOX_TAGGING_GET_ENROLLMENT_OBJECT = "eox_tagging.edxapp_wrappers.backends.enrollment_l_v1"
