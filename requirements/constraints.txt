@@ -9,5 +9,5 @@
 # linking to it here is good.
 
 
-# Version used in Palm version of edx-platform
-django<5.0
+# Common constraints for Open edX repos
+-c https://raw.githubusercontent.com/openedx/edx-lint/master/edx_lint/files/common_constraints.txt
