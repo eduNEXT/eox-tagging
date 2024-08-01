@@ -343,7 +343,7 @@ pyjwt[crypto]==2.8.0
     #   social-auth-core
 pylint==2.15.10
     # via -r requirements/test.in
-pymongo==4.4.0
+pymongo==3.13.0
     # via
     #   -r requirements/base.txt
     #   edx-opaque-keys
