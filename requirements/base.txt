@@ -152,7 +152,7 @@ edx-when==2.5.0
     # via edx-proctoring
 eox-core==10.5.1
     # via -r requirements/base.in
-event-tracking==3.0.0
+event-tracking==2.4.0
     # via edx-proctoring
 fastavro==1.9.5
     # via openedx-events

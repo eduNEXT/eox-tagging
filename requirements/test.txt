@@ -231,7 +231,7 @@ edx-when==2.5.0
     #   edx-proctoring
 eox-core==10.5.1
     # via -r requirements/base.txt
-event-tracking==3.0.0
+event-tracking==2.4.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
