@@ -140,9 +140,9 @@ django-oauth2-provider==0.2.6.1
     #   -r requirements/base.txt
     #   -r requirements/test.in
     #   eox-core
-django-simple-history==3.7.0
+django-simple-history==3.0.0
     # via
-    #   -r requirements/base.txt
+    #   -c https://raw.githubusercontent.com/openedx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   edx-proctoring
 django-waffle==4.1.0
     # via
