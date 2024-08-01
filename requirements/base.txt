@@ -102,7 +102,7 @@ django-waffle==4.1.0
     #   eox-core
 django-webpack-loader==3.1.0
     # via edx-proctoring
-djangorestframework==3.15.2
+djangorestframework==3.15.1
     # via
     #   drf-jwt
     #   drf-yasg
