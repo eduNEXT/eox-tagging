@@ -79,7 +79,7 @@ django-crum==0.7.9
     #   edx-django-utils
     #   edx-proctoring
     #   edx-toggles
-django-filter==24.2
+django-filter==23.5
     # via eox-core
 django-ipware==7.0.1
     # via edx-proctoring
