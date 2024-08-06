@@ -5,13 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on ## [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to ## [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v7.2.0](https://github.com/eduNEXT/eox-tagging/compare/v7.1.0...v7.2.0) - (2024-07-31)
+## [v7.2.0](https://github.com/eduNEXT/eox-tagging/compare/v7.1.0...v7.2.0) - (2024-08-06)
 
 ### Added
 
 - **Integration Tests**: A new GitHub workflow has been added to run
   integration tests. These tests validate backend imports and ensure the
   `/eox-info` endpoint functions correctly.
+
+### Fixed
+
+- **Redwood Compatibility**: Corrected a build-time error, ensuring full
+  compatibility with the Redwood release. For this, a new `ImproperlyConfigured`
+  exception is handled when loading the API permissions.
 
 ### Changed
 
