@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on ## [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to ## [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v7.2.0](https://github.com/eduNEXT/eox-tagging/compare/v7.1.0...v7.2.0) - (2024-08-06)
+
+### Added
+
+- **Integration Tests**: A new GitHub workflow has been added to run
+  integration tests. These tests validate backend imports and ensure the
+  `/eox-info` endpoint functions correctly.
+
+### Fixed
+
+- **Redwood Compatibility**: Corrected a build-time error, ensuring full
+  compatibility with the Redwood release. For this, a new `ImproperlyConfigured`
+  exception is handled when loading the API permissions.
+
+### Changed
+
+- **Redwood Support**: Updated requirements based on the edx-platform Redwood release. Revised integration tests to use the new Redwood release with Tutor.
+  release update GitHub workflows with new Python (3.10 and 3.11) and actions
+  version, and update integration test to use new redwood release with Tutor.
+
 ## v7.1.0 - 2024-03-19
 
 ### [7.1.0](https://github.com/eduNEXT/eox-tagging/compare/v7.0.0...v7.1.0) (2024-03-19)

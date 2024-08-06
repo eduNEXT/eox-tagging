@@ -50,6 +50,8 @@ Compatibility Notes
 +------------------+--------------+
 | Quince           | >= 7.0       |
 +------------------+--------------+
+| Redwood          | >= 7.2.0     |
++------------------+--------------+
 
 The plugin is configured for the latest release (Quince). The following changes in the plugin settings should be applied to be used for previous releases.
 Those settings can be changed in `eox_tagging/settings/common.py`` or, for example, in the instance configurations.
