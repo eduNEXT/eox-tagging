@@ -2,3 +2,4 @@
 -c constraints.txt
 
 eox-core
+edx-drf-extensions

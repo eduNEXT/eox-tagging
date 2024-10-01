@@ -2,6 +2,7 @@
 Viewset for Tags.
 """
 from edx_api_doc_tools import query_parameter, schema_for
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import status, viewsets
 from rest_framework.authentication import SessionAuthentication
 
@@ -207,7 +208,7 @@ class TagViewSet(viewsets.ModelViewSet):
     """Viewset for listing and creating Tags."""
 
     serializer_class = TagSerializer
-    authentication_classes = (BearerAuthentication, SessionAuthentication)
+    authentication_classes = [BearerAuthentication, SessionAuthentication, JwtAuthentication,]
     permission_classes = (EoxTaggingAPIPermission,)
     pagination_class = TagApiPagination
     filter_backends = (FilterBackend,)
