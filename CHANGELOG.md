@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on ## [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to ## [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v7.3.0](https://github.com/eduNEXT/eox-tagging/compare/v7.2.0...v7.3.0) - (2024-10-01)
+
+### Added
+
+- **JWT Support**: API for `Tags` now supports JWT (JSON Web Tokens) authentication
+  aiming to mitigate the deprecation of Bearer and keep available the token-based authorization
+
 ## [v7.2.0](https://github.com/eduNEXT/eox-tagging/compare/v7.1.0...v7.2.0) - (2024-08-06)
 
 ### Added
