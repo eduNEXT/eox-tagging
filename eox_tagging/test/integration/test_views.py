@@ -36,4 +36,3 @@ class TestInfoView(TestCase):
         self.assertIn("version", response_data)
         self.assertIn("name", response_data)
         self.assertIn("git", response_data)
-

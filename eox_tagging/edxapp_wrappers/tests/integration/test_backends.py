@@ -2,6 +2,7 @@
 This module contains tests for the backends of the edxapp_wrapper.
 """
 
+
 # pylint: disable=import-outside-toplevel,unused-import
 def test_current_settings_code_imports():
     """
