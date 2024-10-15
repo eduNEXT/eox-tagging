@@ -52,7 +52,7 @@ upgrade: ## update the requirements/*.txt files with the latest packages satisfy
 
 test-python: clean ## Run test suite.
 	$(TOX) pip install -r requirements/test.txt --exists-action w
-	$(TOX) coverage run --source ./eox_tagging manage.py test
+	$(TOX) coverage run --source="." -m pytest ./eox_tagging --ignore-glob='**/integration/*'
 	$(TOX) coverage report -m --fail-under=71
 
 quality: clean ## Run quality test.

@@ -62,3 +62,11 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
 SETTINGS = SettingsClass()
 plugin_settings(SETTINGS)
 vars().update(SETTINGS.__dict__)
+
+
+# Integration test settings
+INTEGRATION_TEST_SETTINGS = {
+    # Retrieved from the Tutor environment where the integration tests run
+    "EOX_TAGGING_BASE_URL": f"http://{os.environ.get('LMS_HOST', 'local.edly.io')}/eox-tagging",
+    "API_TIMEOUT": 5,
+}
