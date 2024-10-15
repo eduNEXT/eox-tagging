@@ -50,8 +50,7 @@ upgrade: ## update the requirements/*.txt files with the latest packages satisfy
 	sed '/^[dD]jango==/d;' requirements/test.txt > requirements/test.tmp
 	mv requirements/test.tmp requirements/test.txt
 
-run-integration-tests:
-	make test_requirements
+run-integration-tests: test_requirements
 	pytest -rPf ./eox_tagging/test/integration --ignore=test_api_integration.py
 
 test-python: clean ## Run test suite.
