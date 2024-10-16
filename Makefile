@@ -28,7 +28,7 @@ requirements: ## install environment requirements
 	pip install -r requirements/base.txt
 
 test_requirements:
-	pip install -r requirements/test.txt -r requirements/django.txt
+	pip install -r requirements/test.txt
 
 docs_requirements:
 	pip install -r requirements/docs.txt
