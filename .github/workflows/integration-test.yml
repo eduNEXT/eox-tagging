@@ -14,5 +14,4 @@ jobs:
         with:
           tutor_version: ${{ matrix.tutor_version }}
           app_name: 'eox-tagging'
-          shell_file_to_run: 'scripts/execute_integration_tests.sh'
           openedx_imports_test_file_path: 'eox_tagging/edxapp_wrappers/tests/integration/test_backends.py'
