@@ -28,7 +28,7 @@ requirements: ## install environment requirements
 	pip install -r requirements/base.txt
 
 test_requirements:
-	pip install -r requirements/test.txt -r requirements/django.txt
+	pip install -r requirements/test.txt
 
 docs_requirements:
 	pip install -r requirements/docs.txt
@@ -46,13 +46,16 @@ upgrade: ## update the requirements/*.txt files with the latest packages satisfy
 	$(PIP_COMPILE) -o requirements/tox.txt requirements/tox.in
 	$(PIP_COMPILE) -o requirements/docs.txt requirements/docs.in
 
-	grep -e "^django==" requirements/test.txt > requirements/django.txt
+	grep -e "^django==" requirements/test.txt > requirements/django42.txt
 	sed '/^[dD]jango==/d;' requirements/test.txt > requirements/test.tmp
 	mv requirements/test.tmp requirements/test.txt
 
+run-integration-tests: test_requirements
+	pytest -rPf ./eox_tagging/test/integration --ignore=test_api_integration.py
+
 test-python: clean ## Run test suite.
 	$(TOX) pip install -r requirements/test.txt --exists-action w
-	$(TOX) coverage run --source ./eox_tagging manage.py test
+	$(TOX) coverage run --source="." -m pytest ./eox_tagging --ignore-glob='**/integration/*'
 	$(TOX) coverage report -m --fail-under=71
 
 quality: clean ## Run quality test.
