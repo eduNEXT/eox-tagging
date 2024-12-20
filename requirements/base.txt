@@ -155,7 +155,7 @@ eox-core==11.1.0
     # via -r requirements/base.in
 event-tracking==3.0.0
     # via edx-proctoring
-fastavro==1.9.7
+fastavro==1.10.0
     # via openedx-events
 fs==2.4.16
     # via xblock

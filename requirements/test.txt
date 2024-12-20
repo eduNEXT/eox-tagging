@@ -234,7 +234,7 @@ event-tracking==3.0.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
-fastavro==1.9.7
+fastavro==1.10.0
     # via
     #   -r requirements/base.txt
     #   openedx-events
