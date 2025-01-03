@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on ## [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to ## [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v5.0.1 - 2025-01-03
+
+### [4.2.0](https://github.com/eduNEXT/eox-tagging/compare/v5.0.0...v5.0.1) (2025-01-03)
+
+#### Fixed
+
+- Optimized `find_all_tags_for` method in the `Tag` model for better performance on large datasets.
+- Added caching for `ContentType` lookups to reduce redundant database queries.
+- Added an index on `target_type` and `target_object_id` fields in the `Tag` model to speed up filtering operations.
+- Improved query logic by removing unnecessary memory-intensive operations in `find_all_tags_for`.
+
 ## v5.0.0 - 2022-10-09
 
 ### [4.2.0](https://github.com/eduNEXT/eox-tagging/compare/v4.1.0...v5.0.0) (2022-10-09)
