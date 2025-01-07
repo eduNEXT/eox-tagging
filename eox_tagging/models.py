@@ -28,6 +28,22 @@ OPAQUE_KEY_PROXY_MODEL_TARGETS = [
 
 PROXY_MODEL_NAME = "opaquekeyproxymodel"
 
+CONTENT_TYPE_CACHE = {}
+
+
+def get_content_type_cached(model_name):
+    """
+    Retrieves the ContentType object for the given model name from a cache.
+
+        This function checks if the ContentType object for the given model name
+    is already present in the in-memory cache. If it exists, the cached object
+    is returned. Otherwise, the ContentType is fetched from the database, stored
+    in the cache, and then returned.
+    """
+    if model_name not in CONTENT_TYPE_CACHE:
+        CONTENT_TYPE_CACHE[model_name] = ContentType.objects.get(model=model_name)
+    return CONTENT_TYPE_CACHE[model_name]
+
 
 class TagQuerySet(QuerySet):
     """ Tag queryset used as manager."""
@@ -74,9 +90,10 @@ class TagQuerySet(QuerySet):
         except ObjectDoesNotExist:
             return self.none()
 
-        target_ids = list(target.values_list("id", flat=True))
-
-        return self.filter(target_type=ctype, target_object_id__in=target_ids)
+        return self.filter(
+            target_type=ctype,
+            target_object_id__in=target.values_list("id", flat=True)
+        )
 
     def find_all_tags_by_type(self, object_type):
         """Returns all tags with target_type equals to object_type."""
@@ -91,16 +108,16 @@ class TagQuerySet(QuerySet):
         Function that given an object type returns the correct content type and a list of objects
         associated.
         """
-        ctype = ContentType.objects.get(model=object_type)
+        ctype = get_content_type_cached(object_type)
+        object_type = object_type.lower()
 
-        if object_type.lower() == PROXY_MODEL_NAME:
+        if object_type == PROXY_MODEL_NAME:
             object_id = object_id.get("course_id")
             object_id = {
                 "opaque_key": CourseKey.from_string(object_id),
             }
 
-        if object_type.lower() in ["courseenrollment", "generatedcertificate"]:
-
+        if object_type in ["courseenrollment", "generatedcertificate"]:
             course_id = object_id.get("course_id")
             username = object_id.get("username")
             verify_uuid = object_id.get("verify_uuid")
@@ -108,10 +125,8 @@ class TagQuerySet(QuerySet):
 
             if course_id:
                 object_id["course_id"] = CourseKey.from_string(course_id)
-
             if username:
                 object_id["user__username"] = username
-
             if verify_uuid:
                 object_id["verify_uuid"] = verify_uuid
 
@@ -207,6 +222,10 @@ class Tag(models.Model):
         verbose_name = "tag"
         verbose_name_plural = "tags"
         app_label = "eox_tagging"
+
+        indexes = [
+            models.Index(fields=["target_type", "target_object_id"], name="target_index"),
+        ]
 
     def __str__(self):
         return str(self.tag_value)
