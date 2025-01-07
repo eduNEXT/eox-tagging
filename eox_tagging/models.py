@@ -9,6 +9,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models.query import QuerySet
@@ -28,21 +29,7 @@ OPAQUE_KEY_PROXY_MODEL_TARGETS = [
 
 PROXY_MODEL_NAME = "opaquekeyproxymodel"
 
-CONTENT_TYPE_CACHE = {}
-
-
-def get_content_type_cached(model_name):
-    """
-    Retrieves the ContentType object for the given model name from a cache.
-
-        This function checks if the ContentType object for the given model name
-    is already present in the in-memory cache. If it exists, the cached object
-    is returned. Otherwise, the ContentType is fetched from the database, stored
-    in the cache, and then returned.
-    """
-    if model_name not in CONTENT_TYPE_CACHE:
-        CONTENT_TYPE_CACHE[model_name] = ContentType.objects.get(model=model_name)
-    return CONTENT_TYPE_CACHE[model_name]
+CACHE_CONTENT_TYPE_TIMEOUT = 24 * 60 * 60
 
 
 class TagQuerySet(QuerySet):
@@ -92,7 +79,7 @@ class TagQuerySet(QuerySet):
 
         return self.filter(
             target_type=ctype,
-            target_object_id__in=target.values_list("id", flat=True)
+            target_object_id__in=target.only("id").values_list("id", flat=True)
         )
 
     def find_all_tags_by_type(self, object_type):
@@ -108,7 +95,11 @@ class TagQuerySet(QuerySet):
         Function that given an object type returns the correct content type and a list of objects
         associated.
         """
-        ctype = get_content_type_cached(object_type)
+        ctype = cache.get_or_set(
+            f"content_type_{object_type}",
+            lambda: ContentType.objects.get(model=object_type),
+            timeout=CACHE_CONTENT_TYPE_TIMEOUT,
+        )
         object_type = object_type.lower()
 
         if object_type == PROXY_MODEL_NAME:
