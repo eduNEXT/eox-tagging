@@ -53,7 +53,6 @@ click==8.2.1
     #   click-repl
     #   code-annotations
     #   edx-django-utils
-    #   eox-core
 click-didyoumean==0.3.1
     # via
     #   -r requirements/base.txt
@@ -72,17 +71,11 @@ code-annotations==2.3.0
     #   edx-toggles
 coverage==7.8.2
     # via -r requirements/test.in
-cryptography==45.0.3
+cryptography==45.0.4
     # via
     #   -r requirements/base.txt
     #   jwcrypto
     #   pyjwt
-    #   social-auth-core
-defusedxml==0.7.1
-    # via
-    #   -r requirements/base.txt
-    #   python3-openid
-    #   social-auth-core
 dill==0.4.0
     # via pylint
     # via
@@ -103,7 +96,6 @@ dill==0.4.0
     #   edx-proctoring
     #   edx-toggles
     #   edx-when
-    #   eox-core
     #   event-tracking
     #   jsonfield
     #   openedx-events
@@ -179,7 +171,7 @@ drf-yasg==1.21.10
     # via
     #   -r requirements/base.txt
     #   edx-api-doc-tools
-edx-api-doc-tools==2.1.0
+edx-api-doc-tools==1.5.1
     # via
     #   -r requirements/base.txt
     #   eox-core
@@ -201,8 +193,7 @@ edx-drf-extensions==10.6.0
     #   -r requirements/base.txt
     #   edx-proctoring
     #   edx-when
-    #   eox-core
-edx-opaque-keys[django]==2.13.0
+edx-opaque-keys[django]==3.0.0
     # via
     #   -r requirements/base.txt
     #   -r requirements/test.in
@@ -228,7 +219,7 @@ edx-when==3.0.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
-eox-core==11.3.0
+eox-core==6.2.1
     # via -r requirements/base.txt
 event-tracking==3.3.0
     # via
@@ -292,12 +283,9 @@ oauthlib==3.2.2
     # via
     #   -r requirements/base.txt
     #   django-oauth-toolkit
-    #   requests-oauthlib
-    #   social-auth-core
 openedx-events==10.2.1
     # via
     #   -r requirements/base.txt
-    #   eox-core
     #   event-tracking
 packaging==25.0
     # via
@@ -340,7 +328,6 @@ pyjwt[crypto]==2.10.1
     #   edx-drf-extensions
     #   edx-proctoring
     #   edx-rest-api-client
-    #   social-auth-core
 pylint==3.3.7
     # via -r requirements/test.in
 pymongo==4.13.0
@@ -372,10 +359,6 @@ python-slugify==8.0.4
     # via
     #   -r requirements/base.txt
     #   code-annotations
-python3-openid==3.2.0
-    # via
-    #   -r requirements/base.txt
-    #   social-auth-core
 pytz==2025.2
     # via
     #   -r requirements/base.txt
@@ -396,12 +379,6 @@ requests==2.32.4
     #   django-oauth-toolkit
     #   edx-drf-extensions
     #   edx-rest-api-client
-    #   requests-oauthlib
-    #   social-auth-core
-requests-oauthlib==2.0.0
-    # via
-    #   -r requirements/base.txt
-    #   social-auth-core
 rules==3.5
     # via
     #   -r requirements/base.txt
@@ -426,10 +403,6 @@ six==1.17.0
     #   event-tracking
     #   fs
     #   python-dateutil
-social-auth-core==4.6.1
-    # via
-    #   -r requirements/base.txt
-    #   eox-core
 sqlparse==0.5.3
     # via
     #   -r requirements/base.txt
