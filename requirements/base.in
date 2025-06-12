@@ -3,4 +3,3 @@
 
 eox-core
 edx-drf-extensions
-edx-opaque-keys[django]>=3.0.0

@@ -47,6 +47,11 @@ cryptography==45.0.4
     # via
     #   jwcrypto
     #   pyjwt
+    #   social-auth-core
+defusedxml==0.7.1
+    # via
+    #   python3-openid
+    #   social-auth-core
 django==4.2.23
     # via
     #   -c https://raw.githubusercontent.com/openedx/edx-lint/master/edx_lint/files/common_constraints.txt
@@ -89,7 +94,7 @@ django-simple-history==3.0.0
     # via
     #   -c https://raw.githubusercontent.com/openedx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   edx-proctoring
-django-waffle==4.2.0
+django-waffle==5.0.0
     # via
     #   edx-django-utils
     #   edx-drf-extensions
@@ -112,7 +117,7 @@ drf-jwt==1.19.2
     # via edx-drf-extensions
 drf-yasg==1.21.10
     # via edx-api-doc-tools
-edx-api-doc-tools==1.5.1
+edx-api-doc-tools==2.1.0
     # via eox-core
 edx-ccx-keys==2.0.2
     # via openedx-events
@@ -129,9 +134,9 @@ edx-drf-extensions==10.6.0
     #   -r requirements/base.in
     #   edx-proctoring
     #   edx-when
-edx-opaque-keys[django]==3.0.0
+    #   eox-core
+edx-opaque-keys[django]==2.13.0
     # via
-    #   -r requirements/base.in
     #   edx-ccx-keys
     #   edx-drf-extensions
     #   edx-proctoring
@@ -146,7 +151,7 @@ edx-toggles==5.3.0
     # via event-tracking
 edx-when==3.0.0
     # via edx-proctoring
-eox-core==6.2.1
+eox-core==11.3.0
     # via -r requirements/base.in
 event-tracking==3.3.0
     # via edx-proctoring
@@ -176,7 +181,10 @@ markupsafe==3.0.2
     #   mako
     #   xblock
 oauthlib==3.2.2
-    # via django-oauth-toolkit
+    # via
+    #   django-oauth-toolkit
+    #   requests-oauthlib
+    #   social-auth-core
 openedx-events==10.2.1
     # via
     #   eox-core
@@ -201,7 +209,8 @@ pyjwt[crypto]==2.10.1
     #   edx-drf-extensions
     #   edx-proctoring
     #   edx-rest-api-client
-pymongo==4.13.0
+    #   social-auth-core
+pymongo==4.13.1
     # via
     #   edx-opaque-keys
     #   event-tracking
@@ -216,6 +225,8 @@ python-ipware==3.0.0
     # via django-ipware
 python-slugify==8.0.4
     # via code-annotations
+python3-openid==3.2.0
+    # via social-auth-core
 pytz==2025.2
     # via
     #   drf-yasg
@@ -232,6 +243,10 @@ requests==2.32.4
     #   django-oauth-toolkit
     #   edx-drf-extensions
     #   edx-rest-api-client
+    #   requests-oauthlib
+    #   social-auth-core
+requests-oauthlib==2.0.0
+    # via social-auth-core
 rules==3.5
     # via edx-proctoring
 semantic-version==2.10.0
@@ -247,6 +262,8 @@ six==1.17.0
     #   event-tracking
     #   fs
     #   python-dateutil
+social-auth-core==4.6.1
+    # via eox-core
 sqlparse==0.5.3
     # via django
 stevedore==5.4.1
