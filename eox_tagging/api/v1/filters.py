@@ -124,12 +124,12 @@ class FilterBackend(filters.DjangoFilterBackend):
     when a new version of django-filter with the fix is released (probably v2.5.0)
     """
 
-    def get_schema_fields(self, view):
+    def get_schema_fields(self, view):  # pylint: disable=missing-function-docstring
         # This is not compatible with widgets where the query param differs from the
         # filter's attribute name. Notably, this includes `MultiWidget`, where query
         # params will be of the format `<name>_0`, `<name>_1`, etc...
-        assert compat.coreapi is not None, 'coreapi must be installed to use `get_schema_fields()`'
-        assert compat.coreschema is not None, 'coreschema must be installed to use `get_schema_fields()`'
+        assert compat.coreapi is not None, 'coreapi must be installed to use `get_schema_fields()`'  # pylint: disable=no-member
+        assert compat.coreschema is not None, 'coreschema must be installed to use `get_schema_fields()`'  # pylint: disable=no-member
         try:
             queryset = view.get_queryset()
         except Exception:  # pylint: disable=broad-except
@@ -148,11 +148,11 @@ class FilterBackend(filters.DjangoFilterBackend):
                 ]
 
     def build_coreapi_field(self, name, field):  # pylint: disable=missing-function-docstring
-        return compat.coreapi.Field(
+        return compat.coreapi.Field(  # pylint: disable=no-member
             name=name,
             required=field.extra['required'],
             location='query',
-            schema=self.get_coreschema_field(field),
+            schema=self.get_coreschema_field(field),  # pylint: disable=no-member
         )
 
     def get_schema_field_names(self, field_name, field):
