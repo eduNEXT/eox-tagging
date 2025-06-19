@@ -202,7 +202,7 @@ edx-drf-extensions==10.6.0
     #   edx-proctoring
     #   edx-when
     #   eox-core
-edx-opaque-keys[django]==2.13.0
+edx-opaque-keys[django]==3.0.0
     # via
     #   -r requirements/base.txt
     #   -r requirements/test.in
@@ -228,7 +228,7 @@ edx-when==3.0.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
-eox-core==11.3.0
+eox-core==12.0.0
     # via -r requirements/base.txt
 event-tracking==3.3.0
     # via
