@@ -95,7 +95,10 @@ class TagTestCase(SimpleTestCase):  # pragma: no cover
         response = self.session.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertDictContainsSubset(expected_response, response.json())
+        response = response.json()
+        for key, value in expected_response.items():
+            self.assertIn(key, response)
+            self.assertEqual(response[key], value)
 
     def test_create_tag_user(self):
         """Test tag creation for target=user."""
