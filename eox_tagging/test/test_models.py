@@ -541,7 +541,7 @@ class TestTagQuerysetManager(TestCase):
         target, target_ctype = Mock(), Mock()
         _get_object_for_this_type.return_value = target, target_ctype
         self.tag_query_set.filter = Mock()
-        target.values_list.return_value = [1]
+        target.only.return_value.values_list.return_value = [1]
 
         self.tag_query_set.find_all_tags_for(target_type, target_id)
 
@@ -554,11 +554,15 @@ class TestTagQuerysetManager(TestCase):
             target_object_id__in=[1],
         )
 
+    @patch('eox_tagging.models.cache.get_or_set')
     @patch.object(ContentType, 'objects')
-    def test_get_objects_for_type_user(self, content_type_mock):
+    def test_get_objects_for_type_user(self, content_type_mock, cache_get_or_set_mock):
         """Test getting courses associated with tags."""
         ctype_object = Mock()
         content_type_mock.get.return_value = ctype_object
+        cache_get_or_set_mock.side_effect = (
+            lambda key, default, timeout=None: default()
+        )
         object_type, object_id = "User", {
             "username": "username",
         }
@@ -573,11 +577,15 @@ class TestTagQuerysetManager(TestCase):
             username="username",
         )
 
+    @patch('eox_tagging.models.cache.get_or_set')
     @patch.object(ContentType, 'objects')
-    def test_get_objects_for_type_course(self, content_type_mock):
+    def test_get_objects_for_type_course(self, content_type_mock, cache_get_or_set_mock):
         """Test getting courses associated with tags."""
         ctype_object = Mock()
         content_type_mock.get.return_value = ctype_object
+        cache_get_or_set_mock.side_effect = (
+            lambda key, default, timeout=None: default()
+        )
         object_type, object_id = "OpaqueKeyProxyModel", {
             "course_id": self.course_id,
         }
@@ -595,11 +603,15 @@ class TestTagQuerysetManager(TestCase):
             **object_id_modified
         )
 
+    @patch('eox_tagging.models.cache.get_or_set')
     @patch.object(ContentType, 'objects')
-    def test_get_objects_for_type_enrollment(self, content_type_mock):
+    def test_get_objects_for_type_enrollment(self, content_type_mock, cache_get_or_set_mock):
         """Test getting enrollments associated with tags."""
         ctype_object = Mock()
         content_type_mock.get.return_value = ctype_object
+        cache_get_or_set_mock.side_effect = (
+            lambda key, default, timeout=None: default()
+        )
         object_type, object_id = "CourseEnrollment", {
             "course_id": self.course_id,
             "username": "username",
