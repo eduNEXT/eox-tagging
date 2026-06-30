@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on ## [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to ## [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v9.4.0](https://github.com/eduNEXT/eox-tagging/compare/v9.3.2...v9.4.0) - (2026-06-24)
+
+### Changed
+
+- **Verawood Support**: Update integration tests to use new Verawood release with Tutor,
+  update GitHub Actions versions, and update integration-test workflow to add Verawood
+  and remove oldest Tutor version support.
+
 ## [v9.3.2](https://github.com/eduNEXT/eox-tagging/compare/v9.3.1...v9.3.2) - (2026-01-20)
 
 ### Changed
